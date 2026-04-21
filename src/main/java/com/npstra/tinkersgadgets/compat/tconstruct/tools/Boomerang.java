@@ -60,9 +60,6 @@ public class Boomerang extends ProjectileCore {
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
         ItemStack itemStackIn = playerIn.getHeldItem(hand);
         if (ToolHelper.isBroken(itemStackIn)) return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
-        String toolId = getToolId(itemStackIn);
-        Set<Entity> set = activeBoomerangs.get(toolId);
-        if (set != null && !set.isEmpty()) return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
         playerIn.setActiveHand(hand);
         return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
     }
