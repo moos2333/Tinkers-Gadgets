@@ -107,6 +107,10 @@ repositories {
         name 'CleanroomMC Maven'
         url 'https://maven.cleanroommc.com'
     }
+    maven {
+        name = "CurseForge"
+        url = "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
@@ -144,6 +148,8 @@ dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
+    implementation "curse.maven:mantle-74924:2713386"
+    implementation "curse.maven:tinkers-construct-74072:2902483"
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'
