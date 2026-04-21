@@ -210,7 +210,7 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
                 motionY = motion.y * 0.95D;
                 motionZ = motion.z * 0.95D;
             }
-            if (Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) < 0.2D) {
+            if (Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) < 0.25D) {
                 returning = true;
             }
             if (pierceCount <= 0) returning = true;
