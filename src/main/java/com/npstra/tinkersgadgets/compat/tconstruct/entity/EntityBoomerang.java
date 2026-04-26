@@ -33,7 +33,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final int MAX_ALIVE = 600;
     private static final double BASE_RETURN_SPEED = 0.45D;
     private static final double SMOOTH_FACTOR = 0.5D;
-    private static final int PIERCE_TIMEOUT = 120;
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -49,7 +48,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     private int bounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
-    private int pierceNoHitTimer;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -180,16 +178,6 @@ public class EntityBoomerang extends EntityProjectileBase {
                 }
             }
 
-            if (piercing && !returning && !world.isRemote) {
-                pierceNoHitTimer++;
-                if (pierceNoHitTimer >= PIERCE_TIMEOUT) {
-                    setDead();
-                    return;
-                }
-            } else {
-                pierceNoHitTimer = 0;
-            }
-
             if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
                 if (returnDamageEnabled) checkReturnHit();
                 returnToShooter();
@@ -276,12 +264,18 @@ public class EntityBoomerang extends EntityProjectileBase {
         if (!allowRehit && hitEntities.contains(entityHit.getUniqueID())) return;
 
         hitEntities.add(entityHit.getUniqueID());
-        pierceNoHitTimer = 0;
         if (allowRehit && entityHit instanceof EntityLivingBase) {
             entityHit.hurtResistantTime = 0;
         }
 
+        Vec3d savedMotion = new Vec3d(motionX, motionY, motionZ);
         super.onHitEntity(raytraceResult);
+
+        if (piercing && !returning) {
+            motionX = savedMotion.x;
+            motionY = savedMotion.y;
+            motionZ = savedMotion.z;
+        }
 
         ItemStack toolStack = tinkerProjectile.getItemStack();
         NBTTagCompound toolTag = TagUtil.getToolTag(toolStack);
@@ -292,15 +286,11 @@ public class EntityBoomerang extends EntityProjectileBase {
             return;
         }
 
-        if (piercing && pierceCount > 0) {
+        if (piercing && !returning) {
             pierceCount--;
-            Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-            if (motion.lengthSquared() > 0.0D) {
-                motion = motion.normalize();
-                motionX = motion.x * 0.95D;
-                motionY = motion.y * 0.95D;
-                motionZ = motion.z * 0.95D;
-            }
+            inGround = false;
+            arrowShake = 0;
+            ticksInGround = 0;
             totalDistanceTraveled = 0.0D;
             return;
         }
@@ -390,7 +380,9 @@ public class EntityBoomerang extends EntityProjectileBase {
     @Nullable
     @Override
     protected Entity findEntityOnPath(Vec3d start, Vec3d end) {
-        return returning ? null : super.findEntityOnPath(start, end);
+        if (returning) return null;
+        if (piercing && pierceCount <= 0) return null;
+        return super.findEntityOnPath(start, end);
     }
 
     @Override

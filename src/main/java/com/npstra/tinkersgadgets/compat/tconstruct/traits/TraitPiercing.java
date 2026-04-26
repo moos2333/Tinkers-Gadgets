@@ -17,7 +17,7 @@ public class TraitPiercing extends ProjectileModifierTrait {
     public void onLaunch(EntityProjectileBase projectile, World world, EntityLivingBase shooter) {
         if (projectile instanceof EntityBoomerang) {
             ((EntityBoomerang) projectile).setPiercing(true);
-            ((EntityBoomerang) projectile).setPierceCount(2);
+            ((EntityBoomerang) projectile).setPierceCount(3);
         }
     }
 }
