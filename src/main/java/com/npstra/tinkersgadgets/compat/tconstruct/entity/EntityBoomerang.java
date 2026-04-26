@@ -67,6 +67,10 @@ public class EntityBoomerang extends EntityProjectileBase {
         this.cancelReturn = cancel;
     }
 
+    public void resetTravelDistance() {
+        this.totalDistanceTraveled = 0.0D;
+    }
+
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
         split = true;
@@ -260,6 +264,11 @@ public class EntityBoomerang extends EntityProjectileBase {
             return;
         }
 
+        if (cancelReturn) {
+            cancelReturn = false;
+            return;
+        }
+
         if (piercing && pierceCount > 0) {
             pierceCount--;
             Vec3d motion = new Vec3d(motionX, motionY, motionZ);
@@ -273,11 +282,6 @@ public class EntityBoomerang extends EntityProjectileBase {
                 returning = true;
             }
             if (pierceCount <= 0) returning = true;
-            return;
-        }
-
-        if (cancelReturn) {
-            cancelReturn = false;
             return;
         }
 

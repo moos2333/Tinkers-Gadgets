@@ -82,6 +82,7 @@ public class TraitBouncing extends ProjectileModifierTrait {
         if (next != null) {
             root.setInteger(KEY_BOUNCE_INDEX, index + 1);
             ammo.setTagCompound(root);
+            boomerang.resetTravelDistance();
             boomerang.redirectToTarget(next);
             boomerang.setCancelReturn(true);
         }
