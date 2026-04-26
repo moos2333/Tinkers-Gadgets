@@ -21,6 +21,7 @@ public class MaterialRegister {
     public static Material netherQuartz;
     public static Material magmaCream;
     public static Material shulkerShell;
+    public static Material leather;
     private static boolean materialsInitialized = false;
 
     public static void preInit(FMLPreInitializationEvent event) {
@@ -32,6 +33,7 @@ public class MaterialRegister {
         netherQuartz = new Material("nether_quartz", 0xe5dfd6, false);
         magmaCream = new Material("magma_cream", 0xFF8C00, false);
         shulkerShell = new Material("shulker_shell", 0x976997, false);
+        leather = new Material("leather", 0xC76A43, false);
 
         glass.setCraftable(true).setCastable(false);
         slimeball.setCraftable(true).setCastable(false);
@@ -39,6 +41,7 @@ public class MaterialRegister {
         netherQuartz.setCraftable(true).setCastable(false);
         magmaCream.setCraftable(true).setCastable(false);
         shulkerShell.setCraftable(true).setCastable(false);
+        leather.setCraftable(true).setCastable(false);
 
         glass.addTrait(TraitsRegistry.FRACTURE);
         slimeball.addTrait(TraitsRegistry.BOUNCING);
@@ -53,6 +56,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterial(netherQuartz);
         TinkerRegistry.addMaterial(magmaCream);
         TinkerRegistry.addMaterial(shulkerShell);
+        TinkerRegistry.addMaterial(leather);
 
         registerMaterialStats();
     }
@@ -66,6 +70,7 @@ public class MaterialRegister {
             TinkerRegistry.integrate(netherQuartz);
             TinkerRegistry.integrate(magmaCream);
             TinkerRegistry.integrate(shulkerShell);
+            TinkerRegistry.integrate(leather);
             materialsInitialized = true;
         }
     }
@@ -88,6 +93,9 @@ public class MaterialRegister {
 
         shulkerShell.addItem(new ItemStack(Items.SHULKER_SHELL), 1, Material.VALUE_Ingot);
         shulkerShell.setRepresentativeItem(Items.SHULKER_SHELL);
+
+        leather.addItem(new ItemStack(Items.LEATHER), 1, Material.VALUE_Ingot);
+        leather.setRepresentativeItem(Items.LEATHER);
     }
 
     private static void registerMaterialStats() {
@@ -97,6 +105,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(netherQuartz, new ConnectorMaterialStats());
         TinkerRegistry.addMaterialStats(magmaCream, new ConnectorMaterialStats());
         TinkerRegistry.addMaterialStats(shulkerShell, new ConnectorMaterialStats());
+        TinkerRegistry.addMaterialStats(leather, new ConnectorMaterialStats());
 
         glass.setVisible();
         slimeball.setVisible();
@@ -104,6 +113,7 @@ public class MaterialRegister {
         netherQuartz.setVisible();
         magmaCream.setVisible();
         shulkerShell.setVisible();
+        leather.setVisible();
     }
 
     @SideOnly(Side.CLIENT)
@@ -114,5 +124,6 @@ public class MaterialRegister {
         netherQuartz.setRenderInfo(new MaterialRenderInfo.Default(0xe5dfd6));
         magmaCream.setRenderInfo(new MaterialRenderInfo.Default(0xFF8C00));
         shulkerShell.setRenderInfo(new MaterialRenderInfo.Default(0x976997));
+        leather.setRenderInfo(new MaterialRenderInfo.Default(0xC76A43));
     }
 }

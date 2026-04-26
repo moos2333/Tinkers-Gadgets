@@ -16,7 +16,8 @@ public class ItemConnector extends ToolPart {
         String id = mat.getIdentifier();
         return id.equals("glass") || id.equals("slimeball") ||
                 id.equals("popped_chorus") || id.equals("nether_quartz")
-                || id.equals("magma_cream") || id.equals("shulker_shell");
+                || id.equals("magma_cream") || id.equals("shulker_shell")
+                || id.equals("leather");
     }
 
     @Override
