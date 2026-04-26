@@ -18,6 +18,7 @@ material.popped_chorus.name=Popped Chorus Fruit
 material.nether_quartz.name=Nether Quartz
 material.magma_cream.name=Magma Cream
 material.shulker_shell.name=Shulker Shell
+material.leather.name=Leather
 item.tinkersgadgets.connector.name=Boomerang Clasp
 stat.connector.name=Boomerang Clasp
 stat.connector.desc=This part only provides traits.
