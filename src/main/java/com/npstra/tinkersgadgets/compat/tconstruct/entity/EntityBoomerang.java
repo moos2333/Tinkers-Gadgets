@@ -266,6 +266,7 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (cancelReturn) {
             cancelReturn = false;
+            returning = false;
             return;
         }
 
