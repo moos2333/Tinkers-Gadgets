@@ -18,6 +18,7 @@ material.popped_chorus.name=爆裂紫颂果
 material.nether_quartz.name=下界石英
 material.magma_cream.name=岩浆膏
 material.shulker_shell.name=潜影壳
+material.leather.name=皮革
 item.tinkersgadgets.connector.name=扣环
 stat.connector.name=扣环
 stat.connector.none=无数据
