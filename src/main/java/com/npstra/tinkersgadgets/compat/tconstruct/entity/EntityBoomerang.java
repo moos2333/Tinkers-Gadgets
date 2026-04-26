@@ -41,10 +41,9 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private boolean piercing;
     private int pierceCount;
-    private boolean bouncing;
-    private int bounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
+    private boolean cancelReturn;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -60,11 +59,13 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setAssociatedPlayer(EntityPlayer player) { associatedPlayer = player; }
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
-    public void setBouncing(boolean bouncing) { this.bouncing = bouncing; }
-    public void setBounceCount(int count) { this.bounceCount = count; }
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
+
+    public void setCancelReturn(boolean cancel) {
+        this.cancelReturn = cancel;
+    }
 
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
@@ -275,13 +276,9 @@ public class EntityBoomerang extends EntityProjectileBase {
             return;
         }
 
-        if (bouncing && bounceCount > 0) {
-            Entity nextTarget = findNextTarget();
-            if (nextTarget != null) {
-                bounceCount--;
-                redirectToTarget(nextTarget);
-                return;
-            }
+        if (cancelReturn) {
+            cancelReturn = false;
+            return;
         }
 
         returning = true;
@@ -297,21 +294,14 @@ public class EntityBoomerang extends EntityProjectileBase {
         ticksInGround = 0;
     }
 
-    private Entity findNextTarget() {
+    public EntityLivingBase findNextDifferentTarget(Entity currentHit) {
         AxisAlignedBB searchBox = new AxisAlignedBB(posX - 9, posY - 3, posZ - 9, posX + 9, posY + 3, posZ + 9);
         List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
-                e -> e != shootingEntity && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive() && canEntityBeSeen(e));
+                e -> e != shootingEntity && e != currentHit && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive() && canEntityBeSeen(e));
         return entities.isEmpty() ? null : entities.get(0);
     }
 
-    private boolean canEntityBeSeen(Entity target) {
-        Vec3d start = new Vec3d(posX, posY + height / 2, posZ);
-        Vec3d end = new Vec3d(target.posX, target.posY + target.height / 2, target.posZ);
-        RayTraceResult result = world.rayTraceBlocks(start, end, false, true, false);
-        return result == null || result.typeOfHit != RayTraceResult.Type.BLOCK;
-    }
-
-    private void redirectToTarget(Entity target) {
+    public void redirectToTarget(Entity target) {
         double dx = target.posX - posX;
         double dy = (target.posY + target.height / 2) - posY;
         double dz = target.posZ - posZ;
@@ -322,6 +312,13 @@ public class EntityBoomerang extends EntityProjectileBase {
             motionY = dy / dist * speed;
             motionZ = dz / dist * speed;
         }
+    }
+
+    private boolean canEntityBeSeen(Entity target) {
+        Vec3d start = new Vec3d(posX, posY + height / 2, posZ);
+        Vec3d end = new Vec3d(target.posX, target.posY + target.height / 2, target.posZ);
+        RayTraceResult result = world.rayTraceBlocks(start, end, false, true, false);
+        return result == null || result.typeOfHit != RayTraceResult.Type.BLOCK;
     }
 
     @Override
@@ -353,8 +350,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         data.writeBoolean(returning);
         data.writeBoolean(piercing);
         data.writeInt(pierceCount);
-        data.writeBoolean(bouncing);
-        data.writeInt(bounceCount);
         data.writeBoolean(returnDamageEnabled);
         data.writeBoolean(split);
         data.writeDouble(totalDistanceTraveled);
@@ -367,8 +362,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         returning = data.readBoolean();
         piercing = data.readBoolean();
         pierceCount = data.readInt();
-        bouncing = data.readBoolean();
-        bounceCount = data.readInt();
         returnDamageEnabled = data.readBoolean();
         split = data.readBoolean();
         totalDistanceTraveled = data.readDouble();

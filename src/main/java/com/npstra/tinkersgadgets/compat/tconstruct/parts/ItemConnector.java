@@ -1,6 +1,5 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
-import net.minecraft.item.ItemStack;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tools.ToolPart;
 
