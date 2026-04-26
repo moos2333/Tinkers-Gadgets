@@ -33,6 +33,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final int MAX_ALIVE = 600;
     private static final double BASE_RETURN_SPEED = 0.45D;
     private static final double SMOOTH_FACTOR = 0.5D;
+    private static final int PIERCE_TIMEOUT = 120;
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -48,6 +49,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private int bounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
+    private int pierceNoHitTimer;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -178,11 +180,22 @@ public class EntityBoomerang extends EntityProjectileBase {
                 }
             }
 
+            if (piercing && !returning && !world.isRemote) {
+                pierceNoHitTimer++;
+                if (pierceNoHitTimer >= PIERCE_TIMEOUT) {
+                    setDead();
+                    return;
+                }
+            } else {
+                pierceNoHitTimer = 0;
+            }
+
             if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
                 if (returnDamageEnabled) checkReturnHit();
                 returnToShooter();
                 double dist = getDistance(shootingEntity);
-                if (Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) < 0.1D && dist > 2.0D) {
+                double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                if (speed < 0.1D && dist > 2.0D) {
                     stuckTicks++;
                     if (stuckTicks > 60) {
                         setDead();
@@ -220,12 +233,9 @@ public class EntityBoomerang extends EntityProjectileBase {
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist > 1.2D) {
             double returnSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
-            double desiredX = dx / dist * returnSpeed;
-            double desiredY = dy / dist * returnSpeed;
-            double desiredZ = dz / dist * returnSpeed;
-            motionX += (desiredX - motionX) * SMOOTH_FACTOR;
-            motionY += (desiredY - motionY) * SMOOTH_FACTOR;
-            motionZ += (desiredZ - motionZ) * SMOOTH_FACTOR;
+            motionX = dx / dist * returnSpeed;
+            motionY = dy / dist * returnSpeed;
+            motionZ = dz / dist * returnSpeed;
         } else {
             if (shootingEntity instanceof EntityPlayer) onCollideWithPlayer((EntityPlayer) shootingEntity);
             setDead();
@@ -266,6 +276,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         if (!allowRehit && hitEntities.contains(entityHit.getUniqueID())) return;
 
         hitEntities.add(entityHit.getUniqueID());
+        pierceNoHitTimer = 0;
         if (allowRehit && entityHit instanceof EntityLivingBase) {
             entityHit.hurtResistantTime = 0;
         }
@@ -289,11 +300,6 @@ public class EntityBoomerang extends EntityProjectileBase {
                 motionX = motion.x * 0.95D;
                 motionY = motion.y * 0.95D;
                 motionZ = motion.z * 0.95D;
-            }
-            double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-            if (speed < 0.25D) {
-                returning = true;
-                redirectSpeedToShooter();
             }
             totalDistanceTraveled = 0.0D;
             return;
