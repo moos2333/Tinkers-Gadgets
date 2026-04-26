@@ -7,14 +7,14 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = TinkersGadgets.MOD_ID, name = TinkersGadgets.MOD_NAME, version = TinkersGadgets.VERSION,
+@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
         dependencies = "required-after:tconstruct@[1.12.2-2.13.0.183,)")
 public class TinkersGadgets {
-    public static final String MOD_ID = "tinkersgadgets";
-    public static final String MOD_NAME = "Tinkers Gadgets";
-    public static final String VERSION = "0.0.1";
+    public static final String MOD_ID = Tags.MOD_ID;
+    public static final String MOD_NAME = Tags.MOD_NAME;
+    public static final String VERSION = Tags.VERSION;
 
-    @Mod.Instance(MOD_ID)
+    @Mod.Instance(Tags.MOD_ID)
     public static TinkersGadgets instance;
 
     @SidedProxy(clientSide = "com.npstra.tinkersgadgets.compat.tconstruct.client.ClientProxy",
