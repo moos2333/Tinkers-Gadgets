@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -27,6 +28,8 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
 
     private static final int MAX_ALIVE = 300;
     private static final double RETURN_SPEED = 0.4D;
+    private static final double SMOOTH_FACTOR = 0.4D;
+
     private boolean returning;
     private EntityPlayer associatedPlayer;
     private ItemStack damageStack = ItemStack.EMPTY;
@@ -161,9 +164,13 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         double dz = targetPos.z - posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist > 1.2D) {
-            motionX = dx / dist * RETURN_SPEED;
-            motionY = dy / dist * RETURN_SPEED;
-            motionZ = dz / dist * RETURN_SPEED;
+            double returnSpeed = Math.max(RETURN_SPEED, initialSpeed * 0.5D);
+            double desiredX = dx / dist * returnSpeed;
+            double desiredY = dy / dist * returnSpeed;
+            double desiredZ = dz / dist * returnSpeed;
+            motionX += (desiredX - motionX) * SMOOTH_FACTOR;
+            motionY += (desiredY - motionY) * SMOOTH_FACTOR;
+            motionZ += (desiredZ - motionZ) * SMOOTH_FACTOR;
         } else {
             if (shootingEntity instanceof EntityPlayer) onCollideWithPlayer((EntityPlayer) shootingEntity);
             setDead();
@@ -171,18 +178,27 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     }
 
     @Override
+    protected void doMoveUpdate() {
+        if (returning && shootingEntity != null) {
+            double dx = shootingEntity.posX - posX;
+            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
+            double dz = shootingEntity.posZ - posZ;
+            double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
+            this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
+            this.rotationPitch = (float) (-(MathHelper.atan2(dy, horizontalDist) * (180D / Math.PI)));
+            this.prevRotationYaw = this.rotationYaw;
+            this.prevRotationPitch = this.rotationPitch;
+            this.posX += this.motionX;
+            this.posY += this.motionY;
+            this.posZ += this.motionZ;
+        } else {
+            super.doMoveUpdate();
+        }
+    }
+
+    @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
         returning = true;
-        Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-        if (motion.lengthSquared() > 0.0D) {
-            motion = motion.normalize();
-            Vec3d normal = new Vec3d(raytraceResult.sideHit.getDirectionVec());
-            double dot = motion.dotProduct(normal);
-            if (dot > 0.0D) motion = normal.scale(2.0D * dot).subtract(motion);
-            motionX = -motion.x * 0.8D;
-            motionY = -motion.y * 0.8D;
-            motionZ = -motion.z * 0.8D;
-        }
         inGround = false;
         arrowShake = 0;
         ticksInGround = 0;
@@ -210,21 +226,16 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
                 motionY = motion.y * 0.95D;
                 motionZ = motion.z * 0.95D;
             }
-            if (Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) < 0.25D) {
+            double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+            if (speed < 0.25D || pierceCount <= 0) {
                 returning = true;
+                stuckTicks = 0;
             }
-            if (pierceCount <= 0) returning = true;
-            return;
+            if (pierceCount > 0 && speed >= 0.25D) return;
         }
 
         returning = true;
-        Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-        if (motion.lengthSquared() > 0.0D) {
-            motion = motion.normalize();
-            motionX = -motion.x * 0.7D;
-            motionY = -motion.y * 0.7D;
-            motionZ = -motion.z * 0.7D;
-        }
+        stuckTicks = 0;
         inGround = false;
         arrowShake = 0;
         ticksInGround = 0;

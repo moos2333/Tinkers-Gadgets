@@ -22,6 +22,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,8 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private static final int MAX_ALIVE = 600;
     private static final double BASE_RETURN_SPEED = 0.45D;
+    private static final double SMOOTH_FACTOR = 0.5D;
+
     private boolean returning;
     private EntityPlayer associatedPlayer;
     private boolean split;
@@ -41,9 +44,10 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private boolean piercing;
     private int pierceCount;
+    private boolean bouncing;
+    private int bounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
-    private boolean cancelReturn;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -59,17 +63,11 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setAssociatedPlayer(EntityPlayer player) { associatedPlayer = player; }
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
+    public void setBouncing(boolean bouncing) { this.bouncing = bouncing; }
+    public void setBounceCount(int count) { this.bounceCount = count; }
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
-
-    public void setCancelReturn(boolean cancel) {
-        this.cancelReturn = cancel;
-    }
-
-    public void resetTravelDistance() {
-        this.totalDistanceTraveled = 0.0D;
-    }
 
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
@@ -221,9 +219,13 @@ public class EntityBoomerang extends EntityProjectileBase {
         double dz = targetPos.z - posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist > 1.2D) {
-            motionX = dx / dist * BASE_RETURN_SPEED;
-            motionY = dy / dist * BASE_RETURN_SPEED;
-            motionZ = dz / dist * BASE_RETURN_SPEED;
+            double returnSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
+            double desiredX = dx / dist * returnSpeed;
+            double desiredY = dy / dist * returnSpeed;
+            double desiredZ = dz / dist * returnSpeed;
+            motionX += (desiredX - motionX) * SMOOTH_FACTOR;
+            motionY += (desiredY - motionY) * SMOOTH_FACTOR;
+            motionZ += (desiredZ - motionZ) * SMOOTH_FACTOR;
         } else {
             if (shootingEntity instanceof EntityPlayer) onCollideWithPlayer((EntityPlayer) shootingEntity);
             setDead();
@@ -231,18 +233,27 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     @Override
+    protected void doMoveUpdate() {
+        if (returning && shootingEntity != null) {
+            double dx = shootingEntity.posX - posX;
+            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
+            double dz = shootingEntity.posZ - posZ;
+            double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
+            this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
+            this.rotationPitch = (float) (-(MathHelper.atan2(dy, horizontalDist) * (180D / Math.PI)));
+            this.prevRotationYaw = this.rotationYaw;
+            this.prevRotationPitch = this.rotationPitch;
+            this.posX += this.motionX;
+            this.posY += this.motionY;
+            this.posZ += this.motionZ;
+        } else {
+            super.doMoveUpdate();
+        }
+    }
+
+    @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
         returning = true;
-        Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-        if (motion.lengthSquared() > 0.0D) {
-            motion = motion.normalize();
-            Vec3d normal = new Vec3d(raytraceResult.sideHit.getDirectionVec());
-            double dot = motion.dotProduct(normal);
-            if (dot > 0.0D) motion = normal.scale(2.0D * dot).subtract(motion);
-            motionX = -motion.x * 0.8D;
-            motionY = -motion.y * 0.8D;
-            motionZ = -motion.z * 0.8D;
-        }
         inGround = false;
         arrowShake = 0;
         ticksInGround = 0;
@@ -251,8 +262,14 @@ public class EntityBoomerang extends EntityProjectileBase {
     @Override
     public void onHitEntity(RayTraceResult raytraceResult) {
         Entity entityHit = raytraceResult.entityHit;
-        if (hitEntities.contains(entityHit.getUniqueID())) return;
+        boolean allowRehit = bouncing && bounceCount > 0;
+        if (!allowRehit && hitEntities.contains(entityHit.getUniqueID())) return;
+
         hitEntities.add(entityHit.getUniqueID());
+        if (allowRehit && entityHit instanceof EntityLivingBase) {
+            entityHit.hurtResistantTime = 0;
+        }
+
         super.onHitEntity(raytraceResult);
 
         ItemStack toolStack = tinkerProjectile.getItemStack();
@@ -261,12 +278,6 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (!split && !returning && hasFracture && entityHit instanceof EntityLivingBase) {
             split((EntityLivingBase) entityHit);
-            return;
-        }
-
-        if (cancelReturn) {
-            cancelReturn = false;
-            returning = false;
             return;
         }
 
@@ -279,34 +290,76 @@ public class EntityBoomerang extends EntityProjectileBase {
                 motionY = motion.y * 0.95D;
                 motionZ = motion.z * 0.95D;
             }
-            if (Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) < 0.25D) {
+            double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+            if (speed < 0.25D) {
                 returning = true;
+                redirectSpeedToShooter();
             }
-            if (pierceCount <= 0) returning = true;
+            totalDistanceTraveled = 0.0D;
             return;
         }
 
-        returning = true;
-        Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-        if (motion.lengthSquared() > 0.0D) {
-            motion = motion.normalize();
-            motionX = -motion.x * 0.7D;
-            motionY = -motion.y * 0.7D;
-            motionZ = -motion.z * 0.7D;
+        if (bouncing && bounceCount > 0) {
+            EntityLivingBase nextTarget = findNextBounceTarget(entityHit);
+            if (nextTarget != null) {
+                bounceCount--;
+                totalDistanceTraveled = 0.0D;
+                redirectToTarget(nextTarget);
+                this.stuckTicks = 0;
+                return;
+            }
         }
+
+        returning = true;
+        redirectSpeedToShooter();
+    }
+
+    private void redirectSpeedToShooter() {
+        if (shootingEntity != null) {
+            double dx = shootingEntity.posX - posX;
+            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
+            double dz = shootingEntity.posZ - posZ;
+            double dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+            if (dist > 0.1D) {
+                double currentSpeed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                motionX = dx / dist * currentSpeed;
+                motionY = dy / dist * currentSpeed;
+                motionZ = dz / dist * currentSpeed;
+            }
+        }
+        stuckTicks = 0;
         inGround = false;
         arrowShake = 0;
         ticksInGround = 0;
     }
 
-    public EntityLivingBase findNextDifferentTarget(Entity currentHit) {
-        AxisAlignedBB searchBox = new AxisAlignedBB(posX - 9, posY - 3, posZ - 9, posX + 9, posY + 3, posZ + 9);
-        List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
-                e -> e != shootingEntity && e != currentHit && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive() && canEntityBeSeen(e));
-        return entities.isEmpty() ? null : entities.get(0);
+    private EntityLivingBase findNextBounceTarget(Entity currentHit) {
+        AxisAlignedBB searchBox = new AxisAlignedBB(posX - 9, posY - 5, posZ - 9, posX + 9, posY + 5, posZ + 9);
+        List<EntityLivingBase> allCandidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
+                e -> e != shootingEntity && e.isEntityAlive());
+        allCandidates.removeIf(e -> e == currentHit);
+
+        if (allCandidates.isEmpty()) return null;
+
+        List<EntityLivingBase> fresh = new java.util.ArrayList<>();
+        List<EntityLivingBase> used = new java.util.ArrayList<>();
+        for (EntityLivingBase e : allCandidates) {
+            if (!hitEntities.contains(e.getUniqueID())) fresh.add(e);
+            else used.add(e);
+        }
+
+        if (!fresh.isEmpty()) {
+            fresh.sort(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)));
+            return fresh.get(0);
+        }
+        if (!used.isEmpty()) {
+            used.sort(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)));
+            return used.get(0);
+        }
+        return null;
     }
 
-    public void redirectToTarget(Entity target) {
+    private void redirectToTarget(Entity target) {
         double dx = target.posX - posX;
         double dy = (target.posY + target.height / 2) - posY;
         double dz = target.posZ - posZ;
@@ -317,13 +370,6 @@ public class EntityBoomerang extends EntityProjectileBase {
             motionY = dy / dist * speed;
             motionZ = dz / dist * speed;
         }
-    }
-
-    private boolean canEntityBeSeen(Entity target) {
-        Vec3d start = new Vec3d(posX, posY + height / 2, posZ);
-        Vec3d end = new Vec3d(target.posX, target.posY + target.height / 2, target.posZ);
-        RayTraceResult result = world.rayTraceBlocks(start, end, false, true, false);
-        return result == null || result.typeOfHit != RayTraceResult.Type.BLOCK;
     }
 
     @Override
@@ -355,6 +401,8 @@ public class EntityBoomerang extends EntityProjectileBase {
         data.writeBoolean(returning);
         data.writeBoolean(piercing);
         data.writeInt(pierceCount);
+        data.writeBoolean(bouncing);
+        data.writeInt(bounceCount);
         data.writeBoolean(returnDamageEnabled);
         data.writeBoolean(split);
         data.writeDouble(totalDistanceTraveled);
@@ -367,6 +415,8 @@ public class EntityBoomerang extends EntityProjectileBase {
         returning = data.readBoolean();
         piercing = data.readBoolean();
         pierceCount = data.readInt();
+        bouncing = data.readBoolean();
+        bounceCount = data.readInt();
         returnDamageEnabled = data.readBoolean();
         split = data.readBoolean();
         totalDistanceTraveled = data.readDouble();
