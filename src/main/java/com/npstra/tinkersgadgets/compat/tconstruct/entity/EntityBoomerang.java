@@ -19,6 +19,7 @@ import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.library.tools.ToolCore;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
+import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitBouncing;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private int pierceCount;
     private boolean bouncing;
     private int bounceCount;
+    private int initialBounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
 
@@ -64,10 +66,16 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
     public void setBouncing(boolean bouncing) { this.bouncing = bouncing; }
-    public void setBounceCount(int count) { this.bounceCount = count; }
+    public void setBounceCount(int count) {
+        this.bounceCount = count;
+        this.initialBounceCount = count;
+    }
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
+
+    public boolean isBouncing() { return this.bouncing; }
+    public int getBounceCount() { return this.bounceCount; }
 
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
@@ -268,6 +276,12 @@ public class EntityBoomerang extends EntityProjectileBase {
             entityHit.hurtResistantTime = 0;
         }
 
+        if (bouncing) {
+            int count = initialBounceCount - bounceCount;
+            float mult = Math.max(0.0F, 1.0F - 0.25F * count);
+            TraitBouncing.setDamageMult(entityHit.getUniqueID(), mult);
+        }
+
         Vec3d savedMotion = new Vec3d(motionX, motionY, motionZ);
         super.onHitEntity(raytraceResult);
 
@@ -329,7 +343,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         ticksInGround = 0;
     }
 
-    private EntityLivingBase findNextBounceTarget(Entity currentHit) {
+    public EntityLivingBase findNextBounceTarget(Entity currentHit) {
         AxisAlignedBB searchBox = new AxisAlignedBB(posX - 9, posY - 5, posZ - 9, posX + 9, posY + 5, posZ + 9);
         List<EntityLivingBase> allCandidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
                 e -> e != shootingEntity && e.isEntityAlive());
