@@ -23,6 +23,7 @@ public class TinkersGadgets {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        Config.preInit(event);
         proxy.registerRenderers();
         MaterialRegister.preInit(event);
     }
