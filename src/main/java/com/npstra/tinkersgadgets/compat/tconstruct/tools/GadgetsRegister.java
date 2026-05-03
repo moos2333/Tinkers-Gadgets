@@ -1,6 +1,7 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.tools;
 
 import com.npstra.tinkersgadgets.TinkersGadgets;
+import com.npstra.tinkersgadgets.Config;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemConnector;
@@ -30,14 +31,16 @@ public class GadgetsRegister {
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        connector = new ItemConnector();
-        event.getRegistry().register(connector);
-        TinkerRegistry.registerToolPart(connector);
-        TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), connector));
+        if (Config.enableBoomerang) {
+            connector = new ItemConnector();
+            event.getRegistry().register(connector);
+            TinkerRegistry.registerToolPart(connector);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), connector));
 
-        boomerang = new Boomerang();
-        event.getRegistry().register(boomerang);
-        TinkerRegistry.registerToolCrafting(boomerang);
+            boomerang = new Boomerang();
+            event.getRegistry().register(boomerang);
+            TinkerRegistry.registerToolCrafting(boomerang);
+        }
     }
 
     @SubscribeEvent
@@ -55,11 +58,13 @@ public class GadgetsRegister {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
-        if (boomerang != null) {
-            ModelRegisterUtil.registerToolModel(boomerang);
-        }
-        if (connector != null) {
-            ModelRegisterUtil.registerPartModel(connector);
+        if (Config.enableBoomerang) {
+            if (boomerang != null) {
+                ModelRegisterUtil.registerToolModel(boomerang);
+            }
+            if (connector != null) {
+                ModelRegisterUtil.registerPartModel(connector);
+            }
         }
     }
 }
