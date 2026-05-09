@@ -9,4 +9,6 @@ public class TraitsRegistry {
     public static final AbstractTrait FRACTURE = new TraitFracture();
     public static final AbstractTrait KEEN = new TraitKeen();
     public static final AbstractTrait COLLECTION = new TraitCollection();
+    public static final AbstractTrait INTERACT = new TraitInteract();
+    public static final AbstractTrait DEFLECT = new TraitDeflect();
 }

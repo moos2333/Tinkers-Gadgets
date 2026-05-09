@@ -13,6 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.materials.Material;
+import slimeknights.tconstruct.shared.TinkerCommons;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ public class MaterialRegister {
     public static Material magmaCream;
     public static Material shulkerShell;
     public static Material leather;
+    public static Material redstone;
+    public static Material blueSlimeball;
     private static boolean materialsInitialized = false;
 
     private static Set<String> disabledMaterialSet;
@@ -99,6 +102,24 @@ public class MaterialRegister {
             TinkerRegistry.addMaterialStats(leather, new ConnectorMaterialStats());
             leather.setVisible();
         }
+
+        if (!disabledMaterialSet.contains("redstone")) {
+            redstone = new Material("redstone", 0xCC0000, false);
+            redstone.setCraftable(true).setCastable(false);
+            if (!disabledTraitSet.contains("interact_boomerang")) redstone.addTrait(TraitsRegistry.INTERACT);
+            TinkerRegistry.addMaterial(redstone);
+            TinkerRegistry.addMaterialStats(redstone, new ConnectorMaterialStats());
+            redstone.setVisible();
+        }
+
+        if (!disabledMaterialSet.contains("blue_slimeball")) {
+            blueSlimeball = new Material("blue_slimeball", 0x74c8c5, false);
+            blueSlimeball.setCraftable(true).setCastable(false);
+            if (!disabledTraitSet.contains("deflect_boomerang")) blueSlimeball.addTrait(TraitsRegistry.DEFLECT);
+            TinkerRegistry.addMaterial(blueSlimeball);
+            TinkerRegistry.addMaterialStats(blueSlimeball, new ConnectorMaterialStats());
+            blueSlimeball.setVisible();
+        }
     }
 
     public static void init(FMLInitializationEvent event) {
@@ -111,6 +132,8 @@ public class MaterialRegister {
             if (magmaCream != null) TinkerRegistry.integrate(magmaCream);
             if (shulkerShell != null) TinkerRegistry.integrate(shulkerShell);
             if (leather != null) TinkerRegistry.integrate(leather);
+            if (redstone != null) TinkerRegistry.integrate(redstone);
+            if (blueSlimeball != null) TinkerRegistry.integrate(blueSlimeball);
             materialsInitialized = true;
         }
     }
@@ -144,6 +167,14 @@ public class MaterialRegister {
             leather.addItem(new ItemStack(Items.LEATHER), 1, Material.VALUE_Ingot);
             leather.setRepresentativeItem(Items.LEATHER);
         }
+        if (redstone != null) {
+            redstone.addItem(new ItemStack(Items.REDSTONE), 1, Material.VALUE_Ingot);
+            redstone.setRepresentativeItem(Items.REDSTONE);
+        }
+        if (blueSlimeball != null) {
+            blueSlimeball.addItem(new ItemStack(TinkerCommons.matSlimeBallBlue.getItem()), 1, Material.VALUE_Ingot);
+            blueSlimeball.setRepresentativeItem(TinkerCommons.matSlimeBallBlue);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -155,5 +186,7 @@ public class MaterialRegister {
         if (magmaCream != null) magmaCream.setRenderInfo(new MaterialRenderInfo.Default(0xFF8C00));
         if (shulkerShell != null) shulkerShell.setRenderInfo(new MaterialRenderInfo.Default(0x976997));
         if (leather != null) leather.setRenderInfo(new MaterialRenderInfo.Default(0xC76A43));
+        if (redstone != null) redstone.setRenderInfo(new MaterialRenderInfo.Default(0xCC0000));
+        if (blueSlimeball != null) blueSlimeball.setRenderInfo(new MaterialRenderInfo.Default(0x5BC7FF));
     }
 }

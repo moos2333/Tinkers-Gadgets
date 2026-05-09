@@ -1,15 +1,21 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -51,6 +57,9 @@ public class EntityBoomerang extends EntityProjectileBase {
     private int initialBounceCount;
     private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
+    private boolean interactEnabled;
+    private boolean interactUsed;
+    private boolean deflectProjectiles;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -72,6 +81,8 @@ public class EntityBoomerang extends EntityProjectileBase {
         this.initialBounceCount = count;
     }
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
+    public void setInteract(boolean enabled) { this.interactEnabled = enabled; }
+    public void setDeflectProjectiles(boolean enabled) { this.deflectProjectiles = enabled; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
 
@@ -169,6 +180,10 @@ public class EntityBoomerang extends EntityProjectileBase {
         totalDistanceTraveled += Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
         if (!world.isRemote) {
+            if (deflectProjectiles && !returning) {
+                deflectNearbyProjectiles();
+            }
+
             double baseMaxDistance = 16.0D;
             double speedFactor = Math.min(1.0D, initialSpeed / 1.8D);
             double maxDistance = baseMaxDistance * speedFactor;
@@ -204,6 +219,19 @@ public class EntityBoomerang extends EntityProjectileBase {
 
             if (ticksExisted > MAX_ALIVE) {
                 setDead();
+            }
+        }
+    }
+
+    private void deflectNearbyProjectiles() {
+        AxisAlignedBB box = getEntityBoundingBox().grow(1.5D);
+        List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, box);
+        for (Entity entity : list) {
+            if (entity instanceof EntityArrow || entity instanceof EntityFireball || entity instanceof EntityThrowable || entity instanceof EntityProjectileBase) {
+                entity.motionX *= -1.5;
+                entity.motionY *= -0.5;
+                entity.motionZ *= -1.5;
+                entity.velocityChanged = true;
             }
         }
     }
@@ -260,6 +288,18 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
+        if (!world.isRemote && interactEnabled && !interactUsed && !returning && raytraceResult.sideHit != null && shootingEntity instanceof EntityPlayer) {
+            BlockPos pos = raytraceResult.getBlockPos();
+            IBlockState state = world.getBlockState(pos);
+            if (!state.getBlock().isAir(state, world, pos)) {
+                state.getBlock().onBlockActivated(world, pos, state, (EntityPlayer) shootingEntity,
+                        EnumHand.MAIN_HAND, raytraceResult.sideHit,
+                        (float) raytraceResult.hitVec.x - pos.getX(),
+                        (float) raytraceResult.hitVec.y - pos.getY(),
+                        (float) raytraceResult.hitVec.z - pos.getZ());
+                interactUsed = true;
+            }
+        }
         returning = true;
         inGround = false;
         arrowShake = 0;
@@ -269,6 +309,16 @@ public class EntityBoomerang extends EntityProjectileBase {
     @Override
     public void onHitEntity(RayTraceResult raytraceResult) {
         Entity entityHit = raytraceResult.entityHit;
+        if (deflectProjectiles && !returning) {
+            if (entityHit instanceof EntityArrow || entityHit instanceof EntityFireball || entityHit instanceof EntityThrowable || entityHit instanceof EntityProjectileBase) {
+                entityHit.motionX *= -1.5;
+                entityHit.motionY *= -0.5;
+                entityHit.motionZ *= -1.5;
+                entityHit.velocityChanged = true;
+                return;
+            }
+        }
+
         boolean allowRehit = bouncing && bounceCount > 0;
         if (!allowRehit && hitEntities.contains(entityHit.getUniqueID())) return;
 
