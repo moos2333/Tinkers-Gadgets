@@ -3,6 +3,7 @@ package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
@@ -348,6 +349,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         List<EntityLivingBase> allCandidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
                 e -> e != shootingEntity && e.isEntityAlive());
         allCandidates.removeIf(e -> e == currentHit);
+        allCandidates.removeIf(e -> e instanceof EntityTameable && ((EntityTameable) e).getOwner() == shootingEntity);
 
         if (allCandidates.isEmpty()) return null;
 
