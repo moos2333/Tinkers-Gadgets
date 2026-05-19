@@ -11,4 +11,5 @@ public class TraitsRegistry {
     public static final AbstractTrait COLLECTION = new TraitCollection();
     public static final AbstractTrait INTERACT = new TraitInteract();
     public static final AbstractTrait DEFLECT = new TraitDeflect();
+    public static final AbstractTrait INSTANT_RETURN = new TraitInstantReturn();
 }

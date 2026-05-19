@@ -13,6 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.materials.Material;
+import slimeknights.tconstruct.tools.TinkerTraits;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 public class MaterialRegister {
 
-    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball;
+    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl;
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
     private static Set<String> disabledTraitSet;
@@ -57,6 +58,19 @@ public class MaterialRegister {
         if (!disabledMaterialSet.contains("blue_slimeball")) {
             blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, TraitsRegistry.DEFLECT, "deflect_boomerang");
         }
+        if (!disabledMaterialSet.contains("enderpearl")) {
+            enderpearl = new Material("enderpearl", 0x0A6E6E, false);
+            enderpearl.setCraftable(true).setCastable(false);
+            if (!disabledTraitSet.contains("enderference")) {
+                enderpearl.addTrait(TinkerTraits.enderference);
+            }
+            if (!disabledTraitSet.contains("instant_return_boomerang")) {
+                enderpearl.addTrait(TraitsRegistry.INSTANT_RETURN);
+            }
+            TinkerRegistry.addMaterial(enderpearl);
+            TinkerRegistry.addMaterialStats(enderpearl, new ConnectorMaterialStats());
+            enderpearl.setVisible();
+        }
     }
 
     private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
@@ -84,6 +98,7 @@ public class MaterialRegister {
         integrate(leather);
         integrate(redstone);
         integrate(blueSlimeball);
+        integrate(enderpearl);
     }
 
     private static void integrate(Material mat) {
@@ -108,6 +123,10 @@ public class MaterialRegister {
                 blueSlimeball.setRepresentativeItem(blueSlimeStack);
             }
         }
+
+        if (enderpearl != null) {
+            setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
+        }
     }
 
     private static void setMaterialItems(Material mat, ItemStack stack) {
@@ -128,6 +147,7 @@ public class MaterialRegister {
         setRenderColor(leather, 0xC76A43);
         setRenderColor(redstone, 0xCC0000);
         setRenderColor(blueSlimeball, 0x5BC7FF);
+        setRenderColor(enderpearl, 0x0A6E6E);
     }
 
     private static void setRenderColor(Material mat, int color) {
