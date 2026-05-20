@@ -45,7 +45,7 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
         float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
         GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
 
         if (!entity.inGround) {
             entity.spin += 20.0F * partialTicks;

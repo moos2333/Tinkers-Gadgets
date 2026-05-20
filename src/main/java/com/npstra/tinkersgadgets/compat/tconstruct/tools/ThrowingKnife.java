@@ -30,7 +30,7 @@ import java.util.List;
 public class ThrowingKnife extends ProjectileCore {
 
     private static final int NORMAL_CHARGE = 20;
-    private static final int SNEAK_CHARGE = 40;
+    private static final int SNEAK_CHARGE = 30;
 
     public ThrowingKnife() {
         super(new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD),
