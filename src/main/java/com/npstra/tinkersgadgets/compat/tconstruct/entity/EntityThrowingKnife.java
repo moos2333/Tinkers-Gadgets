@@ -23,7 +23,7 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     }
 
     @Override
-    protected ItemStack getArrowStack() {
+    public ItemStack getArrowStack() {
         return tinkerProjectile.getItemStack();
     }
 

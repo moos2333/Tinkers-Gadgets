@@ -12,8 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
-import slimeknights.tconstruct.library.capability.projectile.ITinkerProjectile;
 
 @SideOnly(Side.CLIENT)
 public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
@@ -27,8 +25,7 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
 
     @Override
     public void doRender(EntityThrowingKnife entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        ITinkerProjectile cap = entity.getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
-        ItemStack stack = cap != null ? cap.getItemStack() : ItemStack.EMPTY;
+        ItemStack stack = entity.getArrowStack();
         if (stack.isEmpty()) return;
 
         GlStateManager.pushMatrix();

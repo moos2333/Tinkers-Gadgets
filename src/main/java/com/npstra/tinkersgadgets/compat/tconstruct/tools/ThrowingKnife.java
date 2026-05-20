@@ -13,7 +13,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
-import slimeknights.tconstruct.library.materials.ArrowShaftMaterialStats;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.materials.MaterialTypes;
 import slimeknights.tconstruct.library.tinkering.Category;
@@ -94,13 +93,11 @@ public class ThrowingKnife extends ProjectileCore {
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
             if (sneaking) {
-                EntityProjectileBase left = getProjectile(stack, stack, worldIn, player, speed, inaccuracy + 2.0F, power, false);
-                left.rotationYaw = player.rotationYaw - 30.0F;
-                worldIn.spawnEntity(left);
-
-                EntityProjectileBase right = getProjectile(stack, stack, worldIn, player, speed, inaccuracy + 2.0F, power, false);
-                right.rotationYaw = player.rotationYaw + 30.0F;
-                worldIn.spawnEntity(right);
+                for (int i = -1; i <= 1; i += 2) {
+                    EntityProjectileBase extra = getProjectile(stack, stack, worldIn, player, speed, inaccuracy + 2.0F, power, false);
+                    extra.rotationYaw = player.rotationYaw + 45.0F * i;
+                    worldIn.spawnEntity(extra);
+                }
             }
         }
     }
@@ -111,9 +108,6 @@ public class ThrowingKnife extends ProjectileCore {
         data.head(materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD));
         data.extra(materials.get(0).getStatsOrUnknown(MaterialTypes.EXTRA),
                 materials.get(1).getStatsOrUnknown(MaterialTypes.EXTRA));
-        ArrowShaftMaterialStats shaftStats = materials.get(1).getStatsOrUnknown(MaterialTypes.SHAFT);
-        data.shafts(this, shaftStats);
-        data.durability = 64;
         return data;
     }
 
