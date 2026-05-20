@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
+import slimeknights.tconstruct.library.capability.projectile.ITinkerProjectile;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 
 public class EntityThrowingKnife extends EntityProjectileBase {
@@ -27,7 +29,8 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     @Override
     public ItemStack getArrowStack() {
-        return tinkerProjectile.getItemStack();
+        ITinkerProjectile cap = getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
+        return cap != null ? cap.getItemStack() : ItemStack.EMPTY;
     }
 
     @Override
