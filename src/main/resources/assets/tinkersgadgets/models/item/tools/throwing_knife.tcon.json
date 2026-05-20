@@ -1,0 +1,10 @@
+{
+  "loader": "tconstruct:tool",
+  "parent": "forge:item/default",
+  "textures": {
+    "layer0": "tinkersgadgets:items/tools/throwing_knife/blade",
+    "layer1": "tinkersgadgets:items/tools/throwing_knife/handle",
+    "layer2": "tinkersgadgets:items/tools/throwing_knife/grip",
+    "broken": "tinkersgadgets:items/tools/throwing_knife/head_broken"
+  }
+}

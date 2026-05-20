@@ -4,6 +4,7 @@ import com.npstra.tinkersgadgets.TinkersGadgets;
 import com.npstra.tinkersgadgets.Config;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
+import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemConnector;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,6 +29,7 @@ import slimeknights.tconstruct.tools.TinkerTools;
 public class GadgetsRegister {
     public static ToolCore boomerang;
     public static ToolPart connector;
+    public static ToolCore throwingKnife;
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
@@ -40,6 +42,10 @@ public class GadgetsRegister {
             boomerang = new Boomerang();
             event.getRegistry().register(boomerang);
             TinkerRegistry.registerToolCrafting(boomerang);
+
+            throwingKnife = new ThrowingKnife();
+            event.getRegistry().register(throwingKnife);
+            TinkerRegistry.registerToolCrafting(throwingKnife);
         }
     }
 
@@ -53,6 +59,7 @@ public class GadgetsRegister {
                 .build();
         event.getRegistry().register(entry);
         EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:boomerang_shard"), EntityBoomerangShard.class, "boomerang_shard", 102, TinkersGadgets.instance, 64, 1, true);
+        EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:throwing_knife"), EntityThrowingKnife.class, "throwing_knife", 103, TinkersGadgets.instance, 64, 1, true);
     }
 
     @SideOnly(Side.CLIENT)
@@ -64,6 +71,9 @@ public class GadgetsRegister {
             }
             if (connector != null) {
                 ModelRegisterUtil.registerPartModel(connector);
+            }
+            if (throwingKnife != null) {
+                ModelRegisterUtil.registerToolModel(throwingKnife);
             }
         }
     }

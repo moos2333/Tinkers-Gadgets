@@ -22,15 +22,15 @@ public class Config {
         String general = "general";
 
         enableBoomerang = config.getBoolean("enableBoomerang", general, true,
-                "Enable the Boomerang tool and its Connector part.");
+                "Enable the Boomerang, Throwing Knife, and their parts.");
 
         disabledMaterials = config.getStringList("disabledMaterials", "materials",
                 new String[0],
-                "List of material IDs to disable. Valid IDs: glass, slimeball, popped_chorus, nether_quartz, magma_cream, shulker_shell, leather, redstone, blue_slimeball.");
+                "List of material IDs to disable. Valid IDs: glass, slimeball, popped_chorus, nether_quartz, magma_cream, shulker_shell, leather, redstone, blue_slimeball, enderpearl.");
 
         disabledTraits = config.getStringList("disabledTraits", "traits",
                 new String[0],
-                "List of trait IDs to prevent materials from obtaining. Valid IDs: fracture, bouncing, boomerang_piercing, keen, return_damage, collection_boomerang, interact_boomerang, deflect_boomerang.");
+                "List of trait IDs to prevent materials from obtaining. Valid IDs: fracture, bouncing, boomerang_piercing, keen, return_damage, collection_boomerang, interact_boomerang, deflect_boomerang, enderference, instant_return_boomerang.");
 
         if (config.hasChanged()) {
             config.save();
