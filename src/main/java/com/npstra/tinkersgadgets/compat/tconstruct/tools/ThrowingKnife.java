@@ -11,6 +11,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.materials.Material;
@@ -88,18 +89,32 @@ public class ThrowingKnife extends ProjectileCore {
         float power = progress;
 
         if (!worldIn.isRemote) {
-            EntityProjectileBase knife = getProjectile(stack, stack, worldIn, player, speed, inaccuracy, power, true);
-            worldIn.spawnEntity(knife);
+            spawnKnife(stack, worldIn, player, speed, inaccuracy, power, true);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
             if (sneaking) {
-                for (int i = -1; i <= 1; i += 2) {
-                    EntityProjectileBase extra = getProjectile(stack, stack, worldIn, player, speed, inaccuracy + 2.0F, power, false);
-                    extra.rotationYaw = player.rotationYaw + 45.0F * i;
-                    worldIn.spawnEntity(extra);
-                }
+                Vec3d look = player.getLookVec();
+                Vec3d left = look.rotateYaw((float) Math.toRadians(-30));
+                Vec3d right = look.rotateYaw((float) Math.toRadians(30));
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
             }
         }
+    }
+
+    private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, boolean usedAmmo) {
+        EntityThrowingKnife knife = new EntityThrowingKnife(world, player, speed, inaccuracy, power,
+                getProjectileStack(stack, world, player, usedAmmo), stack);
+        world.spawnEntity(knife);
+    }
+
+    private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, Vec3d direction, boolean usedAmmo) {
+        EntityThrowingKnife knife = new EntityThrowingKnife(world, player, speed, inaccuracy, power,
+                getProjectileStack(stack, world, player, usedAmmo), stack);
+        knife.shoot(direction.x, direction.y, direction.z, speed, inaccuracy);
+        knife.rotationYaw = (float) (Math.atan2(direction.x, direction.z) * 180.0 / Math.PI);
+        knife.rotationPitch = (float) (-Math.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)) * 180.0 / Math.PI);
+        world.spawnEntity(knife);
     }
 
     @Override

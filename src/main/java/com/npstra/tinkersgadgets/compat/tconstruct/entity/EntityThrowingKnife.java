@@ -8,6 +8,8 @@ import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 
 public class EntityThrowingKnife extends EntityProjectileBase {
 
+    public float spin;
+
     public EntityThrowingKnife(World world) {
         super(world);
     }

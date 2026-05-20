@@ -13,11 +13,14 @@ public class RenderThrowingKnife extends RenderProjectileBase<EntityThrowingKnif
 
     @Override
     public void customRendering(EntityThrowingKnife entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        GlStateManager.scale(0.6F, 0.6F, 0.6F);
         GlStateManager.rotate(entity.rotationYaw, 0f, 1f, 0f);
         GlStateManager.rotate(-entity.rotationPitch, 1f, 0f, 0f);
         GlStateManager.rotate(90f, 1f, 0f, 0f);
-        float spin = (entity.ticksExisted + partialTicks) * 20.0F;
-        GlStateManager.rotate(spin, 0f, 0f, 1f);
+        if (!entity.inGround) {
+            entity.spin += 20 * partialTicks;
+        }
+        float r = entity.spin;
+        GlStateManager.rotate(r, 0f, 0f, 1f);
     }
 }
