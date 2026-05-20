@@ -14,6 +14,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import slimeknights.tconstruct.library.materials.ArrowShaftMaterialStats;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.materials.MaterialTypes;
 import slimeknights.tconstruct.library.tinkering.Category;
@@ -89,15 +90,20 @@ public class ThrowingKnife extends ProjectileCore {
         float power = progress;
 
         if (!worldIn.isRemote) {
-            spawnKnife(stack, worldIn, player, speed, inaccuracy, power, true);
+            boolean usedAmmo = !player.capabilities.isCreativeMode && useAmmo(stack, player);
+            spawnKnife(stack, worldIn, player, speed, inaccuracy, power, usedAmmo);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
             if (sneaking) {
-                Vec3d look = player.getLookVec();
-                Vec3d left = look.rotateYaw((float) Math.toRadians(-30));
-                Vec3d right = look.rotateYaw((float) Math.toRadians(30));
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
+                if (this.getCurrentAmmo(stack) >= 2) {
+                    useAmmo(stack, player);
+                    useAmmo(stack, player);
+                    Vec3d look = player.getLookVec();
+                    Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
+                    Vec3d right = look.rotateYaw((float) Math.toRadians(15));
+                    spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
+                    spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
+                }
             }
         }
     }
@@ -123,6 +129,8 @@ public class ThrowingKnife extends ProjectileCore {
         data.head(materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD));
         data.extra(materials.get(0).getStatsOrUnknown(MaterialTypes.EXTRA),
                 materials.get(1).getStatsOrUnknown(MaterialTypes.EXTRA));
+        ArrowShaftMaterialStats shaftStats = materials.get(1).getStatsOrUnknown(MaterialTypes.SHAFT);
+        data.shafts(this, shaftStats);
         return data;
     }
 

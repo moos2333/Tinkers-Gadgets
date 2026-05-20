@@ -25,9 +25,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (GadgetsRegister.throwingKnife != null) {
             ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.throwingKnife);
-            info.addSlotPosition(33 + 12, 42 - 12);
+            info.addSlotPosition(33 + 18, 42 - 18);
             info.addSlotPosition(33, 42);
-            info.addSlotPosition(33 - 12, 42 + 12);
+            info.addSlotPosition(33 - 18, 42 + 18);
             TinkerRegistryClient.addToolBuilding(info);
         }
     }
@@ -36,8 +36,6 @@ public class ClientProxy extends CommonProxy {
     public void registerRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(EntityBoomerang.class, RenderBoomerang::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityBoomerangShard.class, RenderBoomerangShard::new);
-        if (GadgetsRegister.throwingKnife != null) {
-            RenderingRegistry.registerEntityRenderingHandler(EntityThrowingKnife.class, RenderThrowingKnife::new);
-        }
+        RenderingRegistry.registerEntityRenderingHandler(EntityThrowingKnife.class, RenderThrowingKnife::new);
     }
 }

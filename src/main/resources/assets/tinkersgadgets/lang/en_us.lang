@@ -1,7 +1,7 @@
 item.tinkersgadgets.boomerang.name=Boomerang
 item.tinkersgadgets.boomerang.desc=A returning thrown weapon.§r\nRight-click: Charge to throw. Returns after impact.
 item.tinkersgadgets.throwing_knife.name=Throwing Knife
-item.tinkersgadgets.throwing_knife.desc=The Throwing Knife is a throwable blade with moderate damage.\nSneak + Right-click: Fan out three blades.
+item.tinkersgadgets.throwing_knife.desc=A throwable knife with moderate damage.\nRight-click: short charge to throw one.\nSneak + right-click: long charge to fan three blades.
 modifier.boomerang_piercing.name=Piercing
 modifier.boomerang_piercing.desc=§oClean through!§r\nBoomerang pierces up to 2 additional enemies.
 modifier.bouncing.name=Bouncing

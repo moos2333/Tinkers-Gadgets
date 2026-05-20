@@ -1,7 +1,7 @@
 item.tinkersgadgets.boomerang.name=回力镖
 item.tinkersgadgets.boomerang.desc=可折返的投掷武器。§r\n右击：蓄力掷出，命中后折返。
 item.tinkersgadgets.throwing_knife.name=飞刀
-item.tinkersgadgets.throwing_knife.desc=飞刀是一种投掷型武器，伤害适中。\n潜行+右击：一次性掷出三柄。
+item.tinkersgadgets.throwing_knife.desc=飞刀是一种投掷型武器，伤害适中。\n右击：短蓄力丢出一柄飞刀\n潜行+右击：长蓄力一次性掷出三柄飞刀。
 modifier.boomerang_piercing.name=贯穿
 modifier.boomerang_piercing.desc=§o一气呵成！§r\n回力镖可额外贯穿至多2个敌人。
 modifier.bouncing.name=弹射

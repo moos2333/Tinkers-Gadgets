@@ -3,9 +3,8 @@ package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
-import slimeknights.tconstruct.library.capability.projectile.ITinkerProjectile;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 
 public class EntityThrowingKnife extends EntityProjectileBase {
@@ -19,7 +18,7 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     public EntityThrowingKnife(World world, EntityPlayer player, float speed, float inaccuracy, float power, ItemStack stack, ItemStack launchingStack) {
         super(world, player, speed, inaccuracy, power, stack, launchingStack);
         setSize(0.3f, 0.1f);
-        pickupStatus = PickupStatus.DISALLOWED;
+        pickupStatus = PickupStatus.ALLOWED;
     }
 
     @Override
@@ -29,8 +28,7 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     @Override
     public ItemStack getArrowStack() {
-        ITinkerProjectile cap = getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
-        return cap != null ? cap.getItemStack() : ItemStack.EMPTY;
+        return tinkerProjectile.getItemStack();
     }
 
     @Override
@@ -41,6 +39,12 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     @Override
     public double getSlowdown() {
         return 0.01D;
+    }
+
+    @Override
+    public void onHitEntity(RayTraceResult raytraceResult) {
+        super.onHitEntity(raytraceResult);
+        this.setDead();
     }
 
     @Override

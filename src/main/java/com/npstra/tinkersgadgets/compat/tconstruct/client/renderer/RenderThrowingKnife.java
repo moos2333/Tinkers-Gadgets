@@ -29,7 +29,12 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
     public void doRender(EntityThrowingKnife entity, double x, double y, double z, float entityYaw, float partialTicks) {
         ITinkerProjectile cap = entity.getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
         ItemStack stack = cap != null ? cap.getItemStack() : ItemStack.EMPTY;
-        if (stack.isEmpty()) return;
+        if (stack.isEmpty()) {
+            stack = entity.getArrowStack();
+        }
+        if (stack.isEmpty()) {
+            stack = new ItemStack(net.minecraft.init.Items.STICK);
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) x, (float) y, (float) z);
@@ -40,8 +45,12 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
         float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
         GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate((entity.ticksExisted + partialTicks) * 20.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+
+        if (!entity.inGround) {
+            entity.spin += 20.0F * partialTicks;
+        }
+        GlStateManager.rotate(entity.spin, 0.0F, 0.0F, 1.0F);
 
         if (entity.onGround) {
             GlStateManager.translate(0.0F, 0.0F, -entity.getStuckDepth());
