@@ -68,6 +68,7 @@ public class Boomerang extends ProjectileCore {
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, net.minecraft.entity.EntityLivingBase entityLiving, int timeLeft) {
         if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) entityLiving;
+        boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
         float progress = Math.min(1.0F, (float) useDuration / 20.0F);
         if (progress < 0.1F) progress = 0.1F;
@@ -75,7 +76,7 @@ public class Boomerang extends ProjectileCore {
             String toolId = getToolId(stack);
             Set<Entity> set = activeBoomerangs.get(toolId);
             if (set != null && !set.isEmpty()) return;
-            boolean usedAmmo = !player.capabilities.isCreativeMode && useAmmo(stack, player);
+            boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
             EntityProjectileBase projectile = getProjectile(stack, stack, worldIn, player, 1.8F * progress, 0.5F * (1 - progress), progress, usedAmmo);
             if (projectile instanceof EntityBoomerang) {
                 EntityBoomerang boomerang = (EntityBoomerang) projectile;
@@ -86,6 +87,9 @@ public class Boomerang extends ProjectileCore {
             worldIn.spawnEntity(projectile);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, net.minecraft.util.SoundCategory.PLAYERS, 1.0F, 0.8F + worldIn.rand.nextFloat() * 0.4F);
             player.getCooldownTracker().setCooldown(stack.getItem(), 10);
+            if (ammoDepleted) {
+                ToolHelper.breakTool(stack, player);
+            }
         }
     }
 

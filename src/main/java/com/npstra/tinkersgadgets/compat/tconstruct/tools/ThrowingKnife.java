@@ -79,6 +79,7 @@ public class ThrowingKnife extends ProjectileCore {
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
         if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) entityLiving;
+        boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
         boolean sneaking = player.isSneaking();
         int required = sneaking ? SNEAK_CHARGE : NORMAL_CHARGE;
@@ -90,20 +91,21 @@ public class ThrowingKnife extends ProjectileCore {
         float power = progress;
 
         if (!worldIn.isRemote) {
-            boolean usedAmmo = !player.capabilities.isCreativeMode && useAmmo(stack, player);
+            boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
             spawnKnife(stack, worldIn, player, speed, inaccuracy, power, usedAmmo);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
-            if (sneaking) {
-                if (this.getCurrentAmmo(stack) >= 2) {
-                    useAmmo(stack, player);
-                    useAmmo(stack, player);
-                    Vec3d look = player.getLookVec();
-                    Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
-                    Vec3d right = look.rotateYaw((float) Math.toRadians(15));
-                    spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
-                    spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
-                }
+            if (sneaking && !ammoDepleted && this.getCurrentAmmo(stack) >= 2) {
+                useAmmo(stack, player);
+                useAmmo(stack, player);
+                Vec3d look = player.getLookVec();
+                Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
+                Vec3d right = look.rotateYaw((float) Math.toRadians(15));
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
+            }
+            if (ammoDepleted) {
+                ToolHelper.breakTool(stack, player);
             }
         }
     }
