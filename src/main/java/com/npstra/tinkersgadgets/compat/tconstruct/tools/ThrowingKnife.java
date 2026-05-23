@@ -101,8 +101,8 @@ public class ThrowingKnife extends ProjectileCore {
                 Vec3d look = player.getLookVec();
                 Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
                 Vec3d right = look.rotateYaw((float) Math.toRadians(15));
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, true);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, true);
             }
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
