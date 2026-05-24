@@ -95,14 +95,12 @@ public class ThrowingKnife extends ProjectileCore {
             spawnKnife(stack, worldIn, player, speed, inaccuracy, power, usedAmmo);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
-            if (sneaking && !ammoDepleted && this.getCurrentAmmo(stack) >= 2) {
-                useAmmo(stack, player);
-                useAmmo(stack, player);
+            if (sneaking && !ammoDepleted) {
                 Vec3d look = player.getLookVec();
                 Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
                 Vec3d right = look.rotateYaw((float) Math.toRadians(15));
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, true);
-                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, true);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
+                spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
             }
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
