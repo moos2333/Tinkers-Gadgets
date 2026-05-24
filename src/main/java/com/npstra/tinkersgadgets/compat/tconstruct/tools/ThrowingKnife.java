@@ -1,7 +1,7 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.tools;
 
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.GripPartType;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -35,7 +35,7 @@ public class ThrowingKnife extends ProjectileCore {
     public ThrowingKnife() {
         super(new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD),
                 new PartMaterialType(TinkerTools.arrowShaft, MaterialTypes.SHAFT),
-                new PartMaterialType(GadgetsRegister.connector, ConnectorPartType.CONNECTOR));
+                new PartMaterialType(GadgetsRegister.grip, GripPartType.GRIP));
         addCategory(Category.NO_MELEE, Category.PROJECTILE);
         setRegistryName("throwing_knife");
         setTranslationKey("tinkersgadgets.throwing_knife");

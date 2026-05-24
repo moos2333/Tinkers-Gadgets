@@ -6,6 +6,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemConnector;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemGrip;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -29,6 +30,7 @@ import slimeknights.tconstruct.tools.TinkerTools;
 public class GadgetsRegister {
     public static ToolCore boomerang;
     public static ToolPart connector;
+    public static ToolPart grip;
     public static ToolCore throwingKnife;
 
     @SubscribeEvent
@@ -42,6 +44,13 @@ public class GadgetsRegister {
             boomerang = new Boomerang();
             event.getRegistry().register(boomerang);
             TinkerRegistry.registerToolCrafting(boomerang);
+        }
+
+        if (Config.enableThrowingKnife) {
+            grip = new ItemGrip();
+            event.getRegistry().register(grip);
+            TinkerRegistry.registerToolPart(grip);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), grip));
 
             throwingKnife = new ThrowingKnife();
             event.getRegistry().register(throwingKnife);
@@ -51,15 +60,20 @@ public class GadgetsRegister {
 
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-        EntityEntry entry = EntityEntryBuilder.create()
-                .entity(EntityBoomerang.class)
-                .id(new ResourceLocation(TinkersGadgets.MOD_ID, "boomerang"), 101)
-                .name("boomerang")
-                .tracker(64, 1, true)
-                .build();
-        event.getRegistry().register(entry);
-        EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:boomerang_shard"), EntityBoomerangShard.class, "boomerang_shard", 102, TinkersGadgets.instance, 64, 1, true);
-        EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:throwing_knife"), EntityThrowingKnife.class, "throwing_knife", 103, TinkersGadgets.instance, 64, 1, true);
+        if (Config.enableBoomerang) {
+            EntityEntry entry = EntityEntryBuilder.create()
+                    .entity(EntityBoomerang.class)
+                    .id(new ResourceLocation(TinkersGadgets.MOD_ID, "boomerang"), 101)
+                    .name("boomerang")
+                    .tracker(64, 1, true)
+                    .build();
+            event.getRegistry().register(entry);
+            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:boomerang_shard"), EntityBoomerangShard.class, "boomerang_shard", 102, TinkersGadgets.instance, 64, 1, true);
+        }
+
+        if (Config.enableThrowingKnife) {
+            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:throwing_knife"), EntityThrowingKnife.class, "throwing_knife", 103, TinkersGadgets.instance, 64, 1, true);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -71,6 +85,12 @@ public class GadgetsRegister {
             }
             if (connector != null) {
                 ModelRegisterUtil.registerPartModel(connector);
+            }
+        }
+
+        if (Config.enableThrowingKnife) {
+            if (grip != null) {
+                ModelRegisterUtil.registerPartModel(grip);
             }
             if (throwingKnife != null) {
                 ModelRegisterUtil.registerToolModel(throwingKnife);

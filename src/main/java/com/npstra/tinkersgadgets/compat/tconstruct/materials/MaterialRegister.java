@@ -1,6 +1,8 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.materials;
 
 import com.npstra.tinkersgadgets.Config;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.GripPartType;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -21,7 +23,7 @@ import java.util.Set;
 
 public class MaterialRegister {
 
-    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl;
+    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool;
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
     private static Set<String> disabledTraitSet;
@@ -30,12 +32,20 @@ public class MaterialRegister {
         disabledMaterialSet = new HashSet<>(Arrays.asList(Config.disabledMaterials));
         disabledTraitSet = new HashSet<>(Arrays.asList(Config.disabledTraits));
         Material.UNKNOWN.addStats(new ConnectorMaterialStats());
+        Material.UNKNOWN.addStats(new GripMaterialStats());
 
         if (!disabledMaterialSet.contains("glass")) {
             glass = createMaterial("glass", 0xFFFFFF, TraitsRegistry.FRACTURE, "fracture");
         }
         if (!disabledMaterialSet.contains("slimeball")) {
-            slimeball = createMaterial("slimeball", 0x71ac63, TraitsRegistry.BOUNCING, "bouncing");
+            slimeball = createMaterial("slimeball", 0x71ac63, null, null);
+            if (!disabledTraitSet.contains("bouncing")) {
+                slimeball.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
+            }
+            if (!disabledTraitSet.contains("rebound_throwingknife")) {
+                slimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("popped_chorus")) {
             poppedChorus = createMaterial("popped_chorus", 0xb78db7, TraitsRegistry.PIERCING, "boomerang_piercing");
@@ -51,6 +61,7 @@ public class MaterialRegister {
         }
         if (!disabledMaterialSet.contains("leather")) {
             leather = createMaterial("leather", 0xC76A43, null, null);
+            TinkerRegistry.addMaterialStats(leather, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("redstone")) {
             redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
@@ -70,6 +81,13 @@ public class MaterialRegister {
             TinkerRegistry.addMaterial(enderpearl);
             TinkerRegistry.addMaterialStats(enderpearl, new ConnectorMaterialStats());
             enderpearl.setVisible();
+        }
+        if (!disabledMaterialSet.contains("wool")) {
+            wool = new Material("wool", 0xBFB5B5, false);
+            wool.setCraftable(true).setCastable(false);
+            TinkerRegistry.addMaterial(wool);
+            TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
+            wool.setVisible();
         }
     }
 
@@ -99,6 +117,7 @@ public class MaterialRegister {
         integrate(redstone);
         integrate(blueSlimeball);
         integrate(enderpearl);
+        integrate(wool);
     }
 
     private static void integrate(Material mat) {
@@ -106,7 +125,7 @@ public class MaterialRegister {
     }
 
     private static void setupMaterials() {
-        setMaterialItems(glass, new ItemStack(Item.getItemFromBlock(Blocks.GLASS)));
+        setMaterialItems(glass, new ItemStack(Blocks.GLASS));
         setMaterialItems(slimeball, new ItemStack(Items.SLIME_BALL));
         setMaterialItems(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED));
         setMaterialItems(netherQuartz, new ItemStack(Items.QUARTZ));
@@ -114,6 +133,8 @@ public class MaterialRegister {
         setMaterialItems(shulkerShell, new ItemStack(Items.SHULKER_SHELL));
         setMaterialItems(leather, new ItemStack(Items.LEATHER));
         setMaterialItems(redstone, new ItemStack(Items.REDSTONE));
+        setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
+        setMaterialItems(wool, new ItemStack(Blocks.WOOL));
 
         if (blueSlimeball != null) {
             Item blueSlimeItem = Item.getByNameOrId("tconstruct:edible");
@@ -122,10 +143,6 @@ public class MaterialRegister {
                 blueSlimeball.addItem(blueSlimeStack, 1, Material.VALUE_Ingot);
                 blueSlimeball.setRepresentativeItem(blueSlimeStack);
             }
-        }
-
-        if (enderpearl != null) {
-            setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
         }
     }
 
@@ -148,6 +165,7 @@ public class MaterialRegister {
         setRenderColor(redstone, 0xCC0000);
         setRenderColor(blueSlimeball, 0x5BC7FF);
         setRenderColor(enderpearl, 0x0A6E6E);
+        setRenderColor(wool, 0xBFB5B5);
     }
 
     private static void setRenderColor(Material mat, int color) {
