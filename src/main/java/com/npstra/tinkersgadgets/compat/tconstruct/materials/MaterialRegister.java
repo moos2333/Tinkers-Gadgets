@@ -190,7 +190,7 @@ public class MaterialRegister {
         setRenderColor(blueSlimeball, 0x5BC7FF);
         setRenderColor(enderpearl, 0x0A6E6E);
         setRenderColor(wool, 0xBFB5B5);
-        setRenderColor(prismarineCrystals, 0x5FCDCD);
+        setRenderColor(prismarineCrystals, 0xdfe9dc);
     }
 
     private static void setRenderColor(Material mat, int color) {
