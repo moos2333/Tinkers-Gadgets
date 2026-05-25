@@ -13,4 +13,6 @@ public class TraitsRegistry {
     public static final AbstractTrait DEFLECT = new TraitDeflect();
     public static final AbstractTrait INSTANT_RETURN = new TraitInstantReturn();
     public static final AbstractTrait REBOUND = new TraitRebound();
+    public static final AbstractTrait RECOVERY = new TraitRecovery();
+    public static final AbstractTrait SHATTER = new TraitShatter();
 }

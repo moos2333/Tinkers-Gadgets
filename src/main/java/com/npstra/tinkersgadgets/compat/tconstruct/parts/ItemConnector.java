@@ -18,7 +18,8 @@ public class ItemConnector extends ToolPart {
                 id.equals("popped_chorus") || id.equals("nether_quartz") ||
                 id.equals("magma_cream") || id.equals("shulker_shell") ||
                 id.equals("leather") || id.equals("redstone") ||
-                id.equals("blue_slimeball") || id.equals("enderpearl");
+                id.equals("blue_slimeball") || id.equals("enderpearl") ||
+                id.equals("prismarine_crystals");
     }
 
     @Override

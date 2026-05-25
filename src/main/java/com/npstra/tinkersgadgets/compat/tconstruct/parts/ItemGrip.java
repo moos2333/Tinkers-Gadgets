@@ -14,7 +14,7 @@ public class ItemGrip extends ToolPart {
     @Override
     public boolean canUseMaterial(Material mat) {
         String id = mat.getIdentifier();
-        return id.equals("leather") || id.equals("wool") || id.equals("slimeball");
+        return id.equals("leather") || id.equals("wool") || id.equals("slimeball") || id.equals("shulker_shell");
     }
 
     @Override

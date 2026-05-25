@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.materials.Material;
+import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.TinkerTraits;
 
 import java.util.Arrays;
@@ -23,7 +24,7 @@ import java.util.Set;
 
 public class MaterialRegister {
 
-    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool;
+    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool, prismarineCrystals;
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
     private static Set<String> disabledTraitSet;
@@ -57,7 +58,18 @@ public class MaterialRegister {
             magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
         }
         if (!disabledMaterialSet.contains("shulker_shell")) {
-            shulkerShell = createMaterial("shulker_shell", 0x976997, TraitsRegistry.COLLECTION, "collection_boomerang");
+            shulkerShell = createMaterial("shulker_shell", 0x976997, null, null);
+            if (!disabledTraitSet.contains("collection_boomerang")) {
+                shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
+            }
+            if (!disabledTraitSet.contains("recovery_throwingknife")) {
+                shulkerShell.addTrait(TraitsRegistry.RECOVERY, GripPartType.GRIP);
+            }
+            if (!disabledTraitSet.contains("enderference")) {
+                shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
+                shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("leather")) {
             leather = createMaterial("leather", 0xC76A43, null, null);
@@ -89,6 +101,16 @@ public class MaterialRegister {
             TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
             wool.setVisible();
         }
+        if (!disabledMaterialSet.contains("prismarine_crystals")) {
+            prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
+            prismarineCrystals.setCraftable(true).setCastable(false);
+            if (!disabledTraitSet.contains("shatter_boomerang")) {
+                prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
+            }
+            TinkerRegistry.addMaterial(prismarineCrystals);
+            TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
+            prismarineCrystals.setVisible();
+        }
     }
 
     private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
@@ -118,6 +140,7 @@ public class MaterialRegister {
         integrate(blueSlimeball);
         integrate(enderpearl);
         integrate(wool);
+        integrate(prismarineCrystals);
     }
 
     private static void integrate(Material mat) {
@@ -135,6 +158,7 @@ public class MaterialRegister {
         setMaterialItems(redstone, new ItemStack(Items.REDSTONE));
         setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
         setMaterialItems(wool, new ItemStack(Blocks.WOOL));
+        setMaterialItems(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS));
 
         if (blueSlimeball != null) {
             Item blueSlimeItem = Item.getByNameOrId("tconstruct:edible");
@@ -166,6 +190,7 @@ public class MaterialRegister {
         setRenderColor(blueSlimeball, 0x5BC7FF);
         setRenderColor(enderpearl, 0x0A6E6E);
         setRenderColor(wool, 0xBFB5B5);
+        setRenderColor(prismarineCrystals, 0x5FCDCD);
     }
 
     private static void setRenderColor(Material mat, int color) {

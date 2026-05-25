@@ -60,6 +60,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private boolean interactEnabled;
     private boolean interactUsed;
     private boolean deflectProjectiles;
+    private boolean shatterEnabled;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -83,6 +84,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
     public void setInteract(boolean enabled) { this.interactEnabled = enabled; }
     public void setDeflectProjectiles(boolean enabled) { this.deflectProjectiles = enabled; }
+    public void setShatter(boolean shatter) { this.shatterEnabled = shatter; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
 
@@ -300,6 +302,16 @@ public class EntityBoomerang extends EntityProjectileBase {
                 interactUsed = true;
             }
         }
+        if (!world.isRemote && shatterEnabled && !returning && raytraceResult.sideHit != null) {
+            BlockPos pos = raytraceResult.getBlockPos();
+            IBlockState state = world.getBlockState(pos);
+            float hardness = state.getBlockHardness(world, pos);
+            if (hardness >= 0.0F && hardness <= 2.0F) {
+                world.destroyBlock(pos, true);
+                setDead();
+                return;
+            }
+        }
         returning = true;
         inGround = false;
         arrowShake = 0;
@@ -469,6 +481,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         data.writeInt(bounceCount);
         data.writeBoolean(returnDamageEnabled);
         data.writeBoolean(split);
+        data.writeBoolean(shatterEnabled);
         data.writeDouble(totalDistanceTraveled);
         data.writeDouble(initialSpeed);
     }
@@ -483,6 +496,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         bounceCount = data.readInt();
         returnDamageEnabled = data.readBoolean();
         split = data.readBoolean();
+        shatterEnabled = data.readBoolean();
         totalDistanceTraveled = data.readDouble();
         initialSpeed = data.readDouble();
     }
