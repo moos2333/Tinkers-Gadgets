@@ -43,5 +43,6 @@ stat.connector.name=扣环
 stat.connector.none=无数据
 stat.connector.desc=这个部件仅提供材料特性。
 item.tinkersgadgets.grip.name=裹柄
+stat.grip.name=裹柄
 stat.grip.none=无数据
 stat.grip.desc=这个部件仅提供材料特性。
