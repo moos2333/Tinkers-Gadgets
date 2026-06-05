@@ -30,6 +30,14 @@ public class ClientProxy extends CommonProxy {
             info.addSlotPosition(33 - 18, 42 + 18);
             TinkerRegistryClient.addToolBuilding(info);
         }
+        if (GadgetsRegister.heatRayGun != null) {
+            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.heatRayGun);
+            info.addSlotPosition(33 + 18, 42 + 18);
+            info.addSlotPosition(33 + 18, 42);
+            info.addSlotPosition(33, 42);
+            info.addSlotPosition(33 - 18, 42 - 18);
+            TinkerRegistryClient.addToolBuilding(info);
+        }
     }
 
     @Override

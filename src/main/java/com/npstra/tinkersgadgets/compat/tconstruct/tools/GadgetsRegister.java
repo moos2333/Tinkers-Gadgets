@@ -7,6 +7,8 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemConnector;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemGrip;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemFuelTank;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemHeatRayEmitter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -32,6 +34,9 @@ public class GadgetsRegister {
     public static ToolPart connector;
     public static ToolPart grip;
     public static ToolCore throwingKnife;
+    public static ToolCore heatRayGun;
+    public static ToolPart fuelTank;
+    public static ToolPart heatRayEmitter;
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
@@ -55,6 +60,22 @@ public class GadgetsRegister {
             throwingKnife = new ThrowingKnife();
             event.getRegistry().register(throwingKnife);
             TinkerRegistry.registerToolCrafting(throwingKnife);
+        }
+
+        if (Config.enableHeatRayGun) {
+            fuelTank = new ItemFuelTank();
+            event.getRegistry().register(fuelTank);
+            TinkerRegistry.registerToolPart(fuelTank);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), fuelTank));
+
+            heatRayEmitter = new ItemHeatRayEmitter();
+            event.getRegistry().register(heatRayEmitter);
+            TinkerRegistry.registerToolPart(heatRayEmitter);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), heatRayEmitter));
+
+            heatRayGun = new HeatRayGun();
+            event.getRegistry().register(heatRayGun);
+            TinkerRegistry.registerToolForgeCrafting(heatRayGun);
         }
     }
 
@@ -94,6 +115,18 @@ public class GadgetsRegister {
             }
             if (throwingKnife != null) {
                 ModelRegisterUtil.registerToolModel(throwingKnife);
+            }
+        }
+
+        if (Config.enableHeatRayGun) {
+            if (fuelTank != null) {
+                ModelRegisterUtil.registerPartModel(fuelTank);
+            }
+            if (heatRayEmitter != null) {
+                ModelRegisterUtil.registerPartModel(heatRayEmitter);
+            }
+            if (heatRayGun != null) {
+                ModelRegisterUtil.registerToolModel(heatRayGun);
             }
         }
     }

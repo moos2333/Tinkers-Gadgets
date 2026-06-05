@@ -2,7 +2,9 @@ package com.npstra.tinkersgadgets.compat.tconstruct.materials;
 
 import com.npstra.tinkersgadgets.Config;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.FuelTankPartType;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.GripPartType;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.HeatRayEmitterPartType;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -15,7 +17,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.materials.Material;
-import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.TinkerTraits;
 
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.Set;
 public class MaterialRegister {
 
     public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool, prismarineCrystals;
+    public static Material brick, netherbrick;
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
     private static Set<String> disabledTraitSet;
@@ -34,6 +36,8 @@ public class MaterialRegister {
         disabledTraitSet = new HashSet<>(Arrays.asList(Config.disabledTraits));
         Material.UNKNOWN.addStats(new ConnectorMaterialStats());
         Material.UNKNOWN.addStats(new GripMaterialStats());
+        Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
+        Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
 
         if (!disabledMaterialSet.contains("glass")) {
             glass = createMaterial("glass", 0xFFFFFF, TraitsRegistry.FRACTURE, "fracture");
@@ -111,6 +115,41 @@ public class MaterialRegister {
             TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
             prismarineCrystals.setVisible();
         }
+        if (!disabledMaterialSet.contains("brick")) {
+            brick = new Material("brick", 0xB87333, false);
+            brick.setCraftable(true).setCastable(false);
+            TinkerRegistry.addMaterial(brick);
+            TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
+            brick.setVisible();
+        }
+        if (!disabledMaterialSet.contains("netherbrick")) {
+            netherbrick = new Material("netherbrick", 0x2A0A0A, false);
+            netherbrick.setCraftable(true).setCastable(false);
+            TinkerRegistry.addMaterial(netherbrick);
+            TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
+            netherbrick.setVisible();
+        }
+        Material iron = TinkerRegistry.getMaterial("iron");
+        if (iron != Material.UNKNOWN && iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+            iron.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
+        }
+        if (iron != Material.UNKNOWN && iron.getStats(FuelTankPartType.FUEL_TANK) == null) {
+            iron.addStats(new FuelTankMaterialStats(10000, 10, 1.0f));
+        }
+        Material stone = TinkerRegistry.getMaterial("stone");
+        if (stone != Material.UNKNOWN && stone.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+            stone.addStats(new HeatRayEmitterMaterialStats(3600.0f, 0.001f));
+        }
+        if (stone != Material.UNKNOWN && stone.getStats(FuelTankPartType.FUEL_TANK) == null) {
+            stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
+        }
+        Material cobalt = TinkerRegistry.getMaterial("cobalt");
+        if (cobalt != Material.UNKNOWN && cobalt.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+            cobalt.addStats(new HeatRayEmitterMaterialStats(0.75f, 0.75f));
+        }
+        if (cobalt != Material.UNKNOWN && cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
+            cobalt.addStats(new FuelTankMaterialStats(3000, 5, 1.5f));
+        }
     }
 
     private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
@@ -141,6 +180,8 @@ public class MaterialRegister {
         integrate(enderpearl);
         integrate(wool);
         integrate(prismarineCrystals);
+        integrate(brick);
+        integrate(netherbrick);
     }
 
     private static void integrate(Material mat) {
@@ -159,6 +200,8 @@ public class MaterialRegister {
         setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
         setMaterialItems(wool, new ItemStack(Blocks.WOOL));
         setMaterialItems(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS));
+        setMaterialItems(brick, new ItemStack(Items.BRICK));
+        setMaterialItems(netherbrick, new ItemStack(Items.NETHERBRICK));
 
         if (blueSlimeball != null) {
             Item blueSlimeItem = Item.getByNameOrId("tconstruct:edible");
@@ -191,6 +234,8 @@ public class MaterialRegister {
         setRenderColor(enderpearl, 0x0A6E6E);
         setRenderColor(wool, 0xBFB5B5);
         setRenderColor(prismarineCrystals, 0xdfe9dc);
+        setRenderColor(brick, 0xB87333);
+        setRenderColor(netherbrick, 0x2A0A0A);
     }
 
     private static void setRenderColor(Material mat, int color) {

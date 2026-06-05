@@ -1,0 +1,11 @@
+{
+  "loader": "tconstruct:tool",
+  "parent": "forge:item/bow_standby",
+  "textures": {
+    "layer0": "tinkersgadgets:items/tools/heat_ray_gun/handle",
+    "layer1": "tinkersgadgets:items/tools/heat_ray_gun/plate",
+    "layer2": "tinkersgadgets:items/tools/heat_ray_gun/fuel_tank",
+    "layer3": "tinkersgadgets:items/tools/heat_ray_gun/emitter",
+    "broken0": "tinkersgadgets:items/tools/heat_ray_gun/fuel_tank_broken"
+  }
+}
