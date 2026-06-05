@@ -148,7 +148,7 @@ public class MaterialRegister {
             cobalt.addStats(new HeatRayEmitterMaterialStats(0.75f, 0.75f));
         }
         if (cobalt != Material.UNKNOWN && cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
-            cobalt.addStats(new FuelTankMaterialStats(3000, 5, 1.5f));
+            cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
         }
     }
 

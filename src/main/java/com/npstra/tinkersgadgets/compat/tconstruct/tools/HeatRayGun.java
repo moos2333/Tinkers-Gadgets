@@ -180,7 +180,10 @@ public class HeatRayGun extends TinkerToolCore {
 
     private int getOverheatThreshold(ItemStack stack) {
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        if (toolTag != null && toolTag.hasKey("heatCapacity")) return toolTag.getInteger("heatCapacity");
+        if (toolTag != null && toolTag.hasKey("heatCapacity")) {
+            int threshold = toolTag.getInteger("heatCapacity");
+            return threshold > 0 ? threshold : 1;
+        }
         return 10;
     }
 
@@ -253,6 +256,8 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     private void shootRay(World world, EntityPlayer player, ItemStack stack) {
+        world.playSound(null, player.posX, player.posY, player.posZ,
+                SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0F, 1.0F);
         Vec3d eyePos = player.getPositionEyes(1.0F);
         Vec3d lookVec = player.getLookVec();
         Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
@@ -311,7 +316,7 @@ public class HeatRayGun extends TinkerToolCore {
             ToolHelper.attackEntity(stack, this, player, hitEntity);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
             hitEntity.setFire(4);
-            world.playSound(null, player.posX, player.posY, player.posZ,
+            world.playSound(null, hitEntity.posX, hitEntity.posY, hitEntity.posZ,
                     SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.PLAYERS, 0.7F, 0.9F);
         } else if (hitVec != null) {
             for (int i = 0; i < 6; i++) {
@@ -389,15 +394,19 @@ public class HeatRayGun extends TinkerToolCore {
     public ToolNBT buildTagData(List<Material> materials) {
         ToolNBT data = buildDefaultTag(materials);
         NBTTagCompound tag = data.get();
-        for (Material mat : materials) {
-            if (mat.getStats(FuelTankPartType.FUEL_TANK) != null) {
-                FuelTankMaterialStats fuelStats = mat.getStatsOrUnknown(FuelTankPartType.FUEL_TANK);
+        if (materials.size() > 2) {
+            Material fuelMat = materials.get(2);
+            FuelTankMaterialStats fuelStats = fuelMat.getStatsOrUnknown(FuelTankPartType.FUEL_TANK);
+            if (fuelStats != FuelTankMaterialStats.UNKNOWN) {
                 tag.setInteger("maxFuel", fuelStats.maxFuel);
                 tag.setInteger("heatCapacity", fuelStats.heatCapacity);
                 tag.setFloat("fuelEfficiency", fuelStats.efficiency);
             }
-            if (mat.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) != null) {
-                HeatRayEmitterMaterialStats emitterStats = mat.getStatsOrUnknown(HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+        }
+        if (materials.size() > 3) {
+            Material emitterMat = materials.get(3);
+            HeatRayEmitterMaterialStats emitterStats = emitterMat.getStatsOrUnknown(HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+            if (emitterStats != HeatRayEmitterMaterialStats.UNKNOWN) {
                 int chargeTicks = Math.max(10, (int)(emitterStats.chargeTime * 20));
                 tag.setInteger("chargeTime", chargeTicks);
                 tag.setFloat("powerMultiplier", emitterStats.power);
