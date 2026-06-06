@@ -194,7 +194,8 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     private int getFuelCost(ItemStack stack) {
-        return (int) (BASE_FUEL_PER_SHOT * getFuelEfficiency(stack));
+        float efficiency = getFuelEfficiency(stack);
+        return (int) (BASE_FUEL_PER_SHOT / efficiency);
     }
 
     private void reloadOneItem(World world, EntityPlayer player, ItemStack stack) {
@@ -262,7 +263,7 @@ public class HeatRayGun extends TinkerToolCore {
         Vec3d lookVec = player.getLookVec();
         Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
         for (int i = 0; i < 12; i++) {
-            world.spawnParticle(EnumParticleTypes.FLAME,
+            world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
                     muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
                     muzzlePos.y + (world.rand.nextDouble() - 0.5) * 0.5,
                     muzzlePos.z + (world.rand.nextDouble() - 0.5) * 0.5,
@@ -275,6 +276,18 @@ public class HeatRayGun extends TinkerToolCore {
         if (hitBlock != null) {
             hitVec = hitBlock.hitVec;
             rayEnd = hitVec;
+        }
+        double distance = eyePos.distanceTo(rayEnd);
+        int steps = (int) (distance * 1.5);
+        for (int i = 0; i <= steps; i++) {
+            double t = (double) i / steps;
+            Vec3d pathPos = eyePos.add(lookVec.scale(distance * t));
+            world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
+                    pathPos.x, pathPos.y, pathPos.z, 0, 0.01, 0);
+            if (i % 2 == 0) {
+                world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_NORMAL.getParticleID(),
+                        pathPos.x, pathPos.y, pathPos.z, 0, 0.005, 0);
+            }
         }
         AxisAlignedBB checkBox = new AxisAlignedBB(eyePos, rayEnd).grow(0.5);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, checkBox,
@@ -293,18 +306,18 @@ public class HeatRayGun extends TinkerToolCore {
         }
         if (hitEntity != null) {
             for (int i = 0; i < 20; i++) {
-                world.spawnParticle(EnumParticleTypes.FLAME,
-                        hitEntity.posX + (world.rand.nextDouble() - 0.5) * hitEntity.width * 1.5,
-                        hitEntity.posY + world.rand.nextDouble() * hitEntity.height,
-                        hitEntity.posZ + (world.rand.nextDouble() - 0.5) * hitEntity.width * 1.5,
-                        0, 0.05, 0);
-            }
-            for (int i = 0; i < 10; i++) {
-                world.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+                world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
                         hitEntity.posX + (world.rand.nextDouble() - 0.5) * hitEntity.width,
                         hitEntity.posY + world.rand.nextDouble() * hitEntity.height,
                         hitEntity.posZ + (world.rand.nextDouble() - 0.5) * hitEntity.width,
-                        0, 0.02, 0);
+                        0, 0.05, 0);
+            }
+            for (int i = 0; i < 10; i++) {
+                world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
+                        hitEntity.posX + (world.rand.nextDouble() - 0.5) * hitEntity.width,
+                        hitEntity.posY + world.rand.nextDouble() * hitEntity.height,
+                        hitEntity.posZ + (world.rand.nextDouble() - 0.5) * hitEntity.width,
+                        0, 0.03, 0);
             }
             float power = getPowerMultiplier(stack);
             ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
@@ -319,13 +332,15 @@ public class HeatRayGun extends TinkerToolCore {
             world.playSound(null, hitEntity.posX, hitEntity.posY, hitEntity.posZ,
                     SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.PLAYERS, 0.7F, 0.9F);
         } else if (hitVec != null) {
-            for (int i = 0; i < 6; i++) {
-                world.spawnParticle(EnumParticleTypes.FLAME,
-                        hitVec.x + (world.rand.nextDouble() - 0.5) * 0.2,
-                        hitVec.y + (world.rand.nextDouble() - 0.5) * 0.2,
-                        hitVec.z + (world.rand.nextDouble() - 0.5) * 0.2,
+            for (int i = 0; i < 8; i++) {
+                world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
+                        hitVec.x + (world.rand.nextDouble() - 0.5) * 0.3,
+                        hitVec.y + (world.rand.nextDouble() - 0.5) * 0.3,
+                        hitVec.z + (world.rand.nextDouble() - 0.5) * 0.3,
                         0, 0.05, 0);
             }
+            world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
+                    hitVec.x, hitVec.y, hitVec.z, 0, 0.05, 0);
         }
     }
 
@@ -333,7 +348,8 @@ public class HeatRayGun extends TinkerToolCore {
         NBTTagCompound itemTag = stack.getTagCompound();
         if (itemTag == null) return false;
         long overheatEnd = itemTag.getLong("OverheatEndTick");
-        if (player.ticksExisted < overheatEnd) return true;
+        long currentTime = player.world.getTotalWorldTime();
+        if (currentTime < overheatEnd) return true;
         else if (itemTag.hasKey("OverheatEndTick")) {
             itemTag.removeTag("OverheatEndTick");
             setShotCount(stack, 0);
@@ -348,12 +364,12 @@ public class HeatRayGun extends TinkerToolCore {
         shots++;
         int threshold = getOverheatThreshold(stack);
         if (shots >= threshold) {
-            itemTag.setLong("OverheatEndTick", player.ticksExisted + 100);
+            itemTag.setLong("OverheatEndTick", player.world.getTotalWorldTime() + 100);
             itemTag.setInteger("ShotCount", 0);
             player.world.playSound(null, player.posX, player.posY, player.posZ,
                     SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0F, 0.5F);
             for (int i = 0; i < 20; i++) {
-                player.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
+                player.world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
                         player.posX + (player.world.rand.nextDouble() - 0.5D) * 1.0D,
                         player.posY + player.world.rand.nextDouble() * 1.5D,
                         player.posZ + (player.world.rand.nextDouble() - 0.5D) * 1.0D,
