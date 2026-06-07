@@ -312,7 +312,7 @@ public class HeatRayGun extends TinkerToolCore {
         Vec3d eyePos = player.getPositionEyes(1.0F);
         Vec3d lookVec = player.getLookVec();
         Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 2; i++) {
             world.spawnParticle(EnumParticleTypes.FLAME,
                     muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
                     muzzlePos.y + (world.rand.nextDouble() - 0.5) * 0.5,
