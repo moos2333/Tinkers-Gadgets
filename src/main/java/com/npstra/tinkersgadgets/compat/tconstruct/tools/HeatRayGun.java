@@ -182,7 +182,7 @@ public class HeatRayGun extends TinkerToolCore {
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
         if (toolTag != null && toolTag.hasKey("heatCapacity")) {
             int threshold = toolTag.getInteger("heatCapacity");
-            return threshold > 0 ? threshold : 1;
+            return threshold > 0 ? threshold : 10;
         }
         return 10;
     }
@@ -368,7 +368,7 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             player.world.playSound(null, player.posX, player.posY, player.posZ,
                     SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0F, 0.5F);
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 8; i++) {
                 player.world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
                         player.posX + (player.world.rand.nextDouble() - 0.5D) * 1.0D,
                         player.posY + player.world.rand.nextDouble() * 1.5D,
