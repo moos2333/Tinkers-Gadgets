@@ -330,7 +330,7 @@ public class HeatRayGun extends TinkerToolCore {
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
             hitEntity.setFire(4);
             world.playSound(null, hitEntity.posX, hitEntity.posY, hitEntity.posZ,
-                    SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.PLAYERS, 0.7F, 0.9F);
+                    SoundEvents.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.7F, 0.9F);
         } else if (hitVec != null) {
             for (int i = 0; i < 8; i++) {
                 world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
