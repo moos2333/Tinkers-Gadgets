@@ -116,14 +116,14 @@ public class MaterialRegister {
             prismarineCrystals.setVisible();
         }
         if (!disabledMaterialSet.contains("brick")) {
-            brick = new Material("brick", 0xB87333, false);
+            brick = new Material("brick", 0xb75a40, false);
             brick.setCraftable(true).setCastable(false);
             TinkerRegistry.addMaterial(brick);
             TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
             brick.setVisible();
         }
         if (!disabledMaterialSet.contains("netherbrick")) {
-            netherbrick = new Material("netherbrick", 0x2A0A0A, false);
+            netherbrick = new Material("netherbrick", 0x49282e, false);
             netherbrick.setCraftable(true).setCastable(false);
             TinkerRegistry.addMaterial(netherbrick);
             TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
@@ -234,8 +234,8 @@ public class MaterialRegister {
         setRenderColor(enderpearl, 0x0A6E6E);
         setRenderColor(wool, 0xBFB5B5);
         setRenderColor(prismarineCrystals, 0xdfe9dc);
-        setRenderColor(brick, 0xB87333);
-        setRenderColor(netherbrick, 0x2A0A0A);
+        setRenderColor(brick, 0xb75a40);
+        setRenderColor(netherbrick, 0x49282e);
     }
 
     private static void setRenderColor(Material mat, int color) {
