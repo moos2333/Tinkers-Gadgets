@@ -129,7 +129,12 @@ public class HeatRayGun extends TinkerToolCore {
             } else {
                 int useTime = this.getMaxItemUseDuration(stack) - count;
                 int chargeTicks = getChargeTicks(stack);
-                if (useTime >= chargeTicks && !entityPlayer.world.isRemote) entityPlayer.stopActiveHand();
+                if (useTime >= chargeTicks && !entityPlayer.world.isRemote) {
+                    entityPlayer.stopActiveHand();
+                }
+                if (entityPlayer.world.isRemote && useTime >= chargeTicks) {
+                    spawnClientParticles(entityPlayer.world, entityPlayer, stack);
+                }
             }
         }
     }
@@ -261,34 +266,10 @@ public class HeatRayGun extends TinkerToolCore {
                 SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0F, 1.0F);
         Vec3d eyePos = player.getPositionEyes(1.0F);
         Vec3d lookVec = player.getLookVec();
-        Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
-        for (int i = 0; i < 12; i++) {
-            world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
-                    muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
-                    muzzlePos.y + (world.rand.nextDouble() - 0.5) * 0.5,
-                    muzzlePos.z + (world.rand.nextDouble() - 0.5) * 0.5,
-                    0, 0.02, 0);
-        }
         Vec3d rayEnd = eyePos.add(lookVec.scale(MAX_RANGE));
-        EntityLivingBase hitEntity = null;
         RayTraceResult hitBlock = world.rayTraceBlocks(eyePos, rayEnd, false, true, false);
-        Vec3d hitVec = null;
-        if (hitBlock != null) {
-            hitVec = hitBlock.hitVec;
-            rayEnd = hitVec;
-        }
-        double distance = eyePos.distanceTo(rayEnd);
-        int steps = (int) (distance * 1.5);
-        for (int i = 0; i <= steps; i++) {
-            double t = (double) i / steps;
-            Vec3d pathPos = eyePos.add(lookVec.scale(distance * t));
-            world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
-                    pathPos.x, pathPos.y, pathPos.z, 0, 0.01, 0);
-            if (i % 2 == 0) {
-                world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_NORMAL.getParticleID(),
-                        pathPos.x, pathPos.y, pathPos.z, 0, 0.005, 0);
-            }
-        }
+        if (hitBlock != null) rayEnd = hitBlock.hitVec;
+        EntityLivingBase hitEntity = null;
         AxisAlignedBB checkBox = new AxisAlignedBB(eyePos, rayEnd).grow(0.5);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, checkBox,
                 e -> e != player && e instanceof EntityLivingBase);
@@ -299,30 +280,15 @@ public class HeatRayGun extends TinkerToolCore {
                 RayTraceResult entityHit = entityBox.calculateIntercept(eyePos, rayEnd);
                 if (entityHit != null) {
                     hitEntity = target;
-                    hitVec = entityHit.hitVec;
                     break;
                 }
             }
         }
+        float power = getPowerMultiplier(stack);
+        ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
+        float baseDamage = data.attack;
+        float finalDamage = baseDamage * 2.0f * power;
         if (hitEntity != null) {
-            for (int i = 0; i < 20; i++) {
-                world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
-                        hitEntity.posX + (world.rand.nextDouble() - 0.5) * hitEntity.width,
-                        hitEntity.posY + world.rand.nextDouble() * hitEntity.height,
-                        hitEntity.posZ + (world.rand.nextDouble() - 0.5) * hitEntity.width,
-                        0, 0.05, 0);
-            }
-            for (int i = 0; i < 10; i++) {
-                world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
-                        hitEntity.posX + (world.rand.nextDouble() - 0.5) * hitEntity.width,
-                        hitEntity.posY + world.rand.nextDouble() * hitEntity.height,
-                        hitEntity.posZ + (world.rand.nextDouble() - 0.5) * hitEntity.width,
-                        0, 0.03, 0);
-            }
-            float power = getPowerMultiplier(stack);
-            ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
-            float baseDamage = data.attack;
-            float finalDamage = baseDamage * 2.0f * power;
             AttributeModifier damageMod = new AttributeModifier(DAMAGE_BONUS_UUID, "HeatRay damage bonus",
                     finalDamage - baseDamage, 0);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(damageMod);
@@ -331,16 +297,42 @@ public class HeatRayGun extends TinkerToolCore {
             hitEntity.setFire(4);
             world.playSound(null, hitEntity.posX, hitEntity.posY, hitEntity.posZ,
                     SoundEvents.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.7F, 0.9F);
-        } else if (hitVec != null) {
-            for (int i = 0; i < 8; i++) {
-                world.spawnAlwaysVisibleParticle(EnumParticleTypes.FLAME.getParticleID(),
-                        hitVec.x + (world.rand.nextDouble() - 0.5) * 0.3,
-                        hitVec.y + (world.rand.nextDouble() - 0.5) * 0.3,
-                        hitVec.z + (world.rand.nextDouble() - 0.5) * 0.3,
-                        0, 0.05, 0);
+        }
+    }
+
+    private void spawnClientParticles(World world, EntityPlayer player, ItemStack stack) {
+        if (!world.isRemote) return;
+        NBTTagCompound itemTag = stack.getTagCompound();
+        if (itemTag != null && itemTag.hasKey("OverheatEndTick")) {
+            long overheatEnd = itemTag.getLong("OverheatEndTick");
+            if (world.getTotalWorldTime() < overheatEnd) {
+                return;
             }
-            world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
-                    hitVec.x, hitVec.y, hitVec.z, 0, 0.05, 0);
+        }
+        Vec3d eyePos = player.getPositionEyes(1.0F);
+        Vec3d lookVec = player.getLookVec();
+        Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
+        for (int i = 0; i < 6; i++) {
+            world.spawnParticle(EnumParticleTypes.FLAME,
+                    muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
+                    muzzlePos.y + (world.rand.nextDouble() - 0.5) * 0.5,
+                    muzzlePos.z + (world.rand.nextDouble() - 0.5) * 0.5,
+                    0, 0.02, 0);
+        }
+        Vec3d rayEnd = eyePos.add(lookVec.scale(MAX_RANGE));
+        RayTraceResult hitBlock = world.rayTraceBlocks(eyePos, rayEnd, false, true, false);
+        if (hitBlock != null) rayEnd = hitBlock.hitVec;
+        double distance = eyePos.distanceTo(rayEnd);
+        int steps = (int) (distance * 0.8);
+        for (int i = 0; i <= steps; i++) {
+            double t = (double) i / steps;
+            Vec3d pathPos = eyePos.add(lookVec.scale(distance * t));
+            world.spawnParticle(EnumParticleTypes.FLAME,
+                    pathPos.x, pathPos.y, pathPos.z, 0, 0.01, 0);
+            if (i % 4 == 0 && world.rand.nextInt(2) == 0) {
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+                        pathPos.x, pathPos.y, pathPos.z, 0, 0.005, 0);
+            }
         }
     }
 
