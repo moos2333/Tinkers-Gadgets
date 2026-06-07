@@ -23,6 +23,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tinkering.Category;
 import slimeknights.tconstruct.library.tinkering.PartMaterialType;
@@ -31,6 +32,7 @@ import slimeknights.tconstruct.library.tools.ToolNBT;
 import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.tools.TinkerTools;
+
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
@@ -56,10 +58,10 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public List<String> getInformation(ItemStack stack, boolean detailed) {
+        List<String> info = super.getInformation(stack, detailed);
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        if (toolTag == null) return;
+        if (toolTag == null) return info;
         NBTTagCompound itemTag = stack.getTagCompound();
         if (itemTag == null) itemTag = new NBTTagCompound();
         int maxFuel = toolTag.hasKey("maxFuel") ? toolTag.getInteger("maxFuel") : 10000;
@@ -77,18 +79,16 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             stack.setTagCompound(itemTag);
         }
-        tooltip.add(net.minecraft.util.text.TextFormatting.GOLD + "Fuel: " + fuel + "/" + maxFuel);
-        tooltip.add(net.minecraft.util.text.TextFormatting.GOLD + "Heat: " + shots + "/" + threshold);
+        info.add(Util.translateFormatted("stat.heat_ray_gun.fuel", fuel, maxFuel));
+        info.add(Util.translateFormatted("stat.heat_ray_gun.heat", shots, threshold));
         int effPercent = (int)(efficiency * 100);
-        String effColor = effPercent >= 100 ? net.minecraft.util.text.TextFormatting.GREEN.toString() : net.minecraft.util.text.TextFormatting.RED.toString();
-        tooltip.add(net.minecraft.util.text.TextFormatting.GOLD + "Fuel Efficiency: " + effColor + effPercent + "%" + net.minecraft.util.text.TextFormatting.RESET);
+        info.add(Util.translateFormatted("stat.fuel_tank.efficiency.name", effPercent + "%"));
         int powPercent = (int)(power * 100);
-        String powColor = powPercent >= 100 ? net.minecraft.util.text.TextFormatting.GREEN.toString() : net.minecraft.util.text.TextFormatting.RED.toString();
-        tooltip.add(net.minecraft.util.text.TextFormatting.GOLD + "Power: " + powColor + powPercent + "%" + net.minecraft.util.text.TextFormatting.RESET);
+        info.add(Util.translateFormatted("stat.heat_ray_emitter.power.name", powPercent + "%"));
         float chargeTimeSec = chargeTicks / 20.0f;
         int chargeRatio = (int)((1.5f / chargeTimeSec) * 100);
-        String chargeColor = chargeRatio >= 100 ? net.minecraft.util.text.TextFormatting.GREEN.toString() : net.minecraft.util.text.TextFormatting.RED.toString();
-        tooltip.add(net.minecraft.util.text.TextFormatting.GOLD + "Charge Speed: " + chargeColor + chargeRatio + "%" + net.minecraft.util.text.TextFormatting.RESET);
+        info.add(Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeRatio + "%"));
+        return info;
     }
 
     @Override

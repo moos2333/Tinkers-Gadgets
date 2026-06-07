@@ -64,3 +64,5 @@ stat.fuel_tank.heat_capacity.name=热容: %s
 stat.fuel_tank.efficiency.name=燃料效率: %s
 stat.heat_ray_emitter.charge_time.name=充能效率: %s
 stat.heat_ray_emitter.power.name=功率: %s
+stat.heat_ray_gun.fuel=燃料: %s/%s
+stat.heat_ray_gun.heat=热量: %s/%s
