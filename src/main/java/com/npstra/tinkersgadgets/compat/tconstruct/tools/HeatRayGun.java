@@ -22,6 +22,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.materials.Material;
@@ -79,15 +80,22 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             stack.setTagCompound(itemTag);
         }
-        info.add(Util.translateFormatted("stat.heat_ray_gun.fuel", fuel, maxFuel));
-        info.add(Util.translateFormatted("stat.heat_ray_gun.heat", shots, threshold));
+        info.add(Util.translateFormatted("stat.heat_ray_gun.fuel",
+                TextFormatting.GOLD + String.valueOf(fuel) + TextFormatting.RESET,
+                TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET));
+        info.add(Util.translateFormatted("stat.heat_ray_gun.heat",
+                TextFormatting.GOLD + String.valueOf(shots) + TextFormatting.RESET,
+                TextFormatting.GOLD + String.valueOf(threshold) + TextFormatting.RESET));
         int effPercent = (int)(efficiency * 100);
-        info.add(Util.translateFormatted("stat.fuel_tank.efficiency.name", effPercent + "%"));
+        String effColor = effPercent >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+        info.add(Util.translateFormatted("stat.fuel_tank.efficiency.name", effColor + effPercent + "%" + TextFormatting.RESET));
         int powPercent = (int)(power * 100);
-        info.add(Util.translateFormatted("stat.heat_ray_emitter.power.name", powPercent + "%"));
+        String powColor = powPercent >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+        info.add(Util.translateFormatted("stat.heat_ray_emitter.power.name", powColor + powPercent + "%" + TextFormatting.RESET));
         float chargeTimeSec = chargeTicks / 20.0f;
         int chargeRatio = (int)((1.5f / chargeTimeSec) * 100);
-        info.add(Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeRatio + "%"));
+        String chargeColor = chargeRatio >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+        info.add(Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeColor + chargeRatio + "%" + TextFormatting.RESET));
         return info;
     }
 
