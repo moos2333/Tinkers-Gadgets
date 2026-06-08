@@ -45,7 +45,7 @@ public class ThrowingKnife extends ProjectileCore {
     public float damagePotential() { return 0.66f; }
 
     @Override
-    public int[] getRepairParts() { return new int[]{0, 1}; }
+    public int[] getRepairParts() { return new int[]{0}; }
 
     @Nonnull
     @Override

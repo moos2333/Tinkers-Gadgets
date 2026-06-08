@@ -80,12 +80,7 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             stack.setTagCompound(itemTag);
         }
-        info.add(Util.translateFormatted("stat.heat_ray_gun.fuel",
-                TextFormatting.GOLD + String.valueOf(fuel) + TextFormatting.RESET,
-                TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET));
-        info.add(Util.translateFormatted("stat.heat_ray_gun.heat",
-                TextFormatting.GOLD + String.valueOf(shots) + TextFormatting.RESET,
-                TextFormatting.GOLD + String.valueOf(threshold) + TextFormatting.RESET));
+
         int effPercent = (int)(efficiency * 100);
         String effColor = effPercent >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
         info.add(Util.translateFormatted("stat.fuel_tank.efficiency.name", effColor + effPercent + "%" + TextFormatting.RESET));
@@ -96,7 +91,44 @@ public class HeatRayGun extends TinkerToolCore {
         int chargeRatio = (int)((1.5f / chargeTimeSec) * 100);
         String chargeColor = chargeRatio >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
         info.add(Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeColor + chargeRatio + "%" + TextFormatting.RESET));
+
+        if (detailed) {
+            info.add(Util.translateFormatted("stat.heat_ray_gun.fuel",
+                    TextFormatting.GOLD + String.valueOf(fuel) + TextFormatting.RESET,
+                    TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET));
+            info.add(Util.translateFormatted("stat.heat_ray_gun.heat",
+                    TextFormatting.GOLD + String.valueOf(shots) + TextFormatting.RESET,
+                    TextFormatting.GOLD + String.valueOf(threshold) + TextFormatting.RESET));
+        }
         return info;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        if (flagIn.isAdvanced()) return;
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        if (toolTag == null) return;
+        NBTTagCompound itemTag = stack.getTagCompound();
+        if (itemTag == null) itemTag = new NBTTagCompound();
+        int maxFuel = toolTag.hasKey("maxFuel") ? toolTag.getInteger("maxFuel") : 10000;
+        int threshold = toolTag.hasKey("heatCapacity") ? toolTag.getInteger("heatCapacity") : 10;
+        int fuel = itemTag.hasKey("Fuel") ? itemTag.getInteger("Fuel") : 0;
+        int shots = itemTag.hasKey("ShotCount") ? itemTag.getInteger("ShotCount") : 0;
+        if (!itemTag.hasKey("Fuel")) {
+            itemTag.setInteger("Fuel", 0);
+            stack.setTagCompound(itemTag);
+        }
+        if (!itemTag.hasKey("ShotCount")) {
+            itemTag.setInteger("ShotCount", 0);
+            stack.setTagCompound(itemTag);
+        }
+        tooltip.add(Util.translateFormatted("stat.heat_ray_gun.fuel",
+                TextFormatting.GOLD + String.valueOf(fuel) + TextFormatting.RESET,
+                TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET));
+        tooltip.add(Util.translateFormatted("stat.heat_ray_gun.heat",
+                TextFormatting.GOLD + String.valueOf(shots) + TextFormatting.RESET,
+                TextFormatting.GOLD + String.valueOf(threshold) + TextFormatting.RESET));
     }
 
     @Override
