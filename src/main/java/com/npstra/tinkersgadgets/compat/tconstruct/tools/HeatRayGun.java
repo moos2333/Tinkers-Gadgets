@@ -342,16 +342,30 @@ public class HeatRayGun extends TinkerToolCore {
 
     private void spawnClientParticles(World world, EntityPlayer player, ItemStack stack) {
         if (!world.isRemote) return;
+        int fuel = getFuel(stack);
+        int fuelCost = getFuelCost(stack);
+        boolean hasFuel = fuel >= fuelCost;
+        boolean overheated = false;
         NBTTagCompound itemTag = stack.getTagCompound();
         if (itemTag != null && itemTag.hasKey("OverheatEndTick")) {
             long overheatEnd = itemTag.getLong("OverheatEndTick");
             if (world.getTotalWorldTime() < overheatEnd) {
-                return;
+                overheated = true;
             }
         }
         Vec3d eyePos = player.getPositionEyes(1.0F);
         Vec3d lookVec = player.getLookVec();
         Vec3d muzzlePos = eyePos.add(lookVec.scale(1.5));
+        if (!hasFuel || overheated) {
+            for (int i = 0; i < 4; i++) {
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+                        muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
+                        muzzlePos.y + (world.rand.nextDouble() - 0.5) * 0.5,
+                        muzzlePos.z + (world.rand.nextDouble() - 0.5) * 0.5,
+                        0, 0.02, 0);
+            }
+            return;
+        }
         for (int i = 0; i < 2; i++) {
             world.spawnParticle(EnumParticleTypes.FLAME,
                     muzzlePos.x + (world.rand.nextDouble() - 0.5) * 0.5,
