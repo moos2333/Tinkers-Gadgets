@@ -48,7 +48,7 @@ public class HeatRayGun extends TinkerToolCore {
                 PartMaterialType.head(TinkerTools.largePlate),
                 new PartMaterialType(GadgetsRegister.fuelTank, FuelTankPartType.FUEL_TANK),
                 new PartMaterialType(GadgetsRegister.heatRayEmitter, HeatRayEmitterPartType.HEAT_RAY_EMITTER));
-        addCategory(Category.NO_MELEE, Category.PROJECTILE);
+        addCategory(Category.NO_MELEE);
         setRegistryName("heat_ray_gun");
         setTranslationKey("tinkersgadgets.heat_ray_gun");
     }
