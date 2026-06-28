@@ -157,6 +157,10 @@ public class MaterialRegister {
         if (cobalt != Material.UNKNOWN && cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
             cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
         }
+        Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
+        if (magmaslime != Material.UNKNOWN && magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+            magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.25f));
+        }
     }
 
     private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
@@ -239,7 +243,7 @@ public class MaterialRegister {
         setRenderColor(redstone, 0xCC0000);
         setRenderColor(blueSlimeball, 0x5BC7FF);
         setRenderColor(enderpearl, 0x0A6E6E);
-        setRenderColor(wool, 0xBFB5B5);
+        setRenderColor(wool, 0xF3E9E3);
         setRenderColor(prismarineCrystals, 0xdfe9dc);
         setRenderColor(brick, 0xb75a40);
         setRenderColor(netherbrick, 0x49282e);
