@@ -83,7 +83,14 @@ public class MaterialRegister {
             redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
         }
         if (!disabledMaterialSet.contains("blue_slimeball")) {
-            blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, TraitsRegistry.DEFLECT, "deflect_boomerang");
+            blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, null, null);
+            if (!disabledTraitSet.contains("deflect_boomerang")) {
+                blueSlimeball.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
+            }
+            if (!disabledTraitSet.contains("rebound_throwingknife")) {
+                blueSlimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("enderpearl")) {
             enderpearl = new Material("enderpearl", 0x0A6E6E, false);
