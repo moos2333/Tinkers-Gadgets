@@ -159,7 +159,7 @@ public class MaterialRegister {
         }
         Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
         if (magmaslime != Material.UNKNOWN && magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.25f));
+            magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
         }
     }
 
