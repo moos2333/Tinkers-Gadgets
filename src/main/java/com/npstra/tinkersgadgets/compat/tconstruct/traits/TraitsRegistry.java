@@ -17,4 +17,5 @@ public class TraitsRegistry {
     public static final AbstractTrait SHATTER = new TraitShatter();
     public static final AbstractTrait ECHO = new TraitEcho();
     public static final AbstractTrait PULSE = new TraitPulse();
+    public static final AbstractTrait GUIDANCE = new TraitGuidance();
 }

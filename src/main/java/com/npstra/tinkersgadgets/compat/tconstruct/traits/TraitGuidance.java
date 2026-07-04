@@ -1,10 +1,10 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.traits;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
@@ -17,7 +17,7 @@ import java.util.List;
 public class TraitGuidance extends ProjectileModifierTrait {
 
     private static final double MAX_RANGE = 12.0;
-    private static final double HOMING_STRENGTH = 0.03;
+    private static final double HOMING_STRENGTH = 0.05;
 
     public TraitGuidance() {
         super("guidance_throwingknife", 0x0A6E6E);
@@ -28,14 +28,18 @@ public class TraitGuidance extends ProjectileModifierTrait {
     public void onProjectileUpdate(EntityProjectileBase projectile, World world, ItemStack toolStack) {
         if (world.isRemote) return;
         if (!(projectile instanceof EntityThrowingKnife)) return;
-        if (projectile.ticksExisted < 5) return;
+        if (projectile.ticksExisted < 2) return;
+        if (projectile.isDead || projectile.defused) return;
+        if (projectile.motionX == 0.0D && projectile.motionY == 0.0D && projectile.motionZ == 0.0D) return;
 
-        EntityLivingBase shooter = projectile.shootingEntity;
-        if (!(shooter instanceof EntityPlayer)) return;
+        Entity shooter = projectile.shootingEntity;
+        if (!(shooter instanceof EntityLivingBase)) return;
+        EntityLivingBase shooterLiving = (EntityLivingBase) shooter;
+        if (!(shooterLiving instanceof EntityPlayer)) return;
 
         AxisAlignedBB aabb = projectile.getEntityBoundingBox().grow(MAX_RANGE);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, aabb,
-                e -> e != shooter && e != projectile && e.isEntityAlive() && !e.isSpectator());
+                e -> e != shooterLiving && e.getEntityId() != projectile.getEntityId() && e.isEntityAlive() && !(e instanceof EntityPlayer && ((EntityPlayer)e).isSpectator()));
 
         if (targets.isEmpty()) return;
 
