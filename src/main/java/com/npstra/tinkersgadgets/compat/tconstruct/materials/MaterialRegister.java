@@ -85,6 +85,10 @@ public class MaterialRegister {
         }
         if (!disabledMaterialSet.contains("redstone")) {
             redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
+            if (!disabledTraitSet.contains("pulse_throwingknife")) {
+                redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("blue_slimeball")) {
             blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, null, null);

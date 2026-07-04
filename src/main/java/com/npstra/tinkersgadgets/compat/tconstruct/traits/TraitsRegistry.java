@@ -16,4 +16,5 @@ public class TraitsRegistry {
     public static final AbstractTrait RECOVERY = new TraitRecovery();
     public static final AbstractTrait SHATTER = new TraitShatter();
     public static final AbstractTrait ECHO = new TraitEcho();
+    public static final AbstractTrait PULSE = new TraitPulse();
 }

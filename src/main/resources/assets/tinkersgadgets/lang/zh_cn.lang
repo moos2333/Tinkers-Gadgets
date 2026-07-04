@@ -1,7 +1,7 @@
 item.tinkersgadgets.boomerang.name=回力镖
 item.tinkersgadgets.boomerang.desc=可折返的投掷武器。§r\n右击：蓄力掷出，命中后折返。
 item.tinkersgadgets.throwing_knife.name=飞刀
-item.tinkersgadgets.throwing_knife.desc=飞刀是一种投掷型武器，伤害适中。\n右击：短蓄力丢出一柄飞刀\n潜行+右击：长蓄力一次性掷出三柄飞刀。
+item.tinkersgadgets.throwing_knife.desc=飞刀是一种投掷型武器，伤害适中。\n右击：短蓄力掷出一柄飞刀\n潜行+右击：长蓄力掷出三柄飞刀。
 modifier.boomerang_piercing.name=贯穿
 modifier.boomerang_piercing.desc=§o一气呵成！§r\n回力镖可额外贯穿至多2个敌人。
 modifier.bouncing_boomerang.name=弹射
@@ -28,6 +28,8 @@ modifier.shatter_boomerang.name=粉碎
 modifier.shatter_boomerang.desc=§o碎片横飞！§r\n回力镖撞击足以击碎较软的方块。
 modifier.echo_throwingknife.name=回响
 modifier.echo_throwingknife.desc=§o余音绕梁！§r\n切换攻击目标时，对上一个目标造成额外伤害，连续切换将使伤害逐渐提高。
+modifier.pulse_throwingknife.name=脉冲
+modifier.pulse_throwingknife.desc=§o高频脉冲！§r\n显著缩减命中后产生的无敌时间。
 material.prismarine_crystals.name=海晶砂粒
 material.wool.name=羊毛
 material.glass.name=玻璃
