@@ -54,6 +54,10 @@ public class MaterialRegister {
         }
         if (!disabledMaterialSet.contains("popped_chorus")) {
             poppedChorus = createMaterial("popped_chorus", 0xb78db7, TraitsRegistry.PIERCING, "boomerang_piercing");
+            if (!disabledTraitSet.contains("echo_throwingknife")) {
+                poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
         }
         if (!disabledMaterialSet.contains("nether_quartz")) {
             netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.KEEN, "keen");
