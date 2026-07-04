@@ -17,7 +17,7 @@ public class TraitBouncing extends ProjectileModifierTrait {
     private static final Map<UUID, Float> damageMultMap = new HashMap<>();
 
     public TraitBouncing() {
-        super("bouncing", 0x32CD32);
+        super("bouncing_boomerang", 0x32CD32);
         addAspects(ModifierAspect.projectileOnly);
     }
 

@@ -199,35 +199,34 @@ public class MaterialRegister {
         if (mat != null) TinkerRegistry.integrate(mat);
     }
 
+    private static void registerMaterial(Material mat, ItemStack stack, int value) {
+        if (mat != null) {
+            mat.addItem(stack, 1, value);
+            mat.setRepresentativeItem(stack.getItem());
+        }
+    }
+
     private static void setupMaterials() {
-        setMaterialItems(glass, new ItemStack(Blocks.GLASS));
-        setMaterialItems(slimeball, new ItemStack(Items.SLIME_BALL));
-        setMaterialItems(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED));
-        setMaterialItems(netherQuartz, new ItemStack(Items.QUARTZ));
-        setMaterialItems(magmaCream, new ItemStack(Items.MAGMA_CREAM));
-        setMaterialItems(shulkerShell, new ItemStack(Items.SHULKER_SHELL));
-        setMaterialItems(leather, new ItemStack(Items.LEATHER));
-        setMaterialItems(redstone, new ItemStack(Items.REDSTONE));
-        setMaterialItems(enderpearl, new ItemStack(Items.ENDER_PEARL));
-        setMaterialItems(wool, new ItemStack(Blocks.WOOL));
-        setMaterialItems(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS));
-        setMaterialItems(brick, new ItemStack(Items.BRICK));
-        setMaterialItems(netherbrick, new ItemStack(Items.NETHERBRICK));
+        registerMaterial(glass, new ItemStack(Blocks.GLASS), Material.VALUE_Ingot);
+        registerMaterial(slimeball, new ItemStack(Items.SLIME_BALL), 36);
+        registerMaterial(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot);
+        registerMaterial(netherQuartz, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot);
+        registerMaterial(magmaCream, new ItemStack(Items.MAGMA_CREAM), Material.VALUE_Ingot);
+        registerMaterial(shulkerShell, new ItemStack(Items.SHULKER_SHELL), Material.VALUE_Ingot);
+        registerMaterial(leather, new ItemStack(Items.LEATHER), Material.VALUE_Ingot);
+        registerMaterial(redstone, new ItemStack(Items.REDSTONE), Material.VALUE_Shard);
+        registerMaterial(enderpearl, new ItemStack(Items.ENDER_PEARL), Material.VALUE_Ingot);
+        registerMaterial(wool, new ItemStack(Blocks.WOOL), Material.VALUE_Ingot);
+        registerMaterial(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS), Material.VALUE_Ingot);
+        registerMaterial(brick, new ItemStack(Items.BRICK), Material.VALUE_Ingot);
+        registerMaterial(netherbrick, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot);
 
         if (blueSlimeball != null) {
             Item blueSlimeItem = Item.getByNameOrId("tconstruct:edible");
             ItemStack blueSlimeStack = blueSlimeItem != null ? new ItemStack(blueSlimeItem, 1, 1) : ItemStack.EMPTY;
             if (!blueSlimeStack.isEmpty()) {
-                blueSlimeball.addItem(blueSlimeStack, 1, Material.VALUE_Ingot);
-                blueSlimeball.setRepresentativeItem(blueSlimeStack);
+                registerMaterial(blueSlimeball, blueSlimeStack, 36);
             }
-        }
-    }
-
-    private static void setMaterialItems(Material mat, ItemStack stack) {
-        if (mat != null) {
-            mat.addItem(stack, 1, Material.VALUE_Ingot);
-            mat.setRepresentativeItem(stack.getItem());
         }
     }
 

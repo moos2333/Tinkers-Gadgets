@@ -12,7 +12,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 
 public class TraitFracture extends ProjectileModifierTrait {
     public TraitFracture() {
-        super("fracture", 0xAAAAAA);
+        super("fracture_boomerang", 0xAAAAAA);
         addAspects(ModifierAspect.projectileOnly);
     }
 
