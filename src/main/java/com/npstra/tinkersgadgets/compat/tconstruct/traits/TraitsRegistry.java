@@ -18,4 +18,6 @@ public class TraitsRegistry {
     public static final AbstractTrait ECHO = new TraitEcho();
     public static final AbstractTrait PULSE = new TraitPulse();
     public static final AbstractTrait GUIDANCE = new TraitGuidance();
+    public static final AbstractTrait TRAUMA =  new TraitTrauma();
+    public static final AbstractTrait INERTIA =  new TraitInertia();
 }

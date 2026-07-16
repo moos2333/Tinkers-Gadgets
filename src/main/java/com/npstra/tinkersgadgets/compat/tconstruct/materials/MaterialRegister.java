@@ -69,6 +69,13 @@ public class MaterialRegister {
         }
         if (isMaterialEnabled("nether_quartz")) {
             netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.KEEN, "keen");
+            if (isTraitEnabled("keen")) {
+                netherQuartz.addTrait(TraitsRegistry.KEEN, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("trauma_throwingknife")) {
+                netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
+            }
+            TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         }
         if (isMaterialEnabled("magma_cream")) {
             magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
@@ -163,6 +170,14 @@ public class MaterialRegister {
         }
         if (iron != Material.UNKNOWN && iron.getStats(FuelTankPartType.FUEL_TANK) == null) {
             iron.addStats(new FuelTankMaterialStats(10000, 10, 1.0f));
+        }
+        if (iron != Material.UNKNOWN) {
+            if (iron.getStats(GripPartType.GRIP) == null) {
+                TinkerRegistry.addMaterialStats(iron, new GripMaterialStats());
+            }
+            if (isTraitEnabled("inertia_throwingknife")) {
+                iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
+            }
         }
         Material stone = TinkerRegistry.getMaterial("stone");
         if (stone != Material.UNKNOWN && stone.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
