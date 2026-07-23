@@ -24,7 +24,7 @@ public class FuelTankMaterialStats extends AbstractMaterialStats {
     public List<String> getLocalizedInfo() {
         int effPercent = (int)((efficiency - 1.0f) * 100);
         String effColor = effPercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String effSign = effPercent > 0 ? "+" : "";
+        String effSign = effPercent >= 0 ? "+" : "";
         return ImmutableList.of(
                 TextFormatting.GOLD + Util.translateFormatted("stat.fuel_tank.max_fuel.name", maxFuel),
                 TextFormatting.GOLD + Util.translateFormatted("stat.fuel_tank.heat_capacity.name", heatCapacity),

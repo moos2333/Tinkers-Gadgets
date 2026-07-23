@@ -22,10 +22,10 @@ public class HeatRayEmitterMaterialStats extends AbstractMaterialStats {
     public List<String> getLocalizedInfo() {
         int chargePercent = (int)((1.5f / chargeTime - 1.0f) * 100);
         String chargeColor = chargePercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String chargeSign = chargePercent > 0 ? "+" : "";
+        String chargeSign = chargePercent >= 0 ? "+" : "";
         int powerPercent = (int)((power - 1.0f) * 100);
         String powerColor = powerPercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String powerSign = powerPercent > 0 ? "+" : "";
+        String powerSign = powerPercent >= 0 ? "+" : "";
         return ImmutableList.of(
                 TextFormatting.AQUA + Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeColor + chargeSign + chargePercent + "%" + TextFormatting.RESET),
                 TextFormatting.AQUA + Util.translateFormatted("stat.heat_ray_emitter.power.name", powerColor + powerSign + powerPercent + "%" + TextFormatting.RESET)

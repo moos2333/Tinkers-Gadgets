@@ -93,6 +93,9 @@ public class MaterialRegister {
                 shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
             }
             TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
+            if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.1f));
+            }
         }
         if (isMaterialEnabled("leather")) {
             leather = createMaterial("leather", 0xC76A43, null, null);
