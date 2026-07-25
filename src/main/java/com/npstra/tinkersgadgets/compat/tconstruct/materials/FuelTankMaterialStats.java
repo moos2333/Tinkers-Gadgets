@@ -5,6 +5,7 @@ import net.minecraft.util.text.TextFormatting;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.materials.AbstractMaterialStats;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.FuelTankPartType;
+
 import java.util.List;
 
 public class FuelTankMaterialStats extends AbstractMaterialStats {
@@ -23,12 +24,23 @@ public class FuelTankMaterialStats extends AbstractMaterialStats {
     @Override
     public List<String> getLocalizedInfo() {
         int effPercent = (int)((efficiency - 1.0f) * 100);
-        String effColor = effPercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String effSign = effPercent >= 0 ? "+" : "";
+        String effColor;
+        String effSign;
+        if (effPercent > 0) {
+            effColor = TextFormatting.GREEN.toString();
+            effSign = "+";
+        } else if (effPercent < 0) {
+            effColor = TextFormatting.RED.toString();
+            effSign = "";
+        } else {
+            effColor = TextFormatting.GRAY.toString();
+            effSign = "+";
+        }
+
         return ImmutableList.of(
-                TextFormatting.GOLD + Util.translateFormatted("stat.fuel_tank.max_fuel.name", maxFuel),
-                TextFormatting.GOLD + Util.translateFormatted("stat.fuel_tank.heat_capacity.name", heatCapacity),
-                TextFormatting.GOLD + Util.translateFormatted("stat.fuel_tank.efficiency.name", effColor + effSign + effPercent + "%" + TextFormatting.RESET)
+                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.max_fuel.name", TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET),
+                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.heat_capacity.name", TextFormatting.GOLD + String.valueOf(heatCapacity) + TextFormatting.RESET),
+                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.efficiency.name", effColor + effSign + effPercent + "%" + TextFormatting.RESET)
         );
     }
 

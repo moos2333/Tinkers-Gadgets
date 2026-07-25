@@ -5,6 +5,7 @@ import net.minecraft.util.text.TextFormatting;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.materials.AbstractMaterialStats;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.HeatRayEmitterPartType;
+
 import java.util.List;
 
 public class HeatRayEmitterMaterialStats extends AbstractMaterialStats {
@@ -21,14 +22,36 @@ public class HeatRayEmitterMaterialStats extends AbstractMaterialStats {
     @Override
     public List<String> getLocalizedInfo() {
         int chargePercent = (int)((1.5f / chargeTime - 1.0f) * 100);
-        String chargeColor = chargePercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String chargeSign = chargePercent >= 0 ? "+" : "";
+        String chargeColor;
+        String chargeSign;
+        if (chargePercent > 0) {
+            chargeColor = TextFormatting.GREEN.toString();
+            chargeSign = "+";
+        } else if (chargePercent < 0) {
+            chargeColor = TextFormatting.RED.toString();
+            chargeSign = "";
+        } else {
+            chargeColor = TextFormatting.GRAY.toString();
+            chargeSign = "+";
+        }
+
         int powerPercent = (int)((power - 1.0f) * 100);
-        String powerColor = powerPercent >= 0 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        String powerSign = powerPercent >= 0 ? "+" : "";
+        String powerColor;
+        String powerSign;
+        if (powerPercent > 0) {
+            powerColor = TextFormatting.GREEN.toString();
+            powerSign = "+";
+        } else if (powerPercent < 0) {
+            powerColor = TextFormatting.RED.toString();
+            powerSign = "";
+        } else {
+            powerColor = TextFormatting.GRAY.toString();
+            powerSign = "+";
+        }
+
         return ImmutableList.of(
-                TextFormatting.AQUA + Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeColor + chargeSign + chargePercent + "%" + TextFormatting.RESET),
-                TextFormatting.AQUA + Util.translateFormatted("stat.heat_ray_emitter.power.name", powerColor + powerSign + powerPercent + "%" + TextFormatting.RESET)
+                TextFormatting.GRAY + Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", chargeColor + chargeSign + chargePercent + "%" + TextFormatting.RESET),
+                TextFormatting.GRAY + Util.translateFormatted("stat.heat_ray_emitter.power.name", powerColor + powerSign + powerPercent + "%" + TextFormatting.RESET)
         );
     }
 

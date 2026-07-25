@@ -20,4 +20,6 @@ public class TraitsRegistry {
     public static final AbstractTrait GUIDANCE = new TraitGuidance();
     public static final AbstractTrait TRAUMA =  new TraitTrauma();
     public static final AbstractTrait INERTIA =  new TraitInertia();
+    public static final AbstractTrait PRESSURIZED = new TraitPressurized();
+    public static final AbstractTrait TEMPER =  new TraitTemper();
 }

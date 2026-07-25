@@ -94,7 +94,7 @@ public class MaterialRegister {
             }
             TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
             if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.1f));
+                shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
             }
         }
         if (isMaterialEnabled("leather")) {
@@ -158,6 +158,9 @@ public class MaterialRegister {
             brick.setCraftable(true).setCastable(false);
             TinkerRegistry.addMaterial(brick);
             TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
+            if (isTraitEnabled("temper_heatraygun")) {
+                brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
+            }
             brick.setVisible();
         }
         if (isMaterialEnabled("netherbrick")) {
@@ -165,6 +168,9 @@ public class MaterialRegister {
             netherbrick.setCraftable(true).setCastable(false);
             TinkerRegistry.addMaterial(netherbrick);
             TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
+            if (isTraitEnabled("pressurized_heatraygun")) {
+                netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
+            }
             netherbrick.setVisible();
         }
         Material iron = TinkerRegistry.getMaterial("iron");
