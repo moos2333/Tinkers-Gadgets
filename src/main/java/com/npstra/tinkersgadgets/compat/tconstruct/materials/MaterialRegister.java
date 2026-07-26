@@ -91,10 +91,14 @@ public class MaterialRegister {
             if (isTraitEnabled("enderference")) {
                 shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
                 shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
+                shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
             }
             TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
             if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
                 shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
+            }
+            if (isMaterialEnabled("shulker_shell") && isTraitEnabled("thermostatic_heatraygun")) {
+                shulkerShell.addTrait(TraitsRegistry.THERMOSTATIC, FuelTankPartType.FUEL_TANK);
             }
         }
         if (isMaterialEnabled("leather")) {
@@ -148,6 +152,10 @@ public class MaterialRegister {
             prismarineCrystals.setCraftable(true).setCastable(false);
             if (isTraitEnabled("shatter_boomerang")) {
                 prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
+            }
+            TinkerRegistry.addMaterialStats(prismarineCrystals, new FuelTankMaterialStats(5000, 8, 0.95f));
+            if (isTraitEnabled("condensation_heatraygun")) {
+                prismarineCrystals.addTrait(TraitsRegistry.CONDENSATION, FuelTankPartType.FUEL_TANK);
             }
             TinkerRegistry.addMaterial(prismarineCrystals);
             TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
