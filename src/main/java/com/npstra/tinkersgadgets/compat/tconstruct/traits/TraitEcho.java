@@ -28,7 +28,7 @@ public class TraitEcho extends AbstractTrait {
         if (!(player instanceof EntityPlayer)) return;
         if (tool.isEmpty()) return;
 
-        float baseDamage = ToolHelper.getActualAttack(tool);
+        float baseDamage = ToolHelper.getActualAttack(tool) + 1.0f;
         World world = target.world;
         NBTTagCompound tag = TagUtil.getTagSafe(tool);
         int stacks = tag.getInteger(TAG_STACKS);
