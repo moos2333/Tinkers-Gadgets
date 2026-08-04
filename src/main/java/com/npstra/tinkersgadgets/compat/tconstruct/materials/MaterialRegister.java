@@ -48,7 +48,18 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
 
         if (isMaterialEnabled("glass")) {
-            glass = createMaterial("glass", 0xFFFFFF, TraitsRegistry.FRACTURE, "fracture");
+            glass = new Material("glass", 0xFFFFFF, false);
+            glass.setCraftable(true).setCastable(false);
+            if (isTraitEnabled("fracture")) {
+                glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("focus_heatraygun")) {
+                glass.addTrait(TraitsRegistry.FOCUS, FuelTankPartType.FUEL_TANK);
+            }
+            TinkerRegistry.addMaterial(glass);
+            TinkerRegistry.addMaterialStats(glass, new ConnectorMaterialStats());
+            TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
+            glass.setVisible();
         }
         if (isMaterialEnabled("slimeball")) {
             slimeball = createMaterial("slimeball", 0x71ac63, null, null);
