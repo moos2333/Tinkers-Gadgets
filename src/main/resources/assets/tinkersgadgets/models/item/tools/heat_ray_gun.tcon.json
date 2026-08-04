@@ -7,5 +7,17 @@
     "layer2": "tinkersgadgets:items/tools/heat_ray_gun/fuel_tank",
     "layer3": "tinkersgadgets:items/tools/heat_ray_gun/emitter",
     "broken2": "tinkersgadgets:items/tools/heat_ray_gun/fuel_tank_broken"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [ 0, -90, 55 ],
+      "translation": [ 0, 0.5, -2.5 ],
+      "scale": [ 1.0, 1.0, 1.0 ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [ 0, 90, -55 ],
+      "translation": [ 0, 0.5, -2.5 ],
+      "scale": [ 1.0, 1.0, 1.0 ]
+    }
   }
 }
