@@ -1,0 +1,40 @@
+package com.npstra.tinkersgadgets.compat.tconstruct.modifiers;
+
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import slimeknights.mantle.util.RecipeMatch;
+import slimeknights.tconstruct.library.modifiers.ModifierTrait;
+import slimeknights.tconstruct.library.modifiers.ModifierNBT;
+import slimeknights.tconstruct.library.utils.TagUtil;
+
+public class ModRapid extends ModifierTrait {
+    private static final int MAX_LEVEL = 3;
+    private static final float PER_LEVEL = 0.10f;
+    private static final String KEY_BASE = "baseChargeTime";
+
+    public ModRapid() {
+        super("rapid_heatraygun", 0xFF8C00, MAX_LEVEL, 45);
+        addRecipeMatch(new RecipeMatch.Item(new ItemStack(Items.SUGAR), 1, 1));
+    }
+
+    @Override
+    public boolean canApplyCustom(ItemStack stack) {
+        return stack.getItem() instanceof com.npstra.tinkersgadgets.compat.tconstruct.tools.HeatRayGun;
+    }
+
+    @Override
+    public void applyEffect(NBTTagCompound rootCompound, NBTTagCompound modifierTag) {
+        ModifierNBT.IntegerNBT modData = ModifierNBT.readInteger(modifierTag);
+        NBTTagCompound toolTag = TagUtil.getToolTag(rootCompound);
+        int base = toolTag.getInteger(KEY_BASE);
+        if (base == 0) {
+            base = toolTag.getInteger("chargeTime");
+            toolTag.setInteger(KEY_BASE, base);
+        }
+        float perPoint = PER_LEVEL / 45.0f;
+        int newCharge = Math.max(1, Math.round(base / (1.0f + modData.current * perPoint)));
+        toolTag.setInteger("chargeTime", newCharge);
+        TagUtil.setToolTag(rootCompound, toolTag);
+    }
+}

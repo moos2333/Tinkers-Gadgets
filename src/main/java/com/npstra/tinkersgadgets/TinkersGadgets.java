@@ -2,6 +2,7 @@ package com.npstra.tinkersgadgets;
 
 import com.npstra.tinkersgadgets.compat.tconstruct.common.CommonProxy;
 import com.npstra.tinkersgadgets.compat.tconstruct.materials.MaterialRegister;
+import com.npstra.tinkersgadgets.compat.tconstruct.modifiers.ModifierRegister;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -32,5 +33,6 @@ public class TinkersGadgets {
     public void init(FMLInitializationEvent event) {
         proxy.initToolGuis();
         MaterialRegister.init(event);
+        ModifierRegister.init(event);
     }
 }
