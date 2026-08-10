@@ -1,18 +1,26 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.modifiers;
 
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import slimeknights.tconstruct.library.TinkerRegistry;
+import com.npstra.tinkersgadgets.Config;
 
 public class ModifierRegister {
-    public static final ModCapacity CAPACITY = new ModCapacity();
-    public static final ModRapid RAPID = new ModRapid();
-    public static final ModPower POWER = new ModPower();
-    public static final ModEfficiency EFFICIENCY = new ModEfficiency();
+    private static ModCapacity CAPACITY;
+    private static ModRapid RAPID;
+    private static ModPower POWER;
+    private static ModEfficiency EFFICIENCY;
+
     public static void init(FMLInitializationEvent event) {
-        TinkerRegistry.registerModifier(CAPACITY);
-        TinkerRegistry.registerModifier(RAPID);
-        TinkerRegistry.registerModifier(POWER);
-        TinkerRegistry.registerModifier(EFFICIENCY);
+        if (Config.enableCapacity) {
+            CAPACITY = new ModCapacity();
+        }
+        if (Config.enableRapid) {
+            RAPID = new ModRapid();
+        }
+        if (Config.enablePower) {
+            POWER = new ModPower();
+        }
+        if (Config.enableEfficiency) {
+            EFFICIENCY = new ModEfficiency();
+        }
     }
 }
