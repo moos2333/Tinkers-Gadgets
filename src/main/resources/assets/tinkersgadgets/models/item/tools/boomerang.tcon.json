@@ -4,7 +4,6 @@
   "textures": {
     "layer0": "tinkersgadgets:items/tools/boomerang/blade1",
     "layer1": "tinkersgadgets:items/tools/boomerang/binding",
-    "layer2": "tinkersgadgets:items/tools/boomerang/blade2",
-    "broken": "tinkersgadgets:items/tools/boomerang/blade_broken"
+    "layer2": "tinkersgadgets:items/tools/boomerang/blade2"
   }
 }
