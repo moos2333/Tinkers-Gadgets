@@ -14,7 +14,7 @@ public class ModPower extends ModifierTrait {
     private static final String KEY_BASE = "basePower";
 
     public ModPower() {
-        super("power_heatraygun", 0xFF4500, MAX_LEVEL, 10);
+        super("power_heatraygun", 0xFF4500, MAX_LEVEL, 20);
         addRecipeMatch(new RecipeMatch.Item(new ItemStack(Items.FIRE_CHARGE), 1, 1));
     }
 
@@ -32,7 +32,7 @@ public class ModPower extends ModifierTrait {
             base = toolTag.getFloat("powerMultiplier");
             toolTag.setFloat(KEY_BASE, base);
         }
-        float perPoint = PER_LEVEL / 10.0f;
+        float perPoint = PER_LEVEL / 20.0f;
         toolTag.setFloat("powerMultiplier", base * (1.0f + modData.current * perPoint));
         TagUtil.setToolTag(rootCompound, toolTag);
     }
