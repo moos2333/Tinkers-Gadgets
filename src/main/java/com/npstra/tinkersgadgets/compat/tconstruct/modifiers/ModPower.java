@@ -15,7 +15,7 @@ public class ModPower extends ModifierTrait {
 
     public ModPower() {
         super("power_heatraygun", 0xFF4500, MAX_LEVEL, 10);
-        addRecipeMatch(new RecipeMatch.Item(new ItemStack(Items.BLAZE_ROD), 1, 1));
+        addRecipeMatch(new RecipeMatch.Item(new ItemStack(Items.FIRE_CHARGE), 1, 1));
     }
 
     @Override
