@@ -15,7 +15,7 @@ public class ModRapid extends ModifierTrait {
     private static final String KEY_BASE = "baseChargeTime";
 
     public ModRapid() {
-        super("rapid_heatraygun", 0xFF8C00, MAX_LEVEL, POINTS_PER_LEVEL);
+        super("rapid_heatraygun", 0xF5F5DC, MAX_LEVEL, POINTS_PER_LEVEL);
         addRecipeMatch(new RecipeMatch.Item(new ItemStack(Items.SUGAR), 1, 1));
     }
 
