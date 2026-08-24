@@ -2,8 +2,15 @@ package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tools.ToolPart;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ItemGrip extends ToolPart {
+    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
+            "leather", "wool", "slimeball", "shulker_shell", "blue_slimeball",
+            "popped_chorus", "redstone", "enderpearl", "nether_quartz", "iron"
+    ));
 
     public ItemGrip() {
         super(Material.VALUE_Ingot);
@@ -13,8 +20,7 @@ public class ItemGrip extends ToolPart {
 
     @Override
     public boolean canUseMaterial(Material mat) {
-        String id = mat.getIdentifier();
-        return id.equals("leather") || id.equals("wool") || id.equals("slimeball") || id.equals("shulker_shell") || id.equals("blue_slimeball") || id.equals("popped_chorus") || id.equals("redstone") || id.equals("enderpearl") || id.equals("nether_quartz") || id.equals("iron");
+        return ALLOWED_MATERIALS.contains(mat.getIdentifier());
     }
 
     @Override

@@ -2,8 +2,16 @@ package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tools.ToolPart;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ItemConnector extends ToolPart {
+    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
+            "glass", "slimeball", "popped_chorus", "nether_quartz", "magma_cream",
+            "shulker_shell", "leather", "redstone", "blue_slimeball",
+            "enderpearl", "prismarine_crystals"
+    ));
 
     public ItemConnector() {
         super(Material.VALUE_Ingot);
@@ -13,13 +21,7 @@ public class ItemConnector extends ToolPart {
 
     @Override
     public boolean canUseMaterial(Material mat) {
-        String id = mat.getIdentifier();
-        return id.equals("glass") || id.equals("slimeball") ||
-                id.equals("popped_chorus") || id.equals("nether_quartz") ||
-                id.equals("magma_cream") || id.equals("shulker_shell") ||
-                id.equals("leather") || id.equals("redstone") ||
-                id.equals("blue_slimeball") || id.equals("enderpearl") ||
-                id.equals("prismarine_crystals");
+        return ALLOWED_MATERIALS.contains(mat.getIdentifier());
     }
 
     @Override

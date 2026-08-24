@@ -27,6 +27,7 @@ public class MaterialRegister {
 
     public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool, prismarineCrystals;
     public static Material brick, netherbrick;
+
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
     private static Set<String> disabledTraitSet;
@@ -42,169 +43,224 @@ public class MaterialRegister {
     public static void preInit(FMLPreInitializationEvent event) {
         disabledMaterialSet = new HashSet<>(Arrays.asList(Config.disabledMaterials));
         disabledTraitSet = new HashSet<>(Arrays.asList(Config.disabledTraits));
+
         Material.UNKNOWN.addStats(new ConnectorMaterialStats());
         Material.UNKNOWN.addStats(new GripMaterialStats());
         Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
         Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
 
-        if (isMaterialEnabled("glass")) {
-            glass = new Material("glass", 0xFFFFFF, false);
-            glass.setCraftable(true).setCastable(false);
-            if (isTraitEnabled("fracture")) {
-                glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("focus_heatraygun")) {
-                glass.addTrait(TraitsRegistry.FOCUS, FuelTankPartType.FUEL_TANK);
-            }
-            TinkerRegistry.addMaterial(glass);
-            TinkerRegistry.addMaterialStats(glass, new ConnectorMaterialStats());
-            TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
-            glass.setVisible();
+        registerMaterialsWithConnector();
+        registerMaterialsWithoutConnector();
+        patchExistingMaterials();
+    }
+
+    private static void registerMaterialsWithConnector() {
+        registerGlass();
+        registerSlimeball();
+        registerPoppedChorus();
+        registerNetherQuartz();
+        registerMagmaCream();
+        registerShulkerShell();
+        registerLeather();
+        registerRedstone();
+        registerBlueSlimeball();
+        registerEnderpearl();
+        registerPrismarineCrystals();
+    }
+
+    private static void registerMaterialsWithoutConnector() {
+        registerWool();
+        registerBrick();
+        registerNetherbrick();
+    }
+
+    private static void registerGlass() {
+        if (!isMaterialEnabled("glass")) return;
+        glass = new Material("glass", 0xFFFFFF, false);
+        glass.setCraftable(true).setCastable(false);
+        if (isTraitEnabled("fracture")) {
+            glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
         }
-        if (isMaterialEnabled("slimeball")) {
-            slimeball = createMaterial("slimeball", 0x71ac63, null, null);
-            if (isTraitEnabled("bouncing")) {
-                slimeball.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("rebound_throwingknife")) {
-                slimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-            }
-            TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
+        if (isTraitEnabled("focus_heatraygun")) {
+            glass.addTrait(TraitsRegistry.FOCUS, FuelTankPartType.FUEL_TANK);
         }
-        if (isMaterialEnabled("popped_chorus")) {
-            poppedChorus = createMaterial("popped_chorus", 0xb78db7, TraitsRegistry.PIERCING, "boomerang_piercing");
-            if (isTraitEnabled("echo_throwingknife")) {
-                poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
-                poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
-            }
-            TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
-            if (poppedChorus.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-                poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
-            }
-            TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
+        TinkerRegistry.addMaterial(glass);
+        TinkerRegistry.addMaterialStats(glass, new ConnectorMaterialStats());
+        TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
+        glass.setVisible();
+    }
+
+    private static void registerSlimeball() {
+        if (!isMaterialEnabled("slimeball")) return;
+        slimeball = createMaterial("slimeball", 0x71ac63, null, null);
+        if (isTraitEnabled("bouncing")) {
+            slimeball.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
         }
-        if (isMaterialEnabled("nether_quartz")) {
-            netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.KEEN, "keen");
-            if (isTraitEnabled("keen")) {
-                netherQuartz.addTrait(TraitsRegistry.KEEN, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("trauma_throwingknife")) {
-                netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
-            }
-            TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
+        if (isTraitEnabled("rebound_throwingknife")) {
+            slimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
         }
-        if (isMaterialEnabled("magma_cream")) {
-            magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
+        TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
+    }
+
+    private static void registerPoppedChorus() {
+        if (!isMaterialEnabled("popped_chorus")) return;
+        poppedChorus = createMaterial("popped_chorus", 0xb78db7, TraitsRegistry.PIERCING, "boomerang_piercing");
+        if (isTraitEnabled("echo_throwingknife")) {
+            poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
+            poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
         }
-        if (isMaterialEnabled("shulker_shell")) {
-            shulkerShell = createMaterial("shulker_shell", 0x976997, null, null);
-            if (isTraitEnabled("collection_boomerang")) {
-                shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("recovery_throwingknife")) {
-                shulkerShell.addTrait(TraitsRegistry.RECOVERY, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("enderference")) {
-                shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
-                shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
-                shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
-            }
-            TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
-            if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
-            }
-            if (isMaterialEnabled("shulker_shell") && isTraitEnabled("thermostatic_heatraygun")) {
-                shulkerShell.addTrait(TraitsRegistry.THERMOSTATIC, FuelTankPartType.FUEL_TANK);
-            }
+        TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
+        if (poppedChorus.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+            poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
         }
-        if (isMaterialEnabled("leather")) {
-            leather = createMaterial("leather", 0xC76A43, null, null);
-            TinkerRegistry.addMaterialStats(leather, new GripMaterialStats());
+    }
+
+    private static void registerNetherQuartz() {
+        if (!isMaterialEnabled("nether_quartz")) return;
+        netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.KEEN, "keen");
+        if (isTraitEnabled("keen")) {
+            netherQuartz.addTrait(TraitsRegistry.KEEN, ConnectorPartType.CONNECTOR);
         }
-        if (isMaterialEnabled("redstone")) {
-            redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
-            if (isTraitEnabled("pulse_throwingknife")) {
-                redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
-            }
-            TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
+        if (isTraitEnabled("trauma_throwingknife")) {
+            netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
         }
-        if (isMaterialEnabled("blue_slimeball")) {
-            blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, null, null);
-            if (isTraitEnabled("deflect_boomerang")) {
-                blueSlimeball.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("rebound_throwingknife")) {
-                blueSlimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-            }
-            TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
+        TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
+        netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
+    }
+
+    private static void registerMagmaCream() {
+        if (!isMaterialEnabled("magma_cream")) return;
+        magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
+    }
+
+    private static void registerShulkerShell() {
+        if (!isMaterialEnabled("shulker_shell")) return;
+        shulkerShell = createMaterial("shulker_shell", 0x976997, null, null);
+        if (isTraitEnabled("collection_boomerang")) {
+            shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
         }
-        if (isMaterialEnabled("enderpearl")) {
-            enderpearl = new Material("enderpearl", 0x0A6E6E, false);
-            enderpearl.setCraftable(true).setCastable(false);
-            if (isTraitEnabled("enderference")) {
-                enderpearl.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
-                enderpearl.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("instant_return_boomerang")) {
-                enderpearl.addTrait(TraitsRegistry.INSTANT_RETURN, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("guidance_throwingknife")) {
-                enderpearl.addTrait(TraitsRegistry.GUIDANCE, GripPartType.GRIP);
-            }
-            TinkerRegistry.addMaterial(enderpearl);
-            TinkerRegistry.addMaterialStats(enderpearl, new ConnectorMaterialStats());
-            TinkerRegistry.addMaterialStats(enderpearl, new GripMaterialStats());
-            enderpearl.setVisible();
+        if (isTraitEnabled("recovery_throwingknife")) {
+            shulkerShell.addTrait(TraitsRegistry.RECOVERY, GripPartType.GRIP);
         }
-        if (isMaterialEnabled("wool")) {
-            wool = new Material("wool", 0xBFB5B5, false);
-            wool.setCraftable(true).setCastable(false);
-            TinkerRegistry.addMaterial(wool);
-            TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
-            wool.setVisible();
+        if (isTraitEnabled("enderference")) {
+            shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
+            shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
+            shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
         }
-        if (isMaterialEnabled("prismarine_crystals")) {
-            prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
-            prismarineCrystals.setCraftable(true).setCastable(false);
-            if (isTraitEnabled("shatter_boomerang")) {
-                prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
-            }
-            TinkerRegistry.addMaterialStats(prismarineCrystals, new FuelTankMaterialStats(5000, 8, 0.95f));
-            if (isTraitEnabled("condensation_heatraygun")) {
-                prismarineCrystals.addTrait(TraitsRegistry.CONDENSATION, FuelTankPartType.FUEL_TANK);
-            }
-            TinkerRegistry.addMaterial(prismarineCrystals);
-            TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
-            prismarineCrystals.setVisible();
+        TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
+        if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
+            shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
         }
-        if (isMaterialEnabled("brick")) {
-            brick = new Material("brick", 0xb75a40, false);
-            brick.setCraftable(true).setCastable(false);
-            TinkerRegistry.addMaterial(brick);
-            TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
-            if (isTraitEnabled("temper_heatraygun")) {
-                brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
-            }
-            brick.setVisible();
+        if (isTraitEnabled("thermostatic_heatraygun")) {
+            shulkerShell.addTrait(TraitsRegistry.THERMOSTATIC, FuelTankPartType.FUEL_TANK);
         }
-        if (isMaterialEnabled("netherbrick")) {
-            netherbrick = new Material("netherbrick", 0x49282e, false);
-            netherbrick.setCraftable(true).setCastable(false);
-            TinkerRegistry.addMaterial(netherbrick);
-            TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
-            if (isTraitEnabled("pressurized_heatraygun")) {
-                netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
-            }
-            netherbrick.setVisible();
+    }
+
+    private static void registerLeather() {
+        if (!isMaterialEnabled("leather")) return;
+        leather = createMaterial("leather", 0xC76A43, null, null);
+        TinkerRegistry.addMaterialStats(leather, new GripMaterialStats());
+    }
+
+    private static void registerRedstone() {
+        if (!isMaterialEnabled("redstone")) return;
+        redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
+        if (isTraitEnabled("pulse_throwingknife")) {
+            redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
         }
+        TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
+    }
+
+    private static void registerBlueSlimeball() {
+        if (!isMaterialEnabled("blue_slimeball")) return;
+        blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, null, null);
+        if (isTraitEnabled("deflect_boomerang")) {
+            blueSlimeball.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
+        }
+        if (isTraitEnabled("rebound_throwingknife")) {
+            blueSlimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
+        }
+        TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
+    }
+
+    private static void registerEnderpearl() {
+        if (!isMaterialEnabled("enderpearl")) return;
+        enderpearl = new Material("enderpearl", 0x0A6E6E, false);
+        enderpearl.setCraftable(true).setCastable(false);
+        if (isTraitEnabled("enderference")) {
+            enderpearl.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
+            enderpearl.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
+        }
+        if (isTraitEnabled("instant_return_boomerang")) {
+            enderpearl.addTrait(TraitsRegistry.INSTANT_RETURN, ConnectorPartType.CONNECTOR);
+        }
+        if (isTraitEnabled("guidance_throwingknife")) {
+            enderpearl.addTrait(TraitsRegistry.GUIDANCE, GripPartType.GRIP);
+        }
+        TinkerRegistry.addMaterial(enderpearl);
+        TinkerRegistry.addMaterialStats(enderpearl, new ConnectorMaterialStats());
+        TinkerRegistry.addMaterialStats(enderpearl, new GripMaterialStats());
+        enderpearl.setVisible();
+    }
+
+    private static void registerPrismarineCrystals() {
+        if (!isMaterialEnabled("prismarine_crystals")) return;
+        prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
+        prismarineCrystals.setCraftable(true).setCastable(false);
+        if (isTraitEnabled("shatter_boomerang")) {
+            prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
+        }
+        TinkerRegistry.addMaterialStats(prismarineCrystals, new FuelTankMaterialStats(5000, 8, 0.95f));
+        if (isTraitEnabled("condensation_heatraygun")) {
+            prismarineCrystals.addTrait(TraitsRegistry.CONDENSATION, FuelTankPartType.FUEL_TANK);
+        }
+        TinkerRegistry.addMaterial(prismarineCrystals);
+        TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
+        prismarineCrystals.setVisible();
+    }
+
+    private static void registerWool() {
+        if (!isMaterialEnabled("wool")) return;
+        wool = new Material("wool", 0xBFB5B5, false);
+        wool.setCraftable(true).setCastable(false);
+        TinkerRegistry.addMaterial(wool);
+        TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
+        wool.setVisible();
+    }
+
+    private static void registerBrick() {
+        if (!isMaterialEnabled("brick")) return;
+        brick = new Material("brick", 0xb75a40, false);
+        brick.setCraftable(true).setCastable(false);
+        TinkerRegistry.addMaterial(brick);
+        TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
+        if (isTraitEnabled("temper_heatraygun")) {
+            brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
+        }
+        brick.setVisible();
+    }
+
+    private static void registerNetherbrick() {
+        if (!isMaterialEnabled("netherbrick")) return;
+        netherbrick = new Material("netherbrick", 0x49282e, false);
+        netherbrick.setCraftable(true).setCastable(false);
+        TinkerRegistry.addMaterial(netherbrick);
+        TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
+        if (isTraitEnabled("pressurized_heatraygun")) {
+            netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
+        }
+        netherbrick.setVisible();
+    }
+
+    private static void patchExistingMaterials() {
         Material iron = TinkerRegistry.getMaterial("iron");
-        if (iron != Material.UNKNOWN && iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            iron.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
-        }
-        if (iron != Material.UNKNOWN && iron.getStats(FuelTankPartType.FUEL_TANK) == null) {
-            iron.addStats(new FuelTankMaterialStats(10000, 10, 1.0f));
-        }
         if (iron != Material.UNKNOWN) {
+            if (iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+                iron.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
+            }
+            if (iron.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                iron.addStats(new FuelTankMaterialStats(10000, 10, 1.0f));
+            }
             if (iron.getStats(GripPartType.GRIP) == null) {
                 TinkerRegistry.addMaterialStats(iron, new GripMaterialStats());
             }
@@ -212,20 +268,27 @@ public class MaterialRegister {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
             }
         }
+
         Material stone = TinkerRegistry.getMaterial("stone");
-        if (stone != Material.UNKNOWN && stone.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            stone.addStats(new HeatRayEmitterMaterialStats(3600.0f, 0.001f));
+        if (stone != Material.UNKNOWN) {
+            if (stone.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+                stone.addStats(new HeatRayEmitterMaterialStats(3600.0f, 0.001f));
+            }
+            if (stone.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
+            }
         }
-        if (stone != Material.UNKNOWN && stone.getStats(FuelTankPartType.FUEL_TANK) == null) {
-            stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
-        }
+
         Material cobalt = TinkerRegistry.getMaterial("cobalt");
-        if (cobalt != Material.UNKNOWN && cobalt.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            cobalt.addStats(new HeatRayEmitterMaterialStats(0.75f, 0.75f));
+        if (cobalt != Material.UNKNOWN) {
+            if (cobalt.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+                cobalt.addStats(new HeatRayEmitterMaterialStats(0.75f, 0.75f));
+            }
+            if (cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
+            }
         }
-        if (cobalt != Material.UNKNOWN && cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
-            cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
-        }
+
         Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
         if (magmaslime != Material.UNKNOWN && magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
             magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
