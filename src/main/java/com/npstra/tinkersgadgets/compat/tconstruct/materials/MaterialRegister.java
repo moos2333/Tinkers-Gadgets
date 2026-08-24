@@ -49,12 +49,6 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
         Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
 
-        registerMaterialsWithConnector();
-        registerMaterialsWithoutConnector();
-        patchExistingMaterials();
-    }
-
-    private static void registerMaterialsWithConnector() {
         registerGlass();
         registerSlimeball();
         registerPoppedChorus();
@@ -65,13 +59,12 @@ public class MaterialRegister {
         registerRedstone();
         registerBlueSlimeball();
         registerEnderpearl();
-        registerPrismarineCrystals();
-    }
-
-    private static void registerMaterialsWithoutConnector() {
         registerWool();
+        registerPrismarineCrystals();
         registerBrick();
         registerNetherbrick();
+
+        patchExistingMaterials();
     }
 
     private static void registerGlass() {
@@ -203,6 +196,15 @@ public class MaterialRegister {
         enderpearl.setVisible();
     }
 
+    private static void registerWool() {
+        if (!isMaterialEnabled("wool")) return;
+        wool = new Material("wool", 0xBFB5B5, false);
+        wool.setCraftable(true).setCastable(false);
+        TinkerRegistry.addMaterial(wool);
+        TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
+        wool.setVisible();
+    }
+
     private static void registerPrismarineCrystals() {
         if (!isMaterialEnabled("prismarine_crystals")) return;
         prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
@@ -217,15 +219,6 @@ public class MaterialRegister {
         TinkerRegistry.addMaterial(prismarineCrystals);
         TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
         prismarineCrystals.setVisible();
-    }
-
-    private static void registerWool() {
-        if (!isMaterialEnabled("wool")) return;
-        wool = new Material("wool", 0xBFB5B5, false);
-        wool.setCraftable(true).setCastable(false);
-        TinkerRegistry.addMaterial(wool);
-        TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
-        wool.setVisible();
     }
 
     private static void registerBrick() {
