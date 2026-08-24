@@ -117,6 +117,9 @@ public class MaterialRegister {
         if (isTraitEnabled("trauma_throwingknife")) {
             netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
         }
+        if (isTraitEnabled("burst_heatraygun")) {
+            netherQuartz.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
+        }
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
     }
