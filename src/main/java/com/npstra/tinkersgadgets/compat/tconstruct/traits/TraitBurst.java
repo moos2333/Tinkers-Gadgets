@@ -12,7 +12,7 @@ import slimeknights.tconstruct.library.utils.ToolHelper;
 import java.util.List;
 
 public class TraitBurst extends AbstractTrait {
-    private static final float SPLASH_RADIUS = 2.5f;
+    private static final float SPLASH_RADIUS = 1.5f;
     private static final float SPLASH_DAMAGE_RATIO = 0.25f;
 
     public TraitBurst() {
