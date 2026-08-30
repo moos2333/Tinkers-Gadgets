@@ -163,8 +163,10 @@ public class MaterialRegister {
         redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
         if (isTraitEnabled("pulse_throwingknife")) {
             redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
+            redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
         }
         TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
+        redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
     }
 
     private static void registerBlueSlimeball() {

@@ -5,22 +5,18 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
-import slimeknights.tconstruct.library.modifiers.ModifierAspect;
-import slimeknights.tconstruct.library.modifiers.ProjectileModifierTrait;
+import slimeknights.tconstruct.library.traits.AbstractTrait;
 
-public class TraitPulse extends ProjectileModifierTrait {
+public class TraitPulse extends AbstractTrait {
 
     public TraitPulse() {
         super("pulse_throwingknife", 0xCC0000);
-        addAspects(ModifierAspect.projectileOnly);
     }
 
     @Override
-    public void afterHit(EntityProjectileBase projectile, World world, ItemStack ammoStack,
-                         EntityLivingBase attacker, Entity target, double impactSpeed) {
-        if (target instanceof EntityLivingBase) {
-            EntityLivingBase living = (EntityLivingBase) target;
-            living.hurtResistantTime = living.hurtResistantTime / 2;
+    public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
+        if (wasHit && target != null && !target.world.isRemote) {
+            target.hurtResistantTime = Math.max(0, target.hurtResistantTime / 2);
         }
     }
 }

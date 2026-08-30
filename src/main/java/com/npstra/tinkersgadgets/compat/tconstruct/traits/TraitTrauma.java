@@ -1,15 +1,12 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.traits;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import slimeknights.tconstruct.library.entity.EntityProjectileBase;
-import slimeknights.tconstruct.library.modifiers.ModifierAspect;
-import slimeknights.tconstruct.library.modifiers.ProjectileModifierTrait;
+import net.minecraft.util.text.TextFormatting;
+import slimeknights.tconstruct.library.traits.AbstractTrait;
 
-public class TraitTrauma extends ProjectileModifierTrait {
+public class TraitTrauma extends AbstractTrait {
     private static final String TAG_TRAUMA_LEVEL = "trauma_level";
     private static final String TAG_TRAUMA_TIME = "trauma_time";
     private static final int MAX_LEVEL = 10;
@@ -17,8 +14,7 @@ public class TraitTrauma extends ProjectileModifierTrait {
     private static final int DURATION_TICKS = 100;
 
     public TraitTrauma() {
-        super("trauma_throwingknife", 0xE5DFD6);
-        addAspects(ModifierAspect.projectileOnly);
+        super("trauma_throwingknife", TextFormatting.GRAY);
     }
 
     @Override
@@ -35,12 +31,10 @@ public class TraitTrauma extends ProjectileModifierTrait {
     }
 
     @Override
-    public void afterHit(EntityProjectileBase projectile, World world, ItemStack ammoStack, EntityLivingBase attacker, Entity target, double impactSpeed) {
-        if (world.isRemote) return;
-        if (!(target instanceof EntityLivingBase)) return;
-        EntityLivingBase livingTarget = (EntityLivingBase) target;
-        NBTTagCompound data = livingTarget.getEntityData();
-        long currentTime = world.getTotalWorldTime();
+    public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
+        if (!wasHit || target == null || target.world.isRemote) return;
+        NBTTagCompound data = target.getEntityData();
+        long currentTime = target.world.getTotalWorldTime();
         int level = data.getInteger(TAG_TRAUMA_LEVEL);
         long expireTime = data.getLong(TAG_TRAUMA_TIME);
         if (currentTime > expireTime || level == 0) {

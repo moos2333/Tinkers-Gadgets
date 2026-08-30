@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ItemHeatRayEmitter extends ToolPart {
-    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("iron", "stone", "cobalt", "magmaslime", "popped_chorus"));
+    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("iron", "stone", "cobalt", "magmaslime", "popped_chorus", "redstone"));
 
     public ItemHeatRayEmitter() {
         super(Material.VALUE_Ingot * 8);
