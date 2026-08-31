@@ -96,7 +96,7 @@ public class MaterialRegister {
             slimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
-        slimeball.addStats(new FuelTankMaterialStats(4000, 10, 1.2f));
+        slimeball.addStats(new FuelTankMaterialStats(4000, 8, 1.2f));
     }
 
     private static void registerPoppedChorus() {
@@ -188,7 +188,7 @@ public class MaterialRegister {
             blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
-        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 12, 1.1f));
+        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 10, 1.1f));
     }
 
     private static void registerEnderpearl() {
