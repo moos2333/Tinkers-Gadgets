@@ -92,7 +92,11 @@ public class MaterialRegister {
         if (isTraitEnabled("rebound_throwingknife")) {
             slimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
         }
+        if (isTraitEnabled("conduction_heatraygun")) {
+            slimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+        }
         TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
+        slimeball.addStats(new FuelTankMaterialStats(4000, 10, 1.2f));
     }
 
     private static void registerPoppedChorus() {
@@ -164,8 +168,10 @@ public class MaterialRegister {
         if (isTraitEnabled("pulse_throwingknife")) {
             redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
             redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+            redstone.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
+        redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
     }
 
@@ -178,7 +184,11 @@ public class MaterialRegister {
         if (isTraitEnabled("rebound_throwingknife")) {
             blueSlimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
         }
+        if (isTraitEnabled("conduction_heatraygun")) {
+            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+        }
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
+        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 12, 1.1f));
     }
 
     private static void registerEnderpearl() {
@@ -352,10 +362,10 @@ public class MaterialRegister {
         registerMaterial(netherbrick, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot);
 
         if (blueSlimeball != null) {
-            Item blueSlimeItem = Item.getByNameOrId("tconstruct:edible");
-            ItemStack blueSlimeStack = blueSlimeItem != null ? new ItemStack(blueSlimeItem, 1, 1) : ItemStack.EMPTY;
+            ItemStack blueSlimeStack = new ItemStack(Item.getByNameOrId("tconstruct:edible"), 1, 1);
             if (!blueSlimeStack.isEmpty()) {
-                registerMaterial(blueSlimeball, blueSlimeStack, 36);
+                blueSlimeball.addItem(blueSlimeStack, 1, 36);
+                blueSlimeball.setRepresentativeItem(blueSlimeStack);
             }
         }
     }

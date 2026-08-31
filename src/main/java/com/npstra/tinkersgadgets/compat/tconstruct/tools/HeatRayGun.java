@@ -228,7 +228,14 @@ public class HeatRayGun extends TinkerToolCore {
 
     private int getMaxFuel(ItemStack stack) {
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        if (toolTag != null && toolTag.hasKey("maxFuel")) return toolTag.getInteger("maxFuel");
+        if (toolTag != null && toolTag.hasKey("maxFuel")) {
+            int maxFuel = toolTag.getInteger("maxFuel");
+            int currentFuel = getFuel(stack);
+            if (currentFuel > maxFuel) {
+                setFuel(stack, maxFuel);
+            }
+            return maxFuel;
+        }
         return 10000;
     }
 
@@ -340,6 +347,7 @@ public class HeatRayGun extends TinkerToolCore {
         if (hitEntity != null) {
             AttributeModifier damageMod = new AttributeModifier(DAMAGE_BONUS_UUID, "HeatRay damage bonus",
                     finalDamage - baseDamage, 0);
+            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(damageMod);
             ToolHelper.attackEntity(stack, this, player, hitEntity);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);

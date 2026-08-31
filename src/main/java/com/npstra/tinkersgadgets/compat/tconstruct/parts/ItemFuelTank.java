@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ItemFuelTank extends ToolPart {
-    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("brick", "stone", "netherbrick", "iron", "cobalt", "shulker_shell", "prismarine_crystals", "glass", "nether_quartz"));
+    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("brick", "stone", "netherbrick", "iron", "cobalt", "shulker_shell", "prismarine_crystals", "glass", "nether_quartz", "redstone", "slimeball", "blue_slimeball"));
 
     public ItemFuelTank() {
         super(Material.VALUE_Ingot * 8);
