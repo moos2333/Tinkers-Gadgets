@@ -188,7 +188,7 @@ public class MaterialRegister {
             blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
-        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 10, 1.1f));
+        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 9, 1.1f));
     }
 
     private static void registerEnderpearl() {
