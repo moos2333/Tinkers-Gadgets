@@ -31,6 +31,7 @@ import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 import slimeknights.tconstruct.library.tools.TinkerToolCore;
 import slimeknights.tconstruct.library.tools.ToolNBT;
 import slimeknights.tconstruct.library.utils.TagUtil;
+import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.tools.TinkerTools;
 
@@ -207,8 +208,16 @@ public class HeatRayGun extends TinkerToolCore {
 
     private int getChargeTicks(ItemStack stack) {
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        if (toolTag != null && toolTag.hasKey("chargeTime")) return toolTag.getInteger("chargeTime");
+        if (toolTag != null && toolTag.hasKey("chargeTime")) {
+            int chargeTicks = toolTag.getInteger("chargeTime");
+            int lowerBound = hasPulseTrait(stack) ? 5 : 10;
+            return Math.max(lowerBound, chargeTicks);
+        }
         return 30;
+    }
+
+    private boolean hasPulseTrait(ItemStack stack) {
+        return TinkerUtil.hasTrait(TagUtil.getTagSafe(stack), "pulse_throwingknife");
     }
 
     private float getPowerMultiplier(ItemStack stack) {
