@@ -17,8 +17,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
-import slimeknights.tconstruct.library.capability.projectile.ITinkerProjectile;
 
 @SideOnly(Side.CLIENT)
 public class RenderChainBlade extends Render<EntityChainBlade> {
@@ -78,11 +76,7 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
     }
 
     private void renderTool(EntityChainBlade entity, double x, double y, double z, float partialTicks) {
-        ITinkerProjectile cap = entity.getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
-        ItemStack stack = cap != null ? cap.getItemStack() : ItemStack.EMPTY;
-        if (stack.isEmpty()) {
-            stack = entity.getArrowStack();
-        }
+        ItemStack stack = entity.getArrowStack();
         if (stack.isEmpty()) {
             stack = new ItemStack(net.minecraft.init.Items.STICK);
         }
@@ -92,15 +86,19 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
         GlStateManager.enableRescaleNormal();
         GlStateManager.scale(0.6F, 0.6F, 0.6F);
 
-        float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
-        float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-
-        if (entity.onGround) {
-            GlStateManager.translate(0.0F, 0.0F, -entity.getStuckDepth());
+        double dx = entity.motionX;
+        double dy = entity.motionY;
+        double dz = entity.motionZ;
+        if (dx == 0 && dy == 0 && dz == 0) {
+            dx = 1;
         }
+
+        float yaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
+        float pitch = (float) (-(MathHelper.atan2(dy, MathHelper.sqrt(dx * dx + dz * dz)) * (180D / Math.PI)));
+
+        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         itemRenderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE);
