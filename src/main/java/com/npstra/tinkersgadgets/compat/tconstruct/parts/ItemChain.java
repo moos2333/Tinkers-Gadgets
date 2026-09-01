@@ -10,7 +10,7 @@ public class ItemChain extends ToolPart {
     private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("iron", "cobalt", "stone"));
 
     public ItemChain() {
-        super(Material.VALUE_Ingot * 4);
+        super(Material.VALUE_Ingot * 2);
         setRegistryName("chain");
         setTranslationKey("tinkersgadgets.chain");
     }
