@@ -133,11 +133,15 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) { return 72000; }
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return 72000;
+    }
 
     @Nonnull
     @Override
-    public EnumAction getItemUseAction(ItemStack stack) { return EnumAction.BOW; }
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.BOW;
+    }
 
     @Nonnull
     @Override
@@ -319,8 +323,11 @@ public class HeatRayGun extends TinkerToolCore {
         float baseDamage = data.attack;
         float finalDamage = baseDamage * 2.0f * power;
         if (hitEntity != null) {
-            AttributeModifier damageMod = new AttributeModifier(DAMAGE_BONUS_UUID, "HeatRay damage bonus",
-                    finalDamage - baseDamage, 0);
+            double currentAttack = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+            float cooldown = player.getCooledAttackStrength(0.5F);
+            float cooldownFactor = 0.2F + cooldown * cooldown * 0.8F;
+            float modifierAmount = (float)(finalDamage / cooldownFactor - currentAttack);
+            AttributeModifier damageMod = new AttributeModifier(DAMAGE_BONUS_UUID, "HeatRay damage bonus", modifierAmount, 0);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
             player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(damageMod);
             ToolHelper.attackEntity(stack, this, player, hitEntity);
@@ -438,10 +445,14 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     @Override
-    public float damagePotential() { return 1.25f; }
+    public float damagePotential() {
+        return 1.25f;
+    }
 
     @Override
-    public double attackSpeed() { return 1.0d; }
+    public double attackSpeed() {
+        return 1.0d;
+    }
 
     @Override
     public ToolNBT buildTagData(List<Material> materials) {
