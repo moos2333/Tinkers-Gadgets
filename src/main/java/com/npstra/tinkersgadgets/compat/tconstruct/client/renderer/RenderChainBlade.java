@@ -17,6 +17,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
+import slimeknights.tconstruct.library.capability.projectile.ITinkerProjectile;
 
 @SideOnly(Side.CLIENT)
 public class RenderChainBlade extends Render<EntityChainBlade> {
@@ -76,7 +78,11 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
     }
 
     private void renderTool(EntityChainBlade entity, double x, double y, double z, float partialTicks) {
-        ItemStack stack = entity.getArrowStack();
+        ITinkerProjectile cap = entity.getCapability(CapabilityTinkerProjectile.PROJECTILE_CAPABILITY, null);
+        ItemStack stack = cap != null ? cap.getItemStack() : ItemStack.EMPTY;
+        if (stack.isEmpty()) {
+            stack = entity.getArrowStack();
+        }
         if (stack.isEmpty()) {
             stack = new ItemStack(net.minecraft.init.Items.STICK);
         }
