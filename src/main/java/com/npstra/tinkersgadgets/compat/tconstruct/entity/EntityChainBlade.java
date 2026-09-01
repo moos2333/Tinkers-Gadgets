@@ -27,10 +27,11 @@ import java.util.UUID;
 public class EntityChainBlade extends EntityProjectileBase implements IEntityAdditionalSpawnData {
     private static final int MAX_ALIVE = 120;
     private static final double GRAVITY = 0.065D;
-    private static final double RETURN_SPEED = 0.8D;
-    private static final double MAX_RETURN_SPEED = 2.0D;
+    private static final double BASE_RETURN_SPEED = 0.8D;
+    private static final double MAX_RETURN_SPEED = 3.5D;
     private static final float PULL_STRENGTH_HIT = 0.5f;
     private static final float PULL_STRENGTH_RETURN = 1.0f;
+    private static final int STUCK_TIMEOUT = 80;
 
     private EntityPlayer shooter;
     private ItemStack weaponStack = ItemStack.EMPTY;
@@ -44,6 +45,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private int hitCount;
     private double baseDamage;
     private String toolId = "";
+    private int stuckTicks;
 
     public EntityChainBlade(World world) {
         super(world);
@@ -64,6 +66,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         this.hitCount = 0;
         this.bounceCount = 0;
         this.returning = false;
+        this.stuckTicks = 0;
         setDamage((float) damage);
     }
 
@@ -73,6 +76,27 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     public void setToolId(String id) {
         this.toolId = id;
+    }
+
+    private double getCurrentSpeed() {
+        return Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+    }
+
+    private Vec3d getShooterTargetPos() {
+        if (shooter == null) return new Vec3d(posX, posY, posZ);
+        return new Vec3d(shooter.posX, shooter.posY + shooter.getEyeHeight() * 0.7, shooter.posZ);
+    }
+
+    private double calculateReturnSpeed(double distance) {
+        if (distance > 8.0D) {
+            return 2.4D;
+        } else if (distance > 4.0D) {
+            return 1.6D + (distance - 4.0D) * 0.2D;
+        } else if (distance > 2.0D) {
+            return 1.2D + (distance - 2.0D) * 0.2D;
+        } else {
+            return 0.8D + distance * 0.2D;
+        }
     }
 
     @Override
@@ -91,6 +115,21 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             if (shooter != null && shooter.isEntityAlive()) {
                 returnToShooter();
                 double dist = getDistance(shooter);
+                double speed = getCurrentSpeed();
+
+                if (speed < 0.05D && dist > 3.0D) {
+                    stuckTicks++;
+                    if (stuckTicks > STUCK_TIMEOUT) {
+                        Vec3d dir = new Vec3d(shooter.posX - posX, shooter.posY + shooter.getEyeHeight() * 0.7 - posY, shooter.posZ - posZ).normalize();
+                        motionX += dir.x * 1.5D;
+                        motionY += dir.y * 1.5D;
+                        motionZ += dir.z * 1.5D;
+                        stuckTicks = 0;
+                    }
+                } else {
+                    stuckTicks = 0;
+                }
+
                 if (dist < 1.5D) {
                     onCollideWithPlayer(shooter);
                     setDead();
@@ -110,24 +149,41 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     }
 
     private void returnToShooter() {
-        Vec3d target = new Vec3d(shooter.posX, shooter.posY + shooter.getEyeHeight() * 0.7, shooter.posZ);
+        if (shooter == null || !shooter.isEntityAlive()) {
+            setDead();
+            return;
+        }
+        Vec3d target = getShooterTargetPos();
         Vec3d delta = target.subtract(new Vec3d(posX, posY, posZ));
         double dist = delta.length();
-        if (dist > 1.5D) {
-            Vec3d dir = delta.normalize();
-            double speed = Math.min(MAX_RETURN_SPEED, Math.max(RETURN_SPEED, dist * 0.12D));
-            motionX = dir.x * speed;
-            motionY = dir.y * speed;
-            motionZ = dir.z * speed;
-            dealReturnDamage();
-        } else {
-            motionX = 0;
-            motionY = 0;
-            motionZ = 0;
+
+        if (dist < 1.2D) {
+            onCollideWithPlayer(shooter);
+            setDead();
+            return;
         }
+
+        Vec3d dir = delta.normalize();
+        double desiredSpeed = calculateReturnSpeed(dist);
+        double currentSpeed = getCurrentSpeed();
+        double smoothFactor = Math.min(0.3D, 0.1D + 0.2D / (currentSpeed + 0.1D));
+
+        motionX += (dir.x * desiredSpeed - motionX) * smoothFactor;
+        motionY += (dir.y * desiredSpeed - motionY) * smoothFactor;
+        motionZ += (dir.z * desiredSpeed - motionZ) * smoothFactor;
+
+        double newSpeed = getCurrentSpeed();
+        if (newSpeed > MAX_RETURN_SPEED) {
+            motionX = motionX / newSpeed * MAX_RETURN_SPEED;
+            motionY = motionY / newSpeed * MAX_RETURN_SPEED;
+            motionZ = motionZ / newSpeed * MAX_RETURN_SPEED;
+        }
+
+        dealReturnDamage();
     }
 
     private void dealReturnDamage() {
+        if (shooter == null) return;
         double radius = 2.0D;
         AxisAlignedBB box = getEntityBoundingBox().grow(radius);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
@@ -212,10 +268,17 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     @Override
     public void onHitBlock(RayTraceResult result) {
-        returning = true;
-        inGround = false;
-        arrowShake = 0;
-        ticksInGround = 0;
+        if (!returning) {
+            returning = true;
+            inGround = false;
+            arrowShake = 0;
+            ticksInGround = 0;
+        } else if (shooter != null) {
+            Vec3d dir = new Vec3d(shooter.posX - posX, shooter.posY + shooter.getEyeHeight() * 0.7 - posY, shooter.posZ - posZ).normalize();
+            motionX += dir.x * 0.5D;
+            motionY += dir.y * 0.5D;
+            motionZ += dir.z * 0.5D;
+        }
     }
 
     @Override
@@ -272,6 +335,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     public void writeSpawnData(ByteBuf data) {
         super.writeSpawnData(data);
         ByteBufUtils.writeItemStack(data, weaponStack);
+        data.writeInt(shooter != null ? shooter.getEntityId() : -1);
         data.writeInt(maxBounces);
         data.writeFloat(bounceRange);
         data.writeFloat(sweepRangeBonus);
@@ -286,6 +350,14 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     public void readSpawnData(ByteBuf data) {
         super.readSpawnData(data);
         this.weaponStack = ByteBufUtils.readItemStack(data);
+        int shooterId = data.readInt();
+        if (shooterId != -1 && world != null) {
+            Entity entity = world.getEntityByID(shooterId);
+            if (entity instanceof EntityPlayer) {
+                this.shooter = (EntityPlayer) entity;
+                this.shootingEntity = entity;
+            }
+        }
         maxBounces = data.readInt();
         bounceRange = data.readFloat();
         sweepRangeBonus = data.readFloat();
