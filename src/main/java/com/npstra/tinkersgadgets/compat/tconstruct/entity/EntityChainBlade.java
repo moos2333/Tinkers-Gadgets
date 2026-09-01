@@ -13,6 +13,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
 
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class EntityChainBlade extends EntityProjectileBase {
+public class EntityChainBlade extends EntityProjectileBase implements IEntityAdditionalSpawnData {
     private static final int MAX_ALIVE = 120;
     private static final double GRAVITY = 0.065D;
     private static final double RETURN_SPEED = 0.8D;
@@ -269,6 +271,7 @@ public class EntityChainBlade extends EntityProjectileBase {
     @Override
     public void writeSpawnData(ByteBuf data) {
         super.writeSpawnData(data);
+        ByteBufUtils.writeItemStack(data, weaponStack);
         data.writeInt(maxBounces);
         data.writeFloat(bounceRange);
         data.writeFloat(sweepRangeBonus);
@@ -282,6 +285,7 @@ public class EntityChainBlade extends EntityProjectileBase {
     @Override
     public void readSpawnData(ByteBuf data) {
         super.readSpawnData(data);
+        this.weaponStack = ByteBufUtils.readItemStack(data);
         maxBounces = data.readInt();
         bounceRange = data.readFloat();
         sweepRangeBonus = data.readFloat();
