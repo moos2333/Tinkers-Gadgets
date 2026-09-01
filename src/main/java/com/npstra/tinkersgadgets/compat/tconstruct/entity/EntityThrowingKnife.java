@@ -11,6 +11,9 @@ import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitRecovery;
 
 public class EntityThrowingKnife extends EntityProjectileBase {
 
+    private static final double GRAVITY = 0.065D;
+    private static final double SLOWDOWN = 0.01D;
+
     public float spin;
     private boolean permanentlyDefused;
     private boolean recovery;
@@ -54,12 +57,12 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     @Override
     public double getGravity() {
-        return 0.065D;
+        return GRAVITY;
     }
 
     @Override
     public double getSlowdown() {
-        return 0.01D;
+        return SLOWDOWN;
     }
 
     @Override
@@ -74,12 +77,12 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     @Override
     public void onHitEntity(RayTraceResult raytraceResult) {
         super.onHitEntity(raytraceResult);
-        this.setDead();
+        setDead();
     }
 
     @Override
     protected void playHitEntitySound() {
-        this.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
+        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.2F / (rand.nextFloat() * 0.2F + 0.9F));
     }
 
     @Override

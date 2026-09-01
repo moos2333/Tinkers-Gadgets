@@ -151,13 +151,8 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             stack.setTagCompound(itemTag);
         }
-        if (playerIn.isSneaking()) {
-            playerIn.setActiveHand(handIn);
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-        } else {
-            playerIn.setActiveHand(handIn);
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-        }
+        playerIn.setActiveHand(handIn);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
     @Override
@@ -166,7 +161,7 @@ public class HeatRayGun extends TinkerToolCore {
             EntityPlayer entityPlayer = (EntityPlayer) player;
             if (entityPlayer.isSneaking()) {
                 int useTime = this.getMaxItemUseDuration(stack) - count;
-                if (useTime % 20 == 0 && useTime > 0) reloadOneItem(entityPlayer.world, entityPlayer, stack);
+                if (useTime % 20 == 0 && useTime > 0) reloadFuel(entityPlayer.world, entityPlayer, stack, true);
             } else {
                 int useTime = this.getMaxItemUseDuration(stack) - count;
                 int chargeTicks = getChargeTicks(stack);
@@ -192,8 +187,9 @@ public class HeatRayGun extends TinkerToolCore {
             int fuel = getFuel(stack);
             int fuelCost = getFuelCost(stack);
             if (fuel < fuelCost) {
-                boolean reloaded = tryAutoReload(worldIn, player, stack);
-                if (reloaded) fuel = getFuel(stack);
+                if (reloadFuel(worldIn, player, stack, false)) {
+                    fuel = getFuel(stack);
+                }
             }
             if (fuel < fuelCost) {
                 player.world.playSound(null, player.posX, player.posY, player.posZ,
@@ -259,10 +255,13 @@ public class HeatRayGun extends TinkerToolCore {
         return (int) (BASE_FUEL_PER_SHOT / efficiency);
     }
 
-    private void reloadOneItem(World world, EntityPlayer player, ItemStack stack) {
+    private boolean reloadFuel(World world, EntityPlayer player, ItemStack stack, boolean stopHandOnFullOrFail) {
         int currentFuel = getFuel(stack);
         int maxFuel = getMaxFuel(stack);
-        if (currentFuel >= maxFuel) { player.stopActiveHand(); return; }
+        if (currentFuel >= maxFuel) {
+            if (stopHandOnFullOrFail) player.stopActiveHand();
+            return false;
+        }
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack invStack = player.inventory.getStackInSlot(i);
             if (invStack.isEmpty()) continue;
@@ -283,37 +282,12 @@ public class HeatRayGun extends TinkerToolCore {
                         player.posZ + (world.rand.nextDouble() - 0.5D) * 1.0D,
                         0, 0.05D, 0);
             }
-            if (newFuel >= maxFuel) player.stopActiveHand();
-            return;
-        }
-        player.stopActiveHand();
-    }
-
-    private boolean tryAutoReload(World world, EntityPlayer player, ItemStack stack) {
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack invStack = player.inventory.getStackInSlot(i);
-            if (invStack.isEmpty()) continue;
-            int burnTime = TileEntityFurnace.getItemBurnTime(invStack);
-            if (burnTime <= 0) continue;
-            int fuelValue = (int) (burnTime / 20.0 * 20);
-            ItemStack copy = invStack.copy();
-            copy.shrink(1);
-            player.inventory.setInventorySlotContents(i, copy.isEmpty() ? ItemStack.EMPTY : copy);
-            int currentFuel = getFuel(stack);
-            int maxFuel = getMaxFuel(stack);
-            int newFuel = Math.min(currentFuel + fuelValue, maxFuel);
-            setFuel(stack, newFuel);
-            world.playSound(null, player.posX, player.posY, player.posZ,
-                    SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8F, 1.2F);
-            for (int p = 0; p < 8; p++) {
-                world.spawnParticle(EnumParticleTypes.FLAME,
-                        player.posX + (world.rand.nextDouble() - 0.5D) * 1.0D,
-                        player.posY + world.rand.nextDouble() * 1.5D,
-                        player.posZ + (world.rand.nextDouble() - 0.5D) * 1.0D,
-                        0, 0.05D, 0);
+            if (newFuel >= maxFuel && stopHandOnFullOrFail) {
+                player.stopActiveHand();
             }
             return true;
         }
+        if (stopHandOnFullOrFail) player.stopActiveHand();
         return false;
     }
 

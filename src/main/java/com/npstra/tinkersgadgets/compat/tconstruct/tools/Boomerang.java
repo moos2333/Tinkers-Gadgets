@@ -43,39 +43,58 @@ public class Boomerang extends ProjectileCore {
     }
 
     @Override
-    public float damagePotential() { return 1.0f; }
+    public float damagePotential() {
+        return 1.0f;
+    }
 
     @Override
-    public int[] getRepairParts() { return new int[]{0, 2}; }
+    public int[] getRepairParts() {
+        return new int[]{0, 2};
+    }
 
     @Nonnull
     @Override
-    public EnumAction getItemUseAction(ItemStack stack) { return EnumAction.BOW; }
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.BOW;
+    }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) { return 72000; }
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return 72000;
+    }
 
     @Nonnull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
         ItemStack itemStackIn = playerIn.getHeldItem(hand);
-        if (ToolHelper.isBroken(itemStackIn)) return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+        if (ToolHelper.isBroken(itemStackIn)) {
+            return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+        }
         playerIn.setActiveHand(hand);
         return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
     }
 
     @Override
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, net.minecraft.entity.EntityLivingBase entityLiving, int timeLeft) {
-        if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) return;
+        if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) {
+            return;
+        }
         EntityPlayer player = (EntityPlayer) entityLiving;
         boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
         float progress = Math.min(1.0F, (float) useDuration / 20.0F);
-        if (progress < 0.1F) progress = 0.1F;
+        if (progress < 0.1F) {
+            progress = 0.1F;
+        }
         if (!worldIn.isRemote) {
             String toolId = getToolId(stack);
             Set<Entity> set = activeBoomerangs.get(toolId);
-            if (set != null && !set.isEmpty()) return;
+            if (set != null) {
+                set.removeIf(e -> !e.isEntityAlive());
+                if (!set.isEmpty()) {
+                    return;
+                }
+            }
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
             EntityProjectileBase projectile = getProjectile(stack, stack, worldIn, player, 1.8F * progress, 0.5F * (1 - progress), progress, usedAmmo);
             if (projectile instanceof EntityBoomerang) {
@@ -86,7 +105,8 @@ public class Boomerang extends ProjectileCore {
             }
             worldIn.spawnEntity(projectile);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, net.minecraft.util.SoundCategory.PLAYERS, 1.0F, 0.8F + worldIn.rand.nextFloat() * 0.4F);
-            player.getCooldownTracker().setCooldown(stack.getItem(), 10);
+            int cooldown = Math.max(5, (int)(20.0D / ToolHelper.getActualAttackSpeed(stack)));
+            player.getCooldownTracker().setCooldown(stack.getItem(), cooldown);
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
             }
@@ -114,7 +134,9 @@ public class Boomerang extends ProjectileCore {
     private static String getToolId(ItemStack stack) {
         NBTTagCompound root = TagUtil.getTagSafe(stack);
         NBTTagCompound stats = TagUtil.getToolTag(root);
-        if (stats.hasKey("UUID")) return stats.getString("UUID");
+        if (stats.hasKey("UUID")) {
+            return stats.getString("UUID");
+        }
         return stack.getItem().getRegistryName().toString() + "#" + System.identityHashCode(stack);
     }
 
@@ -127,7 +149,9 @@ public class Boomerang extends ProjectileCore {
         Set<Entity> set = activeBoomerangs.get(toolId);
         if (set != null) {
             set.remove(entity);
-            if (set.isEmpty()) activeBoomerangs.remove(toolId);
+            if (set.isEmpty()) {
+                activeBoomerangs.remove(toolId);
+            }
         }
     }
 }

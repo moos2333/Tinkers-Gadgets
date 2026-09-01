@@ -27,8 +27,20 @@ import java.util.UUID;
 public class EntityBoomerangShard extends EntityProjectileBase implements IEntityAdditionalSpawnData {
 
     private static final int MAX_ALIVE = 300;
-    private static final double RETURN_SPEED = 0.4D;
+    private static final double BASE_RETURN_SPEED = 0.4D;
     private static final double SMOOTH_FACTOR = 0.4D;
+    private static final double MAX_DISTANCE_BASE = 8.0D;
+    private static final double SLOW_START_FACTOR = 0.75D;
+    private static final double MIN_SPEED_FACTOR = 0.5D;
+    private static final double STATIC_SPEED_THRESHOLD = 0.05D;
+    private static final int STATIC_TIMEOUT = 40;
+    private static final double STUCK_SPEED_THRESHOLD = 0.1D;
+    private static final double STUCK_DIST_THRESHOLD = 2.0D;
+    private static final int STUCK_TIMEOUT = 60;
+    private static final double RETURN_DIST_THRESHOLD = 1.2D;
+    private static final double RETURN_SPEED_MULTIPLIER = 0.5D;
+    private static final double PIERCING_SPEED_REDUCTION = 0.95D;
+    private static final double PIERCING_MIN_SPEED = 0.25D;
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -71,6 +83,14 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     public void setPierceCount(int count) { this.pierceCount = count; }
     public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
 
+    private double getCurrentSpeed() {
+        return Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+    }
+
+    private Vec3d getShooterTargetPos() {
+        return new Vec3d(shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ);
+    }
+
     @Override
     protected void init() {
         bounceOnNoDamage = false;
@@ -90,56 +110,51 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         double deltaZ = posZ - prevPosZ;
         totalDistanceTraveled += Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
-        if (!world.isRemote) {
-            double baseMaxDistance = 8.0D;
-            double speedFactor = Math.min(1.0D, initialSpeed / 1.8D);
-            double maxDistance = baseMaxDistance * speedFactor;
-            double slowStartDistance = maxDistance * 0.75D;
+        if (world.isRemote) return;
 
-            if (!returning) {
-                if (totalDistanceTraveled >= maxDistance) {
-                    returning = true;
-                } else if (totalDistanceTraveled > slowStartDistance) {
-                    double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
-                    double minSpeed = 0.5D;
-                    double speedMultiplier = 1.0D - progress * (1.0D - minSpeed);
-                    motionX *= speedMultiplier;
-                    motionY *= speedMultiplier;
-                    motionZ *= speedMultiplier;
-                }
-            }
+        double maxDistance = MAX_DISTANCE_BASE * Math.min(1.0D, initialSpeed / 1.8D);
+        double slowStartDistance = maxDistance * SLOW_START_FACTOR;
 
-            if (ticksExisted > MAX_ALIVE) {
+        if (!returning) {
+            if (totalDistanceTraveled >= maxDistance) {
                 returning = true;
+            } else if (totalDistanceTraveled > slowStartDistance) {
+                double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
+                double speedMultiplier = 1.0D - progress * (1.0D - MIN_SPEED_FACTOR);
+                motionX *= speedMultiplier;
+                motionY *= speedMultiplier;
+                motionZ *= speedMultiplier;
             }
+        }
 
-            double currentSpeed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-            if (!returning && currentSpeed < 0.05D) {
-                staticTicks++;
-                if (staticTicks > 40) {
-                    setDead();
-                    return;
+        if (ticksExisted > MAX_ALIVE) {
+            returning = true;
+        }
+
+        double currentSpeed = getCurrentSpeed();
+        if (!returning && currentSpeed < STATIC_SPEED_THRESHOLD) {
+            staticTicks++;
+            if (staticTicks > STATIC_TIMEOUT) {
+                setDead();
+                return;
+            }
+        } else {
+            staticTicks = 0;
+        }
+
+        if (returning) {
+            if (shootingEntity != null && shootingEntity.isEntityAlive()) {
+                if (returnDamageEnabled) checkReturnHit();
+                returnToShooter();
+                double dist = getDistance(shootingEntity);
+                if (currentSpeed < STUCK_SPEED_THRESHOLD && dist > STUCK_DIST_THRESHOLD) {
+                    stuckTicks++;
+                    if (stuckTicks > STUCK_TIMEOUT) setDead();
+                } else {
+                    stuckTicks = 0;
                 }
             } else {
-                staticTicks = 0;
-            }
-
-            if (returning) {
-                if (shootingEntity != null && shootingEntity.isEntityAlive()) {
-                    if (returnDamageEnabled) checkReturnHit();
-                    returnToShooter();
-                    double dist = getDistance(shootingEntity);
-                    if (currentSpeed < 0.1D && dist > 2.0D) {
-                        stuckTicks++;
-                        if (stuckTicks > 60) {
-                            setDead();
-                        }
-                    } else {
-                        stuckTicks = 0;
-                    }
-                } else {
-                    setDead();
-                }
+                setDead();
             }
         }
     }
@@ -158,13 +173,13 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     }
 
     private void returnToShooter() {
-        Vec3d targetPos = new Vec3d(shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ);
+        Vec3d targetPos = getShooterTargetPos();
         double dx = targetPos.x - posX;
         double dy = targetPos.y - posY;
         double dz = targetPos.z - posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist > 1.2D) {
-            double returnSpeed = Math.max(RETURN_SPEED, initialSpeed * 0.5D);
+        if (dist > RETURN_DIST_THRESHOLD) {
+            double returnSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * RETURN_SPEED_MULTIPLIER);
             double desiredX = dx / dist * returnSpeed;
             double desiredY = dy / dist * returnSpeed;
             double desiredZ = dz / dist * returnSpeed;
@@ -180,9 +195,10 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     @Override
     protected void doMoveUpdate() {
         if (returning && shootingEntity != null) {
-            double dx = shootingEntity.posX - posX;
-            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
-            double dz = shootingEntity.posZ - posZ;
+            Vec3d targetPos = getShooterTargetPos();
+            double dx = targetPos.x - posX;
+            double dy = targetPos.y - posY;
+            double dz = targetPos.z - posZ;
             double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
             this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
             this.rotationPitch = (float) (-(MathHelper.atan2(dy, horizontalDist) * (180D / Math.PI)));
@@ -222,16 +238,16 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
             Vec3d motion = new Vec3d(motionX, motionY, motionZ);
             if (motion.lengthSquared() > 0.0D) {
                 motion = motion.normalize();
-                motionX = motion.x * 0.95D;
-                motionY = motion.y * 0.95D;
-                motionZ = motion.z * 0.95D;
+                motionX = motion.x * PIERCING_SPEED_REDUCTION;
+                motionY = motion.y * PIERCING_SPEED_REDUCTION;
+                motionZ = motion.z * PIERCING_SPEED_REDUCTION;
             }
-            double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-            if (speed < 0.25D || pierceCount <= 0) {
+            double speed = getCurrentSpeed();
+            if (speed < PIERCING_MIN_SPEED || pierceCount <= 0) {
                 returning = true;
                 stuckTicks = 0;
             }
-            if (pierceCount > 0 && speed >= 0.25D) return;
+            if (pierceCount > 0 && speed >= PIERCING_MIN_SPEED) return;
         }
 
         returning = true;

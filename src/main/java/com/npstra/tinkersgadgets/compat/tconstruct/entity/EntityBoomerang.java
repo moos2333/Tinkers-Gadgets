@@ -35,12 +35,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EntityBoomerang extends EntityProjectileBase {
 
     private static final int MAX_ALIVE = 600;
     private static final double BASE_RETURN_SPEED = 0.45D;
     private static final double SMOOTH_FACTOR = 0.5D;
+    private static final double MAX_DISTANCE_BASE = 16.0D;
+    private static final double SLOW_START_FACTOR = 0.75D;
+    private static final double MIN_SPEED_FACTOR = 0.5D;
+    private static final double SPLIT_SPEED_FACTOR = 0.7D;
+    private static final double SPLIT_ANGLE_DEG = 22.5D;
+    private static final double BOUNCE_SEARCH_RADIUS = 9.0D;
+    private static final double BOUNCE_SEARCH_HEIGHT = 5.0D;
+    private static final int STUCK_TIMEOUT = 60;
+    private static final double RETURN_DIST_THRESHOLD = 1.2D;
+    private static final double STUCK_SPEED_THRESHOLD = 0.1D;
+    private static final double STUCK_DIST_THRESHOLD = 2.0D;
+    private static final double DEFLECT_MULTIPLIER_XZ = -1.5D;
+    private static final double DEFLECT_MULTIPLIER_Y = -0.5D;
+    private static final float SPLIT_DAMAGE_RATIO = 0.5f;
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -87,9 +102,44 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setShatter(boolean shatter) { this.shatterEnabled = shatter; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
-
     public boolean isBouncing() { return this.bouncing; }
     public int getBounceCount() { return this.bounceCount; }
+
+    private double getCurrentSpeed() {
+        return Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+    }
+
+    private Vec3d getShooterTargetPos() {
+        return new Vec3d(shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ);
+    }
+
+    private List<String> getMaterialIds(ItemStack toolStack) {
+        NBTTagCompound root = TagUtil.getTagSafe(toolStack);
+        NBTTagCompound tinkerData = root.getCompoundTag("TinkerData");
+        NBTTagList materialsTagList = tinkerData.getTagList("Materials", 8);
+        if (materialsTagList.tagCount() == 0) {
+            materialsTagList = TagUtil.getBaseMaterialsTagList(root);
+        }
+        List<String> ids = new java.util.ArrayList<>();
+        for (int i = 0; i < materialsTagList.tagCount(); i++) {
+            String id = materialsTagList.getStringTagAt(i);
+            if (id != null && !id.isEmpty()) ids.add(id);
+        }
+        if (ids.size() < 3) {
+            NBTTagCompound toolTag = TagUtil.getToolTag(root);
+            String mat0 = toolTag.getString("Material0");
+            String mat1 = toolTag.getString("Material1");
+            String mat2 = toolTag.getString("Material2");
+            if (!mat0.isEmpty() && !mat1.isEmpty() && !mat2.isEmpty()) {
+                ids.clear();
+                ids.add(mat0);
+                ids.add(mat1);
+                ids.add(mat2);
+            }
+        }
+        while (ids.size() < 3) ids.add("wood");
+        return ids;
+    }
 
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
@@ -99,32 +149,7 @@ public class EntityBoomerang extends EntityProjectileBase {
             setDead();
             return;
         }
-        NBTTagCompound root = TagUtil.getTagSafe(toolStack);
-        NBTTagCompound tinkerData = root.getCompoundTag("TinkerData");
-        NBTTagList materialsTagList = tinkerData.getTagList("Materials", 8);
-        if (materialsTagList.tagCount() == 0) {
-            materialsTagList = TagUtil.getBaseMaterialsTagList(root);
-        }
-        List<String> materialIds = new java.util.ArrayList<>();
-        for (int i = 0; i < materialsTagList.tagCount(); i++) {
-            String id = materialsTagList.getStringTagAt(i);
-            if (id != null && !id.isEmpty()) materialIds.add(id);
-        }
-        if (materialIds.size() < 3) {
-            NBTTagCompound toolTag = TagUtil.getToolTag(root);
-            String mat0 = toolTag.getString("Material0");
-            String mat1 = toolTag.getString("Material1");
-            String mat2 = toolTag.getString("Material2");
-            if (!mat0.isEmpty() && !mat1.isEmpty() && !mat2.isEmpty()) {
-                materialIds.clear();
-                materialIds.add(mat0);
-                materialIds.add(mat1);
-                materialIds.add(mat2);
-            }
-        }
-        while (materialIds.size() < 3) {
-            materialIds.add("wood");
-        }
+        List<String> materialIds = getMaterialIds(toolStack);
         String blade1Id = materialIds.get(0);
         String blade2Id = materialIds.get(2);
         ItemStack renderStack1 = new ItemStack(TinkerTools.knifeBlade);
@@ -137,13 +162,13 @@ public class EntityBoomerang extends EntityProjectileBase {
         renderStack2.setTagCompound(tag2);
         ItemStack[] renderStacks = new ItemStack[]{renderStack1, renderStack2};
         Vec3d forward = new Vec3d(motionX, motionY, motionZ).normalize();
-        double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ) * 0.7D;
-        double angle = 22.5D * Math.PI / 180.0D;
+        double speed = getCurrentSpeed() * SPLIT_SPEED_FACTOR;
+        double angle = Math.toRadians(SPLIT_ANGLE_DEG);
         Vec3d right = forward.rotateYaw((float) angle);
         Vec3d left = forward.rotateYaw((float) -angle);
         Vec3d[] directions = new Vec3d[]{right, left};
         Vec3d spawnPos = target.getPositionVector().add(forward.scale(1.5D)).add(0, target.height * 0.5, 0);
-        float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * 0.5);
+        float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * SPLIT_DAMAGE_RATIO);
         for (int i = 0; i < 2; i++) {
             EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
@@ -181,48 +206,41 @@ public class EntityBoomerang extends EntityProjectileBase {
         double deltaZ = posZ - prevPosZ;
         totalDistanceTraveled += Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
-        if (!world.isRemote) {
-            if (deflectProjectiles && !returning) {
-                deflectNearbyProjectiles();
-            }
+        if (world.isRemote) return;
 
-            double baseMaxDistance = 16.0D;
-            double speedFactor = Math.min(1.0D, initialSpeed / 1.8D);
-            double maxDistance = baseMaxDistance * speedFactor;
-            double slowStartDistance = maxDistance * 0.75D;
+        if (deflectProjectiles && !returning) {
+            deflectNearbyProjectiles();
+        }
 
-            if (!returning) {
-                if (totalDistanceTraveled >= maxDistance) {
-                    returning = true;
-                } else if (totalDistanceTraveled > slowStartDistance) {
-                    double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
-                    double minSpeed = 0.5D;
-                    double speedMultiplier = 1.0D - progress * (1.0D - minSpeed);
-                    motionX *= speedMultiplier;
-                    motionY *= speedMultiplier;
-                    motionZ *= speedMultiplier;
-                }
-            }
+        double maxDistance = MAX_DISTANCE_BASE * Math.min(1.0D, initialSpeed / 1.8D);
+        double slowStartDistance = maxDistance * SLOW_START_FACTOR;
 
-            if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
-                if (returnDamageEnabled) checkReturnHit();
-                returnToShooter();
-                double dist = getDistance(shootingEntity);
-                double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-                if (speed < 0.1D && dist > 2.0D) {
-                    stuckTicks++;
-                    if (stuckTicks > 60) {
-                        setDead();
-                    }
-                } else {
-                    stuckTicks = 0;
-                }
-            }
-
-            if (ticksExisted > MAX_ALIVE) {
-                setDead();
+        if (!returning) {
+            if (totalDistanceTraveled >= maxDistance) {
+                returning = true;
+            } else if (totalDistanceTraveled > slowStartDistance) {
+                double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
+                double speedMultiplier = 1.0D - progress * (1.0D - MIN_SPEED_FACTOR);
+                motionX *= speedMultiplier;
+                motionY *= speedMultiplier;
+                motionZ *= speedMultiplier;
             }
         }
+
+        if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
+            if (returnDamageEnabled) checkReturnHit();
+            returnToShooter();
+            double dist = getDistance(shootingEntity);
+            double speed = getCurrentSpeed();
+            if (speed < STUCK_SPEED_THRESHOLD && dist > STUCK_DIST_THRESHOLD) {
+                stuckTicks++;
+                if (stuckTicks > STUCK_TIMEOUT) setDead();
+            } else {
+                stuckTicks = 0;
+            }
+        }
+
+        if (ticksExisted > MAX_ALIVE) setDead();
     }
 
     private void deflectNearbyProjectiles() {
@@ -230,9 +248,9 @@ public class EntityBoomerang extends EntityProjectileBase {
         List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, box);
         for (Entity entity : list) {
             if (entity instanceof EntityArrow || entity instanceof EntityFireball || entity instanceof EntityThrowable || entity instanceof EntityProjectileBase) {
-                entity.motionX *= -1.5;
-                entity.motionY *= -0.5;
-                entity.motionZ *= -1.5;
+                entity.motionX *= DEFLECT_MULTIPLIER_XZ;
+                entity.motionY *= DEFLECT_MULTIPLIER_Y;
+                entity.motionZ *= DEFLECT_MULTIPLIER_XZ;
                 entity.velocityChanged = true;
             }
         }
@@ -253,12 +271,12 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     private void returnToShooter() {
-        Vec3d targetPos = new Vec3d(shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ);
+        Vec3d targetPos = getShooterTargetPos();
         double dx = targetPos.x - posX;
         double dy = targetPos.y - posY;
         double dz = targetPos.z - posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist > 1.2D) {
+        if (dist > RETURN_DIST_THRESHOLD) {
             double returnSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
             motionX = dx / dist * returnSpeed;
             motionY = dy / dist * returnSpeed;
@@ -323,9 +341,9 @@ public class EntityBoomerang extends EntityProjectileBase {
         Entity entityHit = raytraceResult.entityHit;
         if (deflectProjectiles && !returning) {
             if (entityHit instanceof EntityArrow || entityHit instanceof EntityFireball || entityHit instanceof EntityThrowable || entityHit instanceof EntityProjectileBase) {
-                entityHit.motionX *= -1.5;
-                entityHit.motionY *= -0.5;
-                entityHit.motionZ *= -1.5;
+                entityHit.motionX *= DEFLECT_MULTIPLIER_XZ;
+                entityHit.motionY *= DEFLECT_MULTIPLIER_Y;
+                entityHit.motionZ *= DEFLECT_MULTIPLIER_XZ;
                 entityHit.velocityChanged = true;
                 return;
             }
@@ -389,12 +407,13 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private void redirectSpeedToShooter() {
         if (shootingEntity != null) {
-            double dx = shootingEntity.posX - posX;
-            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
-            double dz = shootingEntity.posZ - posZ;
+            Vec3d targetPos = getShooterTargetPos();
+            double dx = targetPos.x - posX;
+            double dy = targetPos.y - posY;
+            double dz = targetPos.z - posZ;
             double dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
             if (dist > 0.1D) {
-                double currentSpeed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                double currentSpeed = getCurrentSpeed();
                 motionX = dx / dist * currentSpeed;
                 motionY = dy / dist * currentSpeed;
                 motionZ = dz / dist * currentSpeed;
@@ -407,30 +426,23 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     public EntityLivingBase findNextBounceTarget(Entity currentHit) {
-        AxisAlignedBB searchBox = new AxisAlignedBB(posX - 9, posY - 5, posZ - 9, posX + 9, posY + 5, posZ + 9);
-        List<EntityLivingBase> allCandidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
-                e -> e != shootingEntity && e.isEntityAlive());
-        allCandidates.removeIf(e -> e == currentHit);
-        allCandidates.removeIf(e -> e instanceof EntityTameable && ((EntityTameable) e).getOwner() == shootingEntity);
+        AxisAlignedBB searchBox = new AxisAlignedBB(posX - BOUNCE_SEARCH_RADIUS, posY - BOUNCE_SEARCH_HEIGHT, posZ - BOUNCE_SEARCH_RADIUS,
+                posX + BOUNCE_SEARCH_RADIUS, posY + BOUNCE_SEARCH_HEIGHT, posZ + BOUNCE_SEARCH_RADIUS);
+        List<EntityLivingBase> candidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
+                e -> e != shootingEntity && e.isEntityAlive() && e != currentHit &&
+                        !(e instanceof EntityTameable && ((EntityTameable) e).getOwner() == shootingEntity));
+        if (candidates.isEmpty()) return null;
 
-        if (allCandidates.isEmpty()) return null;
+        EntityLivingBase firstFresh = candidates.stream()
+                .filter(e -> !hitEntities.contains(e.getUniqueID()))
+                .min(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)))
+                .orElse(null);
+        if (firstFresh != null) return firstFresh;
 
-        List<EntityLivingBase> fresh = new java.util.ArrayList<>();
-        List<EntityLivingBase> used = new java.util.ArrayList<>();
-        for (EntityLivingBase e : allCandidates) {
-            if (!hitEntities.contains(e.getUniqueID())) fresh.add(e);
-            else used.add(e);
-        }
-
-        if (!fresh.isEmpty()) {
-            fresh.sort(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)));
-            return fresh.get(0);
-        }
-        if (!used.isEmpty()) {
-            used.sort(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)));
-            return used.get(0);
-        }
-        return null;
+        return candidates.stream()
+                .filter(e -> hitEntities.contains(e.getUniqueID()))
+                .min(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)))
+                .orElse(null);
     }
 
     private void redirectToTarget(Entity target) {
@@ -439,7 +451,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         double dz = target.posZ - posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist > 0.1D) {
-            double speed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+            double speed = getCurrentSpeed();
             motionX = dx / dist * speed;
             motionY = dy / dist * speed;
             motionZ = dz / dist * speed;

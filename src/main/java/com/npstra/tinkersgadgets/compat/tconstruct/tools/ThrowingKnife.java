@@ -31,6 +31,7 @@ public class ThrowingKnife extends ProjectileCore {
 
     private static final int NORMAL_CHARGE = 20;
     private static final int SNEAK_CHARGE = 30;
+    private static final float SPREAD_ANGLE = 15.0F;
 
     public ThrowingKnife() {
         super(new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD),
@@ -42,23 +43,33 @@ public class ThrowingKnife extends ProjectileCore {
     }
 
     @Override
-    public float damagePotential() { return 0.66f; }
+    public float damagePotential() {
+        return 0.66f;
+    }
 
     @Override
-    public int[] getRepairParts() { return new int[]{0}; }
+    public int[] getRepairParts() {
+        return new int[]{0};
+    }
 
     @Nonnull
     @Override
-    public EnumAction getItemUseAction(ItemStack stack) { return EnumAction.BOW; }
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.BOW;
+    }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) { return 72000; }
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return 72000;
+    }
 
     @Nonnull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
         ItemStack itemStackIn = playerIn.getHeldItem(hand);
-        if (ToolHelper.isBroken(itemStackIn)) return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+        if (ToolHelper.isBroken(itemStackIn)) {
+            return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+        }
         playerIn.setActiveHand(hand);
         return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
     }
@@ -67,9 +78,9 @@ public class ThrowingKnife extends ProjectileCore {
     public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
         if (player instanceof EntityPlayer) {
             EntityPlayer entityPlayer = (EntityPlayer) player;
-            int chargeTime = this.getMaxItemUseDuration(stack) - count;
+            int useTime = this.getMaxItemUseDuration(stack) - count;
             int required = entityPlayer.isSneaking() ? SNEAK_CHARGE : NORMAL_CHARGE;
-            if (chargeTime >= required && !entityPlayer.world.isRemote) {
+            if (useTime >= required && !entityPlayer.world.isRemote) {
                 entityPlayer.stopActiveHand();
             }
         }
@@ -77,13 +88,17 @@ public class ThrowingKnife extends ProjectileCore {
 
     @Override
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
-        if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) return;
+        if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) {
+            return;
+        }
         EntityPlayer player = (EntityPlayer) entityLiving;
         boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
         boolean sneaking = player.isSneaking();
         int required = sneaking ? SNEAK_CHARGE : NORMAL_CHARGE;
-        if (useDuration < required) return;
+        if (useDuration < required) {
+            return;
+        }
 
         float progress = Math.min(1.0F, (float) useDuration / (float) required);
         float speed = 1.4F * progress;
@@ -92,13 +107,13 @@ public class ThrowingKnife extends ProjectileCore {
 
         if (!worldIn.isRemote) {
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
-            spawnKnife(stack, worldIn, player, speed, inaccuracy, power, usedAmmo);
+            Vec3d look = player.getLookVec();
+            spawnKnife(stack, worldIn, player, speed, inaccuracy, power, look, usedAmmo);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
             if (sneaking && !ammoDepleted) {
-                Vec3d look = player.getLookVec();
-                Vec3d left = look.rotateYaw((float) Math.toRadians(-15));
-                Vec3d right = look.rotateYaw((float) Math.toRadians(15));
+                Vec3d left = look.rotateYaw((float) Math.toRadians(-SPREAD_ANGLE));
+                Vec3d right = look.rotateYaw((float) Math.toRadians(SPREAD_ANGLE));
                 spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, left, false);
                 spawnKnife(stack, worldIn, player, speed, inaccuracy + 2.0F, power, right, false);
             }
@@ -106,12 +121,6 @@ public class ThrowingKnife extends ProjectileCore {
                 ToolHelper.breakTool(stack, player);
             }
         }
-    }
-
-    private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, boolean usedAmmo) {
-        EntityThrowingKnife knife = new EntityThrowingKnife(world, player, speed, inaccuracy, power,
-                getProjectileStack(stack, world, player, usedAmmo), stack);
-        world.spawnEntity(knife);
     }
 
     private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, Vec3d direction, boolean usedAmmo) {
