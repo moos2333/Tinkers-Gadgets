@@ -2,10 +2,12 @@ package com.npstra.tinkersgadgets.compat.tconstruct.client;
 
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderBoomerangShard;
+import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.common.CommonProxy;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
+import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.GadgetsRegister;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -38,6 +40,13 @@ public class ClientProxy extends CommonProxy {
             info.addSlotPosition(33 - 18, 42 - 18);
             TinkerRegistryClient.addToolBuilding(info);
         }
+        if (GadgetsRegister.chainBlade != null) {
+            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.chainBlade);
+            info.addSlotPosition(33, 42 - 18);
+            info.addSlotPosition(33, 42 + 18);
+            info.addSlotPosition(33, 42);
+            TinkerRegistryClient.addToolBuilding(info);
+        }
     }
 
     @Override
@@ -45,5 +54,6 @@ public class ClientProxy extends CommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityBoomerang.class, RenderBoomerang::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityBoomerangShard.class, RenderBoomerangShard::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityThrowingKnife.class, RenderThrowingKnife::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityChainBlade.class, RenderChainBlade::new);
     }
 }

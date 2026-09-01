@@ -1,10 +1,7 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.materials;
 
 import com.npstra.tinkersgadgets.Config;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.FuelTankPartType;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.GripPartType;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.HeatRayEmitterPartType;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -272,6 +269,9 @@ public class MaterialRegister {
             if (iron.getStats(GripPartType.GRIP) == null) {
                 TinkerRegistry.addMaterialStats(iron, new GripMaterialStats());
             }
+            if (iron.getStats(ChainPartType.CHAIN) == null) {
+                iron.addStats(new ChainMaterialStats(3, 4.0f, 0.0f, 0.0f));
+            }
             if (isTraitEnabled("inertia_throwingknife")) {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
             }
@@ -285,6 +285,9 @@ public class MaterialRegister {
             if (stone.getStats(FuelTankPartType.FUEL_TANK) == null) {
                 stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
             }
+            if (stone.getStats(ChainPartType.CHAIN) == null) {
+                stone.addStats(new ChainMaterialStats(2, 2.0f, 0.0f, 0.0f));
+            }
         }
 
         Material cobalt = TinkerRegistry.getMaterial("cobalt");
@@ -294,6 +297,9 @@ public class MaterialRegister {
             }
             if (cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
                 cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
+            }
+            if (cobalt.getStats(ChainPartType.CHAIN) == null) {
+                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 0.0f, 0.0f));
             }
         }
 

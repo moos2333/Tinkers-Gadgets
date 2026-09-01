@@ -1,0 +1,294 @@
+package com.npstra.tinkersgadgets.compat.tconstruct.entity;
+
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
+
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+public class EntityChainBlade extends EntityProjectileBase {
+    private static final int MAX_ALIVE = 120;
+    private static final double GRAVITY = 0.065D;
+    private static final double RETURN_SPEED = 0.8D;
+    private static final double MAX_RETURN_SPEED = 2.0D;
+    private static final float PULL_STRENGTH_HIT = 0.5f;
+    private static final float PULL_STRENGTH_RETURN = 1.0f;
+
+    private EntityPlayer shooter;
+    private ItemStack weaponStack = ItemStack.EMPTY;
+    private final Set<UUID> hitEntities = new HashSet<>();
+    private int maxBounces;
+    private float bounceRange;
+    private float sweepRangeBonus;
+    private float damageBonus;
+    private int bounceCount;
+    protected boolean returning;
+    private int hitCount;
+    private double baseDamage;
+    private String toolId = "";
+
+    public EntityChainBlade(World world) {
+        super(world);
+        setSize(0.3f, 0.1f);
+    }
+
+    public EntityChainBlade(World world, EntityPlayer shooter, ItemStack weapon, float speed, float damage,
+                            int maxBounces, float bounceRange, float sweepRangeBonus, float damageBonus) {
+        super(world, shooter, speed, 1.0f, 1.0f, ItemStack.EMPTY, ItemStack.EMPTY);
+        this.shooter = shooter;
+        this.weaponStack = weapon.copy();
+        this.baseDamage = damage;
+        this.maxBounces = maxBounces;
+        this.bounceRange = bounceRange;
+        this.sweepRangeBonus = sweepRangeBonus;
+        this.damageBonus = damageBonus;
+        this.shootingEntity = shooter;
+        this.hitCount = 0;
+        this.bounceCount = 0;
+        this.returning = false;
+        setDamage((float) damage);
+    }
+
+    public boolean isReturning() {
+        return returning;
+    }
+
+    public void setToolId(String id) {
+        this.toolId = id;
+    }
+
+    @Override
+    public double getGravity() {
+        return returning ? 0.0D : GRAVITY;
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (world.isRemote) return;
+        if (ticksExisted > MAX_ALIVE) {
+            returning = true;
+        }
+        if (returning) {
+            if (shooter != null && shooter.isEntityAlive()) {
+                returnToShooter();
+                double dist = getDistance(shooter);
+                if (dist < 1.5D) {
+                    onCollideWithPlayer(shooter);
+                    setDead();
+                }
+            } else {
+                setDead();
+            }
+        }
+        if (!returning) {
+            float yaw = (float) (MathHelper.atan2(motionZ, motionX) * (180D / Math.PI)) - 90.0F;
+            float pitch = (float) (-(MathHelper.atan2(motionY, MathHelper.sqrt(motionX * motionX + motionZ * motionZ)) * (180D / Math.PI)));
+            rotationYaw = yaw;
+            rotationPitch = pitch;
+            prevRotationYaw = rotationYaw;
+            prevRotationPitch = rotationPitch;
+        }
+    }
+
+    private void returnToShooter() {
+        Vec3d target = new Vec3d(shooter.posX, shooter.posY + shooter.getEyeHeight() * 0.7, shooter.posZ);
+        Vec3d delta = target.subtract(new Vec3d(posX, posY, posZ));
+        double dist = delta.length();
+        if (dist > 1.5D) {
+            Vec3d dir = delta.normalize();
+            double speed = Math.min(MAX_RETURN_SPEED, Math.max(RETURN_SPEED, dist * 0.12D));
+            motionX = dir.x * speed;
+            motionY = dir.y * speed;
+            motionZ = dir.z * speed;
+            dealReturnDamage();
+        } else {
+            motionX = 0;
+            motionY = 0;
+            motionZ = 0;
+        }
+    }
+
+    private void dealReturnDamage() {
+        double radius = 2.0D;
+        AxisAlignedBB box = getEntityBoundingBox().grow(radius);
+        List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
+                e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
+        for (EntityLivingBase target : targets) {
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D * (1.0D + damageBonus)));
+            damage = Math.min((float) (baseDamage * 4.0D), damage);
+            target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
+            hitCount++;
+            hitEntities.add(target.getUniqueID());
+            pullEntityTowardsPlayer(target, shooter, PULL_STRENGTH_RETURN);
+            playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
+        }
+    }
+
+    private void pullEntityTowardsPlayer(EntityLivingBase target, EntityPlayer player, float strength) {
+        if (target == null || player == null || target.world.isRemote) return;
+        if (target == player) return;
+        double dx = player.posX - target.posX;
+        double dy = (player.posY + player.getEyeHeight() * 0.5) - target.posY;
+        double dz = player.posZ - target.posZ;
+        double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < 1.0D) return;
+        double pullSpeed = Math.min(1.2D, strength * 1.5D);
+        double speed = Math.min(pullSpeed, dist * 0.2D);
+        target.motionX = dx / dist * speed;
+        target.motionY = dy / dist * speed * 0.4D;
+        target.motionZ = dz / dist * speed;
+        target.velocityChanged = true;
+        target.hurtResistantTime = 0;
+    }
+
+    @Override
+    public void onHitEntity(RayTraceResult result) {
+        Entity target = result.entityHit;
+        if (target == shooter || target == this) return;
+        UUID id = target.getUniqueID();
+        if (hitEntities.contains(id)) return;
+        if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D * (1.0D + damageBonus)));
+            damage = Math.min((float) (baseDamage * 4.0D), damage);
+            target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
+            hitCount++;
+            hitEntities.add(id);
+            if (target instanceof EntityLivingBase) {
+                pullEntityTowardsPlayer((EntityLivingBase) target, shooter, PULL_STRENGTH_HIT);
+            }
+            playHitEntitySound();
+            playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
+        }
+        if (bounceCount < maxBounces) {
+            EntityLivingBase next = findNextTarget();
+            if (next != null) {
+                bounceCount++;
+                Vec3d dir = new Vec3d(
+                        next.posX - posX,
+                        next.posY + next.getEyeHeight() * 0.5 - posY,
+                        next.posZ - posZ
+                ).normalize();
+                double speed = 1.2D + rand.nextDouble() * 0.3D;
+                motionX = dir.x * speed;
+                motionY = dir.y * speed + 0.1D;
+                motionZ = dir.z * speed;
+                return;
+            }
+        }
+        returning = true;
+    }
+
+    @Nullable
+    private EntityLivingBase findNextTarget() {
+        AxisAlignedBB box = new AxisAlignedBB(
+                posX - bounceRange, posY - bounceRange, posZ - bounceRange,
+                posX + bounceRange, posY + bounceRange, posZ + bounceRange
+        );
+        List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
+                e -> e != shooter && e != (Entity) this && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive());
+        if (targets.isEmpty()) return null;
+        targets.sort((a, b) -> Double.compare(a.getDistance(this), b.getDistance(this)));
+        return targets.get(0);
+    }
+
+    @Override
+    public void onHitBlock(RayTraceResult result) {
+        returning = true;
+        inGround = false;
+        arrowShake = 0;
+        ticksInGround = 0;
+    }
+
+    @Override
+    public ItemStack getArrowStack() {
+        return weaponStack;
+    }
+
+    @Override
+    public void setDead() {
+        if (!world.isRemote && !toolId.isEmpty()) {
+            ChainBlade.removeActiveChainBlade(toolId, this);
+        }
+        if (!world.isRemote && !weaponStack.isEmpty() && shooter != null) {
+            if (hitCount > 0) {
+                int charge = getCharge(weaponStack);
+                charge = Math.min(30, charge + hitCount);
+                setCharge(weaponStack, charge);
+            }
+        }
+        super.setDead();
+    }
+
+    private int getCharge(ItemStack stack) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+            stack.setTagCompound(tag);
+        }
+        return tag.getInteger("chain_charge");
+    }
+
+    private void setCharge(ItemStack stack, int value) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+            stack.setTagCompound(tag);
+        }
+        tag.setInteger("chain_charge", value);
+    }
+
+    @Override
+    protected void onEntityHit(Entity entity) {}
+
+    @Override
+    protected void playHitEntitySound() {
+        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 1.0F);
+    }
+
+    protected boolean canFitInBlock() {
+        return true;
+    }
+
+    @Override
+    public void writeSpawnData(ByteBuf data) {
+        super.writeSpawnData(data);
+        data.writeInt(maxBounces);
+        data.writeFloat(bounceRange);
+        data.writeFloat(sweepRangeBonus);
+        data.writeFloat(damageBonus);
+        data.writeInt(bounceCount);
+        data.writeBoolean(returning);
+        data.writeInt(hitCount);
+        data.writeDouble(baseDamage);
+    }
+
+    @Override
+    public void readSpawnData(ByteBuf data) {
+        super.readSpawnData(data);
+        maxBounces = data.readInt();
+        bounceRange = data.readFloat();
+        sweepRangeBonus = data.readFloat();
+        damageBonus = data.readFloat();
+        bounceCount = data.readInt();
+        returning = data.readBoolean();
+        hitCount = data.readInt();
+        baseDamage = data.readDouble();
+    }
+}

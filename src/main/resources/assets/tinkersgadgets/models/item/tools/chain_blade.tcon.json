@@ -1,0 +1,9 @@
+{
+  "loader": "tconstruct:tool",
+  "parent": "forge:item/default",
+  "textures": {
+    "layer0": "tinkersgadgets:items/tools/chain_blade/blade",
+    "layer1": "tinkersgadgets:items/tools/chain_blade/handle",
+    "layer2": "tinkersgadgets:items/tools/chain_blade/chain"
+  }
+}

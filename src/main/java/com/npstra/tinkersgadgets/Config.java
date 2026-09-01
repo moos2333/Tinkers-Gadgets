@@ -9,6 +9,7 @@ public class Config {
     public static boolean enableBoomerang = true;
     public static boolean enableThrowingKnife = true;
     public static boolean enableHeatRayGun = true;
+    public static boolean enableChainBlade = true;
     public static boolean enableCapacity = true;
     public static boolean enableRapid = true;
     public static boolean enablePower = true;
@@ -33,6 +34,8 @@ public class Config {
                 "Enable the Throwing Knife tool and its Grip part.");
         enableHeatRayGun = config.getBoolean("enableHeatRayGun", general, true,
                 "Enable the Heat Ray Gun tool and its parts.");
+        enableChainBlade = config.getBoolean("enableChainBlade", general, true,
+                "Enable the Chain Blade tool and its Chain part.");
         enableCapacity = config.getBoolean("enableCapacity", general, true,
                 "Enable the Capacity modifier for Heat Ray Gun.");
         enableRapid = config.getBoolean("enableRapid", general, true,

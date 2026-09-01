@@ -4,11 +4,9 @@ import com.npstra.tinkersgadgets.TinkersGadgets;
 import com.npstra.tinkersgadgets.Config;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
+import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemConnector;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemGrip;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemFuelTank;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.ItemHeatRayEmitter;
+import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -37,6 +35,9 @@ public class GadgetsRegister {
     public static ToolCore heatRayGun;
     public static ToolPart fuelTank;
     public static ToolPart heatRayEmitter;
+    public static ItemChain chain;
+    public static ChainBlade chainBlade;
+
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
@@ -77,6 +78,17 @@ public class GadgetsRegister {
             event.getRegistry().register(heatRayGun);
             TinkerRegistry.registerToolForgeCrafting(heatRayGun);
         }
+
+        if (Config.enableChainBlade) {
+            chain = new ItemChain();
+            event.getRegistry().register(chain);
+            TinkerRegistry.registerToolPart(chain);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), chain));
+
+            chainBlade = new ChainBlade();
+            event.getRegistry().register(chainBlade);
+            TinkerRegistry.registerToolCrafting(chainBlade);
+        }
     }
 
     @SubscribeEvent
@@ -94,6 +106,10 @@ public class GadgetsRegister {
 
         if (Config.enableThrowingKnife) {
             EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:throwing_knife"), EntityThrowingKnife.class, "throwing_knife", 103, TinkersGadgets.instance, 64, 1, true);
+        }
+
+        if (Config.enableChainBlade) {
+            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:chain_blade"), EntityChainBlade.class, "chain_blade", 104, TinkersGadgets.instance, 64, 1, true);
         }
     }
 
@@ -127,6 +143,15 @@ public class GadgetsRegister {
             }
             if (heatRayGun != null) {
                 ModelRegisterUtil.registerToolModel(heatRayGun);
+            }
+        }
+
+        if (Config.enableChainBlade) {
+            if (chain != null) {
+                ModelRegisterUtil.registerPartModel(chain);
+            }
+            if (chainBlade != null) {
+                ModelRegisterUtil.registerToolModel(chainBlade);
             }
         }
     }
