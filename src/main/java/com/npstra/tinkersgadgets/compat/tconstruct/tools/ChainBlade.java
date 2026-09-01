@@ -41,7 +41,6 @@ import java.util.WeakHashMap;
 
 public class ChainBlade extends ProjectileCore {
     private static final Map<String, Set<Entity>> activeChainBlades = new WeakHashMap<>();
-    private static final int MAX_CHARGE = 30;
     private static final int CHARGE_COST = 10;
     private static final int SWEEP_COOLDOWN = 40;
     private static final float SWEEP_BASE_RADIUS = 3.5f;
@@ -145,7 +144,7 @@ public class ChainBlade extends ProjectileCore {
             boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
             float progress = Math.min(1.0F, (float) useDuration / (float) THROW_CHARGE);
-            float speed = 1.8F * progress;
+            float speed = 1.6F * progress;
             float inaccuracy = 0.3F * (1.0F - progress);
             shootChainBlade(world, player, stack, speed, inaccuracy, progress, toolId, usedAmmo);
             world.playSound(null, player.posX, player.posY, player.posZ,
