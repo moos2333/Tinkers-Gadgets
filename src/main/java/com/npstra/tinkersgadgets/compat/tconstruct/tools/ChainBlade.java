@@ -173,6 +173,18 @@ public class ChainBlade extends ProjectileCore {
         entity.motionX = look.x * speed;
         entity.motionY = look.y * speed + 0.05D;
         entity.motionZ = look.z * speed;
+
+        double dx = entity.motionX;
+        double dy = entity.motionY;
+        double dz = entity.motionZ;
+        if (dx == 0 && dy == 0 && dz == 0) {
+            dx = 1;
+        }
+        entity.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
+        entity.rotationPitch = (float) (-(MathHelper.atan2(dy, MathHelper.sqrt(dx * dx + dz * dz)) * (180D / Math.PI)));
+        entity.prevRotationYaw = entity.rotationYaw;
+        entity.prevRotationPitch = entity.rotationPitch;
+
         world.spawnEntity(entity);
         addActiveChainBlade(toolId, entity);
     }
