@@ -189,13 +189,7 @@ public class ChainBlade extends ProjectileCore {
         Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight() * 0.5, player.posZ);
         Vec3d look = player.getLookVec();
 
-        Vec3d look2D = new Vec3d(look.x, 0, look.z).normalize();
-        float yaw = (float) Math.atan2(look2D.z, look2D.x);
-
-        double px = player.posX + look.x * 2.0D;
-        double pz = player.posZ + look.z * 2.0D;
-        double py = player.posY + player.getEyeHeight() * 0.8D;
-        world.spawnParticle(EnumParticleTypes.SWEEP_ATTACK, px, py, pz, 0, 0, 0);
+        player.spawnSweepParticles();
 
         AxisAlignedBB box = new AxisAlignedBB(
                 origin.x - radius, origin.y - radius, origin.z - radius,
@@ -208,6 +202,7 @@ public class ChainBlade extends ProjectileCore {
             Vec3d toTarget = new Vec3d(e.posX - origin.x, e.posY + e.getEyeHeight() * 0.5 - origin.y, e.posZ - origin.z);
             if (toTarget.length() > radius) return true;
             Vec3d toTarget2D = new Vec3d(toTarget.x, 0, toTarget.z).normalize();
+            Vec3d look2D = new Vec3d(look.x, 0, look.z).normalize();
             double cosAngle = look2D.dotProduct(toTarget2D);
             return Math.acos(MathHelper.clamp(cosAngle, -1.0, 1.0)) > Math.toRadians(angle * 0.5);
         });
