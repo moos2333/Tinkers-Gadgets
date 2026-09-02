@@ -98,7 +98,7 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
 
         GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         itemRenderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE);
