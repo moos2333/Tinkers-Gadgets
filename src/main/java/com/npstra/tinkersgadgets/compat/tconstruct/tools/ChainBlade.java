@@ -52,7 +52,7 @@ public class ChainBlade extends ProjectileCore {
 
     public ChainBlade() {
         super(PartMaterialType.handle(TinkerTools.toolRod),
-                PartMaterialType.head(TinkerTools.swordBlade),
+                PartMaterialType.head(TinkerTools.arrowHead),
                 new PartMaterialType(GadgetsRegister.chain, ChainPartType.CHAIN));
         addCategory(Category.WEAPON);
         addCategory(Category.PROJECTILE);
