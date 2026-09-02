@@ -148,7 +148,7 @@ public class ChainBlade extends ProjectileCore {
             float inaccuracy = 0.3F * (1.0F - progress);
             shootChainBlade(world, player, stack, speed, inaccuracy, progress, toolId, usedAmmo);
             world.playSound(null, player.posX, player.posY, player.posZ,
-                    SoundEvents.ENTITY_ARMORSTAND_PLACE, SoundCategory.PLAYERS, 0.6F, 1.2F);
+                    SoundEvents.ITEM_ARMOR_EQUIP_CHAIN, SoundCategory.PLAYERS, 0.6F, 1.2F);
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
             }
