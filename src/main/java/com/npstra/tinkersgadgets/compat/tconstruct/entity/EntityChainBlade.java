@@ -99,6 +99,21 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         }
     }
 
+    private void updateRotation() {
+        double dx = motionX;
+        double dy = motionY;
+        double dz = motionZ;
+        if (dx == 0 && dy == 0 && dz == 0) {
+            dx = 1;
+        }
+        float yaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
+        float pitch = (float) (-(MathHelper.atan2(dy, MathHelper.sqrt(dx * dx + dz * dz)) * (180D / Math.PI)));
+        rotationYaw = yaw;
+        rotationPitch = pitch;
+        prevRotationYaw = rotationYaw;
+        prevRotationPitch = rotationPitch;
+    }
+
     @Override
     public double getGravity() {
         return returning ? 0.0D : GRAVITY;
@@ -137,14 +152,8 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             } else {
                 setDead();
             }
-        }
-        if (!returning) {
-            float yaw = (float) (MathHelper.atan2(motionZ, motionX) * (180D / Math.PI)) - 90.0F;
-            float pitch = (float) (-(MathHelper.atan2(motionY, MathHelper.sqrt(motionX * motionX + motionZ * motionZ)) * (180D / Math.PI)));
-            rotationYaw = yaw;
-            rotationPitch = pitch;
-            prevRotationYaw = rotationYaw;
-            prevRotationPitch = rotationPitch;
+        } else {
+            updateRotation();
         }
     }
 

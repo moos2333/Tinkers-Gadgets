@@ -309,8 +309,7 @@ public class ChainBlade extends ProjectileCore {
         Material chainMat = materials.size() > 2 && materials.get(2) != null ? materials.get(2) : Material.UNKNOWN;
 
         data.head(bladeMat.getStatsOrUnknown(MaterialTypes.HEAD));
-        data.extra(bladeMat.getStatsOrUnknown(MaterialTypes.EXTRA),
-                handleMat.getStatsOrUnknown(MaterialTypes.EXTRA),
+        data.extra(handleMat.getStatsOrUnknown(MaterialTypes.EXTRA),
                 chainMat.getStatsOrUnknown(MaterialTypes.EXTRA));
         data.accuracy = 0.9f;
 
