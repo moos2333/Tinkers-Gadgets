@@ -18,7 +18,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.materials.MaterialTypes;
@@ -49,6 +51,7 @@ public class ChainBlade extends ProjectileCore {
     private static final float BASE_DAMAGE_RATIO = 0.4f;
     private static final int THROW_CHARGE = 20;
     private static final float CHARGE_MULTIPLIER = 2.0f;
+    private static final int MAX_CHARGE = 30;
 
     public ChainBlade() {
         super(PartMaterialType.handle(TinkerTools.toolRod),
@@ -298,6 +301,36 @@ public class ChainBlade extends ProjectileCore {
     private float getDamageBonus(ItemStack stack) {
         NBTTagCompound tag = TagUtil.getToolTag(stack);
         return tag != null && tag.hasKey("damageBonus") ? tag.getFloat("damageBonus") : 0.0f;
+    }
+
+    @Override
+    public List<String> getInformation(ItemStack stack, boolean detailed) {
+        List<String> info = super.getInformation(stack, detailed);
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        if (toolTag == null) return info;
+        int maxBounces = toolTag.hasKey("maxBounces") ? toolTag.getInteger("maxBounces") : 3;
+        float bounceRange = toolTag.hasKey("bounceRange") ? toolTag.getFloat("bounceRange") : 4.0f;
+        info.add(Util.translateFormatted("stat.chain.max_bounces.tooltip", maxBounces));
+        info.add(Util.translateFormatted("stat.chain.bounce_range.tooltip", String.format("%.1f", bounceRange)));
+        if (detailed) {
+            int charge = getCharge(stack);
+            info.add(Util.translateFormatted("stat.chain.charge.tooltip",
+                    TextFormatting.GOLD + String.valueOf(charge) + TextFormatting.RESET,
+                    TextFormatting.GOLD + String.valueOf(MAX_CHARGE) + TextFormatting.RESET));
+        }
+        return info;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        if (flagIn.isAdvanced()) return;
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        if (toolTag == null) return;
+        int charge = getCharge(stack);
+        tooltip.add(Util.translateFormatted("stat.chain.charge.tooltip",
+                TextFormatting.GOLD + String.valueOf(charge) + TextFormatting.RESET,
+                TextFormatting.GOLD + String.valueOf(MAX_CHARGE) + TextFormatting.RESET));
     }
 
     @Override
