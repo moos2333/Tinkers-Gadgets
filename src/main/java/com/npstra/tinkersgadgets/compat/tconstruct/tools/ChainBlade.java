@@ -310,8 +310,8 @@ public class ChainBlade extends ProjectileCore {
         if (toolTag == null) return info;
         int maxBounces = toolTag.hasKey("maxBounces") ? toolTag.getInteger("maxBounces") : 3;
         float bounceRange = toolTag.hasKey("bounceRange") ? toolTag.getFloat("bounceRange") : 4.0f;
-        info.add(Util.translateFormatted("stat.chain.max_bounces.tooltip", maxBounces));
-        info.add(Util.translateFormatted("stat.chain.bounce_range.tooltip", String.format("%.1f", bounceRange)));
+        info.add(Util.translateFormatted("stat.chain.max_bounces.name", maxBounces));
+        info.add(Util.translateFormatted("stat.chain.bounce_range.name", bounceRange));
         if (detailed) {
             int charge = getCharge(stack);
             info.add(Util.translateFormatted("stat.chain.charge.tooltip",
