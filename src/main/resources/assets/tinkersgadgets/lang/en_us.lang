@@ -110,3 +110,4 @@ stat.chain.damage_bonus.name=Damage Bonus: %s
 stat.chain.damage_bonus.desc=Multiplies target count damage scaling
 item.tinkersgadgets.chain_blade.name=Chain Blade
 item.tinkersgadgets.chain_blade.desc=A group-fighting weapon that bounces between enemies and pulls them toward you.\nRight-click: Charge to throw.\nSneak + Right-click: Sweep attack.
+stat.chain.charge.tooltip=Charge: %s/%s
