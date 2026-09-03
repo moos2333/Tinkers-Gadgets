@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 public class ChainBlade extends ProjectileCore {
@@ -159,6 +160,15 @@ public class ChainBlade extends ProjectileCore {
     }
 
     private void shootChainBlade(World world, EntityPlayer player, ItemStack stack, float speed, float inaccuracy, float power, String toolId, boolean usedAmmo) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+            stack.setTagCompound(tag);
+        }
+        if (!tag.hasKey("chain_uuid")) {
+            tag.setString("chain_uuid", UUID.randomUUID().toString());
+        }
+
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
         int maxBounces = getMaxBounces(stack);

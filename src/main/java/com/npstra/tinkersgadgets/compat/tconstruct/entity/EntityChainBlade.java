@@ -45,6 +45,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private int hitCount;
     private double baseDamage;
     private String toolId = "";
+    private String weaponUuid = "";
     private int stuckTicks;
 
     public EntityChainBlade(World world) {
@@ -67,6 +68,15 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         this.bounceCount = 0;
         this.returning = false;
         this.stuckTicks = 0;
+        NBTTagCompound tag = weapon.getTagCompound();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+            weapon.setTagCompound(tag);
+        }
+        if (!tag.hasKey("chain_uuid")) {
+            tag.setString("chain_uuid", UUID.randomUUID().toString());
+        }
+        this.weaponUuid = tag.getString("chain_uuid");
         setDamage((float) damage);
     }
 
@@ -97,21 +107,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         } else {
             return 0.8D + distance * 0.2D;
         }
-    }
-
-    private void updateRotation() {
-        double dx = motionX;
-        double dy = motionY;
-        double dz = motionZ;
-        if (dx == 0 && dy == 0 && dz == 0) {
-            dx = 1;
-        }
-        float yaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-        float pitch = (float) (-(MathHelper.atan2(dy, MathHelper.sqrt(dx * dx + dz * dz)) * (180D / Math.PI)));
-        rotationYaw = yaw;
-        rotationPitch = pitch;
-        prevRotationYaw = rotationYaw;
-        prevRotationPitch = rotationPitch;
     }
 
     @Override
@@ -152,8 +147,14 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             } else {
                 setDead();
             }
-        } else {
-            updateRotation();
+        }
+        if (!returning) {
+            float yaw = (float) (MathHelper.atan2(motionZ, motionX) * (180D / Math.PI)) - 90.0F;
+            float pitch = (float) (-(MathHelper.atan2(motionY, MathHelper.sqrt(motionX * motionX + motionZ * motionZ)) * (180D / Math.PI)));
+            rotationYaw = yaw;
+            rotationPitch = pitch;
+            prevRotationYaw = rotationYaw;
+            prevRotationPitch = rotationPitch;
         }
     }
 
@@ -295,16 +296,36 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         return weaponStack;
     }
 
+    private ItemStack findActualWeapon() {
+        if (shooter == null || weaponUuid.isEmpty()) return ItemStack.EMPTY;
+        ItemStack main = shooter.getHeldItemMainhand();
+        if (!main.isEmpty() && main.getItem() instanceof ChainBlade) {
+            NBTTagCompound tag = main.getTagCompound();
+            if (tag != null && weaponUuid.equals(tag.getString("chain_uuid"))) {
+                return main;
+            }
+        }
+        ItemStack off = shooter.getHeldItemOffhand();
+        if (!off.isEmpty() && off.getItem() instanceof ChainBlade) {
+            NBTTagCompound tag = off.getTagCompound();
+            if (tag != null && weaponUuid.equals(tag.getString("chain_uuid"))) {
+                return off;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
     @Override
     public void setDead() {
         if (!world.isRemote && !toolId.isEmpty()) {
             ChainBlade.removeActiveChainBlade(toolId, this);
         }
-        if (!world.isRemote && !weaponStack.isEmpty() && shooter != null) {
-            if (hitCount > 0) {
-                int charge = getCharge(weaponStack);
+        if (!world.isRemote && !weaponUuid.isEmpty() && shooter != null && hitCount > 0) {
+            ItemStack actual = findActualWeapon();
+            if (!actual.isEmpty()) {
+                int charge = getCharge(actual);
                 charge = Math.min(30, charge + hitCount);
-                setCharge(weaponStack, charge);
+                setCharge(actual, charge);
             }
         }
         super.setDead();
@@ -353,6 +374,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         data.writeBoolean(returning);
         data.writeInt(hitCount);
         data.writeDouble(baseDamage);
+        ByteBufUtils.writeUTF8String(data, weaponUuid);
     }
 
     @Override
@@ -375,5 +397,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         returning = data.readBoolean();
         hitCount = data.readInt();
         baseDamage = data.readDouble();
+        weaponUuid = ByteBufUtils.readUTF8String(data);
     }
 }
