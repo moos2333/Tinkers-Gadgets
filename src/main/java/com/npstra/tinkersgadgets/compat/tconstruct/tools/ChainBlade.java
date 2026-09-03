@@ -48,6 +48,7 @@ public class ChainBlade extends ProjectileCore {
     private static final float SWEEP_MAX_ANGLE = 180.0f;
     private static final float BASE_DAMAGE_RATIO = 0.4f;
     private static final int THROW_CHARGE = 20;
+    private static final float CHARGE_MULTIPLIER = 2.0f;
 
     public ChainBlade() {
         super(PartMaterialType.handle(TinkerTools.toolRod),
@@ -220,7 +221,7 @@ public class ChainBlade extends ProjectileCore {
 
         int count = targets.size();
         boolean hasCharge = consumeCharge(stack, CHARGE_COST);
-        float chargeMult = hasCharge ? 1.5f : 1.0f;
+        float chargeMult = hasCharge ? CHARGE_MULTIPLIER : 1.0f;
 
         if (!targets.isEmpty()) {
             EntityLivingBase primary = null;
