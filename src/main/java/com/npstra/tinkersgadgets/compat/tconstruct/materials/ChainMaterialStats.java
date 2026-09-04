@@ -9,18 +9,16 @@ import com.npstra.tinkersgadgets.compat.tconstruct.parts.ChainPartType;
 import java.util.List;
 
 public class ChainMaterialStats extends AbstractMaterialStats {
-    public static final ChainMaterialStats UNKNOWN = new ChainMaterialStats(3, 4.0f, 0.0f, 0.0f);
+    public static final ChainMaterialStats UNKNOWN = new ChainMaterialStats(3, 4.0f, 0);
     public final int maxBounces;
     public final float bounceRange;
-    public final float sweepRangeBonus;
-    public final float damageBonus;
+    public final int ammoBonus;
 
-    public ChainMaterialStats(int maxBounces, float bounceRange, float sweepRangeBonus, float damageBonus) {
+    public ChainMaterialStats(int maxBounces, float bounceRange, int ammoBonus) {
         super(ChainPartType.CHAIN);
-        this.maxBounces = Math.max(2, Math.min(6, maxBounces));
-        this.bounceRange = Math.max(2.0f, Math.min(6.0f, bounceRange));
-        this.sweepRangeBonus = Math.max(0.0f, Math.min(1.0f, sweepRangeBonus));
-        this.damageBonus = Math.max(-0.5f, Math.min(1.0f, damageBonus));
+        this.maxBounces = Math.max(1, Math.min(6, maxBounces));
+        this.bounceRange = Math.max(1.0f, Math.min(6.0f, bounceRange));
+        this.ammoBonus = Math.max(0, Math.min(30, ammoBonus));
     }
 
     @Override
@@ -28,14 +26,8 @@ public class ChainMaterialStats extends AbstractMaterialStats {
         return ImmutableList.of(
                 TextFormatting.GRAY + Util.translateFormatted("stat.chain.max_bounces.name", TextFormatting.GOLD + String.valueOf(maxBounces)),
                 TextFormatting.GRAY + Util.translateFormatted("stat.chain.bounce_range.name", TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m"),
-                TextFormatting.GRAY + Util.translateFormatted("stat.chain.sweep_range.name", TextFormatting.GOLD + formatPercent(sweepRangeBonus)),
-                TextFormatting.GRAY + Util.translateFormatted("stat.chain.damage_bonus.name", TextFormatting.GOLD + formatPercent(damageBonus))
+                TextFormatting.GRAY + Util.translateFormatted("stat.chain.ammo_bonus.name", TextFormatting.GOLD + "+" + ammoBonus)
         );
-    }
-
-    private String formatPercent(float value) {
-        int percent = (int)(value * 100);
-        return (percent >= 0 ? "+" : "") + percent + "%";
     }
 
     @Override
@@ -43,8 +35,7 @@ public class ChainMaterialStats extends AbstractMaterialStats {
         return ImmutableList.of(
                 Util.translate("stat.chain.max_bounces.desc"),
                 Util.translate("stat.chain.bounce_range.desc"),
-                Util.translate("stat.chain.sweep_range.desc"),
-                Util.translate("stat.chain.damage_bonus.desc")
+                Util.translate("stat.chain.ammo_bonus.desc")
         );
     }
 }

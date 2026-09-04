@@ -94,6 +94,7 @@ public class MaterialRegister {
         }
         TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
         slimeball.addStats(new FuelTankMaterialStats(4000, 8, 1.2f));
+        slimeball.addStats(new ChainMaterialStats(5, 3.0f, 0));
     }
 
     private static void registerPoppedChorus() {
@@ -121,8 +122,12 @@ public class MaterialRegister {
         if (isTraitEnabled("burst_heatraygun")) {
             netherQuartz.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
         }
+        if (isTraitEnabled("trauma_throwingknife")) {
+            netherQuartz.addTrait(TraitsRegistry.TRAUMA, ChainPartType.CHAIN);
+        }
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
+        netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0));
     }
 
     private static void registerMagmaCream() {
@@ -186,6 +191,7 @@ public class MaterialRegister {
         }
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
         blueSlimeball.addStats(new FuelTankMaterialStats(3000, 9, 1.1f));
+        blueSlimeball.addStats(new ChainMaterialStats(3, 5.0f, 0));
     }
 
     private static void registerEnderpearl() {
@@ -270,7 +276,7 @@ public class MaterialRegister {
                 TinkerRegistry.addMaterialStats(iron, new GripMaterialStats());
             }
             if (iron.getStats(ChainPartType.CHAIN) == null) {
-                iron.addStats(new ChainMaterialStats(3, 4.0f, 0.0f, 0.0f));
+                iron.addStats(new ChainMaterialStats(3, 4.0f, 10));
             }
             if (isTraitEnabled("inertia_throwingknife")) {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
@@ -286,7 +292,7 @@ public class MaterialRegister {
                 stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
             }
             if (stone.getStats(ChainPartType.CHAIN) == null) {
-                stone.addStats(new ChainMaterialStats(2, 2.0f, 0.0f, 0.0f));
+                stone.addStats(new ChainMaterialStats(1, 1.0f, 0));
             }
         }
 
@@ -299,7 +305,7 @@ public class MaterialRegister {
                 cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
             }
             if (cobalt.getStats(ChainPartType.CHAIN) == null) {
-                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 0.0f, 0.0f));
+                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 15));
             }
         }
 

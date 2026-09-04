@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import slimeknights.tconstruct.library.utils.TagUtil;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
 
 import javax.annotation.Nullable;
@@ -27,7 +28,6 @@ import java.util.UUID;
 public class EntityChainBlade extends EntityProjectileBase implements IEntityAdditionalSpawnData {
     private static final int MAX_ALIVE = 120;
     private static final double GRAVITY = 0.065D;
-    private static final double BASE_RETURN_SPEED = 0.8D;
     private static final double MAX_RETURN_SPEED = 3.5D;
     private static final float PULL_STRENGTH_HIT = 0.5f;
     private static final float PULL_STRENGTH_RETURN = 1.0f;
@@ -38,8 +38,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private final Set<UUID> hitEntities = new HashSet<>();
     private int maxBounces;
     private float bounceRange;
-    private float sweepRangeBonus;
-    private float damageBonus;
     private int bounceCount;
     protected boolean returning;
     private int hitCount;
@@ -54,15 +52,27 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     }
 
     public EntityChainBlade(World world, EntityPlayer shooter, ItemStack weapon, float speed, float damage,
-                            int maxBounces, float bounceRange, float sweepRangeBonus, float damageBonus) {
+                            int maxBounces, float bounceRange) {
         super(world, shooter, speed, 1.0f, 1.0f, ItemStack.EMPTY, ItemStack.EMPTY);
         this.shooter = shooter;
         this.weaponStack = weapon.copy();
         this.baseDamage = damage;
-        this.maxBounces = maxBounces;
-        this.bounceRange = bounceRange;
-        this.sweepRangeBonus = sweepRangeBonus;
-        this.damageBonus = damageBonus;
+        NBTTagCompound toolTag = TagUtil.getToolTag(weapon);
+        if (toolTag != null) {
+            if (toolTag.hasKey("maxBounces")) {
+                this.maxBounces = Math.max(1, toolTag.getInteger("maxBounces"));
+            } else {
+                this.maxBounces = Math.max(1, maxBounces);
+            }
+            if (toolTag.hasKey("bounceRange")) {
+                this.bounceRange = Math.max(0.5f, toolTag.getFloat("bounceRange"));
+            } else {
+                this.bounceRange = Math.max(0.5f, bounceRange);
+            }
+        } else {
+            this.maxBounces = Math.max(1, maxBounces);
+            this.bounceRange = Math.max(0.5f, bounceRange);
+        }
         this.shootingEntity = shooter;
         this.hitCount = 0;
         this.bounceCount = 0;
@@ -199,7 +209,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
         for (EntityLivingBase target : targets) {
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D * (1.0D + damageBonus)));
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D));
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
             hitCount++;
@@ -233,7 +243,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         UUID id = target.getUniqueID();
         if (hitEntities.contains(id)) return;
         if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D * (1.0D + damageBonus)));
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D));
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
             hitCount++;
@@ -265,12 +275,13 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     @Nullable
     private EntityLivingBase findNextTarget() {
+        if (shooter == null) return null;
         AxisAlignedBB box = new AxisAlignedBB(
                 posX - bounceRange, posY - bounceRange, posZ - bounceRange,
                 posX + bounceRange, posY + bounceRange, posZ + bounceRange
         );
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
-                e -> e != shooter && e != (Entity) this && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive());
+                e -> e != shooter && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive());
         if (targets.isEmpty()) return null;
         targets.sort((a, b) -> Double.compare(a.getDistance(this), b.getDistance(this)));
         return targets.get(0);
@@ -368,8 +379,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         data.writeInt(shooter != null ? shooter.getEntityId() : -1);
         data.writeInt(maxBounces);
         data.writeFloat(bounceRange);
-        data.writeFloat(sweepRangeBonus);
-        data.writeFloat(damageBonus);
         data.writeInt(bounceCount);
         data.writeBoolean(returning);
         data.writeInt(hitCount);
@@ -391,8 +400,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         }
         maxBounces = data.readInt();
         bounceRange = data.readFloat();
-        sweepRangeBonus = data.readFloat();
-        damageBonus = data.readFloat();
         bounceCount = data.readInt();
         returning = data.readBoolean();
         hitCount = data.readInt();

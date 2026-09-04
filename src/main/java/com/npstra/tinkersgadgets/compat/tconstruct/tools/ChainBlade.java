@@ -34,6 +34,7 @@ import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,6 @@ public class ChainBlade extends ProjectileCore {
     private static final int SWEEP_COOLDOWN = 40;
     private static final float SWEEP_BASE_RADIUS = 3.5f;
     private static final float SWEEP_BASE_ANGLE = 60.0f;
-    private static final float SWEEP_MAX_RADIUS = 5.0f;
-    private static final float SWEEP_MAX_ANGLE = 180.0f;
     private static final float BASE_DAMAGE_RATIO = 0.4f;
     private static final int THROW_CHARGE = 20;
     private static final float CHARGE_MULTIPLIER = 2.0f;
@@ -173,12 +172,10 @@ public class ChainBlade extends ProjectileCore {
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
         int maxBounces = getMaxBounces(stack);
         float bounceRange = getBounceRange(stack);
-        float sweepRangeBonus = getSweepRangeBonus(stack);
-        float damageBonus = getDamageBonus(stack);
 
         EntityChainBlade entity = new EntityChainBlade(
                 world, player, stack, speed, baseDamage,
-                maxBounces, bounceRange, sweepRangeBonus, damageBonus
+                maxBounces, bounceRange
         );
         entity.setToolId(toolId);
         entity.setPosition(player.posX, player.posY + player.getEyeHeight() - 0.1, player.posZ);
@@ -205,12 +202,13 @@ public class ChainBlade extends ProjectileCore {
     private void performSweep(World world, EntityPlayer player, ItemStack stack) {
         if (world.isRemote) return;
 
-        float bonus = getSweepRangeBonus(stack);
-        float radius = Math.min(SWEEP_MAX_RADIUS, SWEEP_BASE_RADIUS * (1.0f + bonus));
-        float angle = Math.min(SWEEP_MAX_ANGLE, SWEEP_BASE_ANGLE * (1.0f + bonus));
-        float damageBonus = getDamageBonus(stack);
+        if (getCurrentAmmo(stack) < 1) return;
+        useAmmo(stack, player);
+
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
+        float radius = SWEEP_BASE_RADIUS;
+        float angle = SWEEP_BASE_ANGLE;
         Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight() * 0.5, player.posZ);
         Vec3d look = player.getLookVec();
 
@@ -247,12 +245,12 @@ public class ChainBlade extends ProjectileCore {
                 }
             }
             if (primary != null) {
-                float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1 * (1.0 + damageBonus))) * chargeMult;
+                float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult;
                 primary.attackEntityFrom(DamageSource.causePlayerDamage(player), primaryDamage);
             }
             for (EntityLivingBase e : targets) {
                 if (e == primary) continue;
-                float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1 * (1.0 + damageBonus))) * chargeMult;
+                float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1)) * chargeMult;
                 e.attackEntityFrom(DamageSource.causePlayerDamage(player), secondaryDamage);
             }
         }
@@ -303,14 +301,14 @@ public class ChainBlade extends ProjectileCore {
         return tag != null && tag.hasKey("bounceRange") ? tag.getFloat("bounceRange") : 4.0f;
     }
 
-    private float getSweepRangeBonus(ItemStack stack) {
-        NBTTagCompound tag = TagUtil.getToolTag(stack);
-        return tag != null && tag.hasKey("sweepRangeBonus") ? tag.getFloat("sweepRangeBonus") : 0.0f;
-    }
-
-    private float getDamageBonus(ItemStack stack) {
-        NBTTagCompound tag = TagUtil.getToolTag(stack);
-        return tag != null && tag.hasKey("damageBonus") ? tag.getFloat("damageBonus") : 0.0f;
+    @Override
+    public int getCurrentAmmo(ItemStack stack) {
+        int base = super.getCurrentAmmo(stack);
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        if (toolTag != null && toolTag.hasKey("ammoBonus")) {
+            return base + toolTag.getInteger("ammoBonus");
+        }
+        return base;
     }
 
     @Override
@@ -345,32 +343,28 @@ public class ChainBlade extends ProjectileCore {
 
     @Override
     public ProjectileNBT buildTagData(List<Material> materials) {
-        ProjectileNBT data = new ProjectileNBT();
-
-        Material handleMat = materials.size() > 0 && materials.get(0) != null ? materials.get(0) : Material.UNKNOWN;
-        Material bladeMat = materials.size() > 1 && materials.get(1) != null ? materials.get(1) : Material.UNKNOWN;
-        Material chainMat = materials.size() > 2 && materials.get(2) != null ? materials.get(2) : Material.UNKNOWN;
-
-        data.head(bladeMat.getStatsOrUnknown(MaterialTypes.HEAD));
-        data.extra(handleMat.getStatsOrUnknown(MaterialTypes.EXTRA),
-                chainMat.getStatsOrUnknown(MaterialTypes.EXTRA));
-        data.accuracy = 0.9f;
-
-        NBTTagCompound tag = data.get();
-        if (chainMat != Material.UNKNOWN && chainMat.hasStats(ChainPartType.CHAIN)) {
-            ChainMaterialStats stats = chainMat.getStatsOrUnknown(ChainPartType.CHAIN);
-            if (stats != ChainMaterialStats.UNKNOWN) {
-                tag.setInteger("maxBounces", stats.maxBounces);
-                tag.setFloat("bounceRange", stats.bounceRange);
-                tag.setFloat("sweepRangeBonus", stats.sweepRangeBonus);
-                tag.setFloat("damageBonus", stats.damageBonus);
-            }
+        if (materials == null) {
+            materials = new ArrayList<>();
         }
-        if (!tag.hasKey("maxBounces")) tag.setInteger("maxBounces", 3);
-        if (!tag.hasKey("bounceRange")) tag.setFloat("bounceRange", 4.0f);
-        if (!tag.hasKey("sweepRangeBonus")) tag.setFloat("sweepRangeBonus", 0.0f);
-        if (!tag.hasKey("damageBonus")) tag.setFloat("damageBonus", 0.0f);
-
+        ToolNBT base = buildDefaultTag(materials);
+        NBTTagCompound tag = base.get();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+        }
+        Material chainMat = materials.size() > 2 ? materials.get(2) : Material.UNKNOWN;
+        if (chainMat == null) {
+            chainMat = Material.UNKNOWN;
+        }
+        ChainMaterialStats stats = chainMat.getStatsOrUnknown(ChainPartType.CHAIN);
+        if (stats == null || stats == ChainMaterialStats.UNKNOWN) {
+            stats = new ChainMaterialStats(3, 4.0f, 0);
+        }
+        tag.setInteger("maxBounces", stats.maxBounces);
+        tag.setFloat("bounceRange", stats.bounceRange);
+        tag.setInteger("ammoBonus", stats.ammoBonus);
+        ProjectileNBT data = new ProjectileNBT(tag);
+        data.accuracy = 0.9f;
+        data.write(tag);
         return data;
     }
 
@@ -381,11 +375,8 @@ public class ChainBlade extends ProjectileCore {
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
         int maxBounces = getMaxBounces(stack);
         float bounceRange = getBounceRange(stack);
-        float sweepRangeBonus = getSweepRangeBonus(stack);
-        float damageBonus = getDamageBonus(stack);
-
         return new EntityChainBlade(world, player, stack, speed, baseDamage,
-                maxBounces, bounceRange, sweepRangeBonus, damageBonus);
+                maxBounces, bounceRange);
     }
 
     private static String getToolId(ItemStack stack) {
