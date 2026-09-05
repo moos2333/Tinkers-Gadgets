@@ -207,8 +207,13 @@ public class ChainBlade extends ProjectileCore {
 
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
-        float radius = SWEEP_BASE_RADIUS;
-        float angle = SWEEP_BASE_ANGLE;
+
+        boolean hasCharge = consumeCharge(stack, CHARGE_COST);
+        float chargeMult = hasCharge ? CHARGE_MULTIPLIER : 1.0f;
+
+        float radius = hasCharge ? 4.0f : SWEEP_BASE_RADIUS;
+        float angle = hasCharge ? 120.0f : SWEEP_BASE_ANGLE;
+
         Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight() * 0.5, player.posZ);
         Vec3d look = player.getLookVec();
 
@@ -231,8 +236,6 @@ public class ChainBlade extends ProjectileCore {
         });
 
         int count = targets.size();
-        boolean hasCharge = consumeCharge(stack, CHARGE_COST);
-        float chargeMult = hasCharge ? CHARGE_MULTIPLIER : 1.0f;
 
         if (!targets.isEmpty()) {
             EntityLivingBase primary = null;
