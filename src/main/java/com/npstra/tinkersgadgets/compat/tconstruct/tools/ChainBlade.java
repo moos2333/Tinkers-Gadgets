@@ -45,11 +45,11 @@ import java.util.WeakHashMap;
 public class ChainBlade extends ProjectileCore {
     private static final Map<String, Set<Entity>> activeChainBlades = new WeakHashMap<>();
     private static final int CHARGE_COST = 10;
-    private static final int SWEEP_COOLDOWN = 40;
+    private static final int SWEEP_COOLDOWN_BASE = 40;
     private static final float SWEEP_BASE_RADIUS = 3.5f;
     private static final float SWEEP_BASE_ANGLE = 60.0f;
     private static final float BASE_DAMAGE_RATIO = 0.4f;
-    private static final int THROW_CHARGE = 20;
+    private static final int THROW_CHARGE_BASE = 20;
     private static final float CHARGE_MULTIPLIER = 2.0f;
     private static final int MAX_CHARGE = 30;
 
@@ -134,7 +134,8 @@ public class ChainBlade extends ProjectileCore {
         EntityPlayer player = (EntityPlayer) entityLiving;
         if (player.isSneaking()) return;
         int useDuration = getMaxItemUseDuration(stack) - timeLeft;
-        if (useDuration < THROW_CHARGE) return;
+        int chargeTime = getChargeTime(stack);
+        if (useDuration < chargeTime) return;
         if (!world.isRemote) {
             String toolId = getToolId(stack);
             Set<Entity> set = activeChainBlades.get(toolId);
@@ -146,7 +147,7 @@ public class ChainBlade extends ProjectileCore {
             }
             boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
-            float progress = Math.min(1.0F, (float) useDuration / (float) THROW_CHARGE);
+            float progress = Math.min(1.0F, (float) useDuration / (float) chargeTime);
             float speed = 1.6F * progress;
             float inaccuracy = 0.3F * (1.0F - progress);
             shootChainBlade(world, player, stack, speed, inaccuracy, progress, toolId, usedAmmo);
@@ -274,7 +275,20 @@ public class ChainBlade extends ProjectileCore {
             tag = new NBTTagCompound();
             stack.setTagCompound(tag);
         }
-        tag.setLong("sweep_cooldown", System.currentTimeMillis() + SWEEP_COOLDOWN * 50L);
+        int cooldown = getSweepCooldown(stack);
+        tag.setLong("sweep_cooldown", System.currentTimeMillis() + cooldown * 50L);
+    }
+
+    private int getChargeTime(ItemStack stack) {
+        float speed = getSpeedRate(stack);
+        float factor = 1.0f + speed;
+        return Math.max(1, Math.round(THROW_CHARGE_BASE / factor));
+    }
+
+    private int getSweepCooldown(ItemStack stack) {
+        float speed = getSpeedRate(stack);
+        float factor = 1.0f + speed;
+        return Math.max(1, Math.round(SWEEP_COOLDOWN_BASE / factor));
     }
 
     private int getCharge(ItemStack stack) {
@@ -304,6 +318,11 @@ public class ChainBlade extends ProjectileCore {
         return tag != null && tag.hasKey("bounceRange") ? tag.getFloat("bounceRange") : 4.0f;
     }
 
+    private float getSpeedRate(ItemStack stack) {
+        NBTTagCompound tag = TagUtil.getToolTag(stack);
+        return tag != null && tag.hasKey("speedRate") ? tag.getFloat("speedRate") : 0.0f;
+    }
+
     @Override
     public int getCurrentAmmo(ItemStack stack) {
         int base = super.getCurrentAmmo(stack);
@@ -319,10 +338,27 @@ public class ChainBlade extends ProjectileCore {
         List<String> info = super.getInformation(stack, detailed);
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
         if (toolTag == null) return info;
+
         int maxBounces = toolTag.hasKey("maxBounces") ? toolTag.getInteger("maxBounces") : 3;
         float bounceRange = toolTag.hasKey("bounceRange") ? toolTag.getFloat("bounceRange") : 4.0f;
-        info.add(Util.translateFormatted("stat.chain.max_bounces.name", maxBounces));
-        info.add(Util.translateFormatted("stat.chain.bounce_range.name", bounceRange));
+        float speedRate = toolTag.hasKey("speedRate") ? toolTag.getFloat("speedRate") : 0.0f;
+
+        String bounceStr = TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces;
+        String rangeStr = TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m";
+
+        String sign = speedRate >= 0 ? "+" : "-";
+        String percent = String.format("%.0f", Math.abs(speedRate * 100));
+        TextFormatting color;
+        if (speedRate > 0) color = TextFormatting.GREEN;
+        else if (speedRate < 0) color = TextFormatting.RED;
+        else color = TextFormatting.GRAY;
+        String speedStr = TextFormatting.GRAY + Util.translate("stat.chain.speed_rate.name") + " " +
+                color + sign + percent + "%" + TextFormatting.RESET;
+
+        info.add(bounceStr);
+        info.add(rangeStr);
+        info.add(speedStr);
+
         if (detailed) {
             int charge = getCharge(stack);
             info.add(Util.translateFormatted("stat.chain.charge.tooltip",
@@ -360,10 +396,11 @@ public class ChainBlade extends ProjectileCore {
         }
         ChainMaterialStats stats = chainMat.getStatsOrUnknown(ChainPartType.CHAIN);
         if (stats == null || stats == ChainMaterialStats.UNKNOWN) {
-            stats = new ChainMaterialStats(3, 4.0f, 0);
+            stats = new ChainMaterialStats(3, 4.0f, 0, 0.0f);
         }
         tag.setInteger("maxBounces", stats.maxBounces);
         tag.setFloat("bounceRange", stats.bounceRange);
+        tag.setFloat("speedRate", stats.speedRate);
         tag.setInteger("ammoBonus", stats.ammoBonus);
         ProjectileNBT data = new ProjectileNBT(tag);
         data.accuracy = 0.9f;
