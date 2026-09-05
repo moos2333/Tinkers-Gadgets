@@ -173,11 +173,10 @@ public class ChainBlade extends ProjectileCore {
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
         int maxBounces = getMaxBounces(stack);
         float bounceRange = getBounceRange(stack);
-        float comboBonus = getComboBonus(stack);
 
         EntityChainBlade entity = new EntityChainBlade(
                 world, player, stack, speed, baseDamage,
-                maxBounces, bounceRange, comboBonus
+                maxBounces, bounceRange
         );
         entity.setToolId(toolId);
         entity.setPosition(player.posX, player.posY + player.getEyeHeight() - 0.1, player.posZ);
@@ -238,8 +237,6 @@ public class ChainBlade extends ProjectileCore {
         });
 
         int count = targets.size();
-        float comboBonus = getComboBonus(stack);
-        float comboMult = 1.0f + Math.min(count * comboBonus, 1.0f); // 上限100%
 
         if (!targets.isEmpty()) {
             EntityLivingBase primary = null;
@@ -252,12 +249,12 @@ public class ChainBlade extends ProjectileCore {
                 }
             }
             if (primary != null) {
-                float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult * comboMult;
+                float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult;
                 primary.attackEntityFrom(DamageSource.causePlayerDamage(player), primaryDamage);
             }
             for (EntityLivingBase e : targets) {
                 if (e == primary) continue;
-                float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1)) * chargeMult * comboMult;
+                float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1)) * chargeMult;
                 e.attackEntityFrom(DamageSource.causePlayerDamage(player), secondaryDamage);
             }
         }
@@ -326,11 +323,6 @@ public class ChainBlade extends ProjectileCore {
         return tag != null && tag.hasKey("speedRate") ? tag.getFloat("speedRate") : 0.0f;
     }
 
-    private float getComboBonus(ItemStack stack) {
-        NBTTagCompound tag = TagUtil.getToolTag(stack);
-        return tag != null && tag.hasKey("comboBonus") ? tag.getFloat("comboBonus") : 0.0f;
-    }
-
     @Override
     public int getCurrentAmmo(ItemStack stack) {
         int base = super.getCurrentAmmo(stack);
@@ -350,20 +342,22 @@ public class ChainBlade extends ProjectileCore {
         int maxBounces = toolTag.hasKey("maxBounces") ? toolTag.getInteger("maxBounces") : 3;
         float bounceRange = toolTag.hasKey("bounceRange") ? toolTag.getFloat("bounceRange") : 4.0f;
         float speedRate = toolTag.hasKey("speedRate") ? toolTag.getFloat("speedRate") : 0.0f;
-        float comboBonus = toolTag.hasKey("comboBonus") ? toolTag.getFloat("comboBonus") : 0.0f;
 
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m");
+        String bounceStr = TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces;
+        String rangeStr = TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m";
 
-        String speedSign = speedRate >= 0 ? "+" : "-";
-        String speedPercent = String.format("%.0f", Math.abs(speedRate * 100));
-        TextFormatting speedColor = speedRate > 0 ? TextFormatting.GREEN : (speedRate < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.speed_rate.name") + " " + speedColor + speedSign + speedPercent + "%" + TextFormatting.RESET);
+        String sign = speedRate >= 0 ? "+" : "-";
+        String percent = String.format("%.0f", Math.abs(speedRate * 100));
+        TextFormatting color;
+        if (speedRate > 0) color = TextFormatting.GREEN;
+        else if (speedRate < 0) color = TextFormatting.RED;
+        else color = TextFormatting.GRAY;
+        String speedStr = TextFormatting.GRAY + Util.translate("stat.chain.speed_rate.name") + " " +
+                color + sign + percent + "%" + TextFormatting.RESET;
 
-        String comboSig = comboBonus >= 0 ? "+" : "-";
-        String comboPercent = String.format("%.0f", Math.abs(comboBonus * 100));
-        TextFormatting comboColor = comboBonus > 0 ? TextFormatting.GREEN : (comboBonus < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.combo_bonus.name") + " " + comboColor + comboSig + comboPercent + "%" + TextFormatting.RESET);
+        info.add(bounceStr);
+        info.add(rangeStr);
+        info.add(speedStr);
 
         if (detailed) {
             int charge = getCharge(stack);
@@ -402,12 +396,11 @@ public class ChainBlade extends ProjectileCore {
         }
         ChainMaterialStats stats = chainMat.getStatsOrUnknown(ChainPartType.CHAIN);
         if (stats == null || stats == ChainMaterialStats.UNKNOWN) {
-            stats = new ChainMaterialStats(3, 4.0f, 0, 0.0f, 0.0f);
+            stats = new ChainMaterialStats(3, 4.0f, 0, 0.0f);
         }
         tag.setInteger("maxBounces", stats.maxBounces);
         tag.setFloat("bounceRange", stats.bounceRange);
         tag.setFloat("speedRate", stats.speedRate);
-        tag.setFloat("comboBonus", stats.comboBonus);
         tag.setInteger("ammoBonus", stats.ammoBonus);
         ProjectileNBT data = new ProjectileNBT(tag);
         data.accuracy = 0.9f;
@@ -422,9 +415,8 @@ public class ChainBlade extends ProjectileCore {
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
         int maxBounces = getMaxBounces(stack);
         float bounceRange = getBounceRange(stack);
-        float comboBonus = getComboBonus(stack);
         return new EntityChainBlade(world, player, stack, speed, baseDamage,
-                maxBounces, bounceRange, comboBonus);
+                maxBounces, bounceRange);
     }
 
     private static String getToolId(ItemStack stack) {

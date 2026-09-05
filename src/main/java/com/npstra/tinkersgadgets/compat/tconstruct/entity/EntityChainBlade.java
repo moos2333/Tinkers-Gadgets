@@ -38,7 +38,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private final Set<UUID> hitEntities = new HashSet<>();
     private int maxBounces;
     private float bounceRange;
-    private float comboBonus;
     private int bounceCount;
     protected boolean returning;
     private int hitCount;
@@ -53,7 +52,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     }
 
     public EntityChainBlade(World world, EntityPlayer shooter, ItemStack weapon, float speed, float damage,
-                            int maxBounces, float bounceRange, float comboBonus) {
+                            int maxBounces, float bounceRange) {
         super(world, shooter, speed, 1.0f, 1.0f, ItemStack.EMPTY, ItemStack.EMPTY);
         this.shooter = shooter;
         this.weaponStack = weapon.copy();
@@ -70,15 +69,9 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             } else {
                 this.bounceRange = Math.max(0.5f, bounceRange);
             }
-            if (toolTag.hasKey("comboBonus")) {
-                this.comboBonus = Math.max(0.0f, Math.min(0.1f, toolTag.getFloat("comboBonus")));
-            } else {
-                this.comboBonus = Math.max(0.0f, Math.min(0.1f, comboBonus));
-            }
         } else {
             this.maxBounces = Math.max(1, maxBounces);
             this.bounceRange = Math.max(0.5f, bounceRange);
-            this.comboBonus = Math.max(0.0f, Math.min(0.1f, comboBonus));
         }
         this.shootingEntity = shooter;
         this.hitCount = 0;
@@ -216,8 +209,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
         for (EntityLivingBase target : targets) {
-            float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D));
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
             hitCount++;
@@ -251,8 +243,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         UUID id = target.getUniqueID();
         if (hitEntities.contains(id)) return;
         if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
-            float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
+            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D));
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
             hitCount++;
@@ -388,7 +379,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         data.writeInt(shooter != null ? shooter.getEntityId() : -1);
         data.writeInt(maxBounces);
         data.writeFloat(bounceRange);
-        data.writeFloat(comboBonus);
         data.writeInt(bounceCount);
         data.writeBoolean(returning);
         data.writeInt(hitCount);
@@ -410,7 +400,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         }
         maxBounces = data.readInt();
         bounceRange = data.readFloat();
-        comboBonus = data.readFloat();
         bounceCount = data.readInt();
         returning = data.readBoolean();
         hitCount = data.readInt();
