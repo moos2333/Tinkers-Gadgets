@@ -170,11 +170,15 @@ public class MaterialRegister {
         if (isTraitEnabled("pulse_throwingknife")) {
             redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
             redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+            redstone.addTrait(TraitsRegistry.PULSE, ChainPartType.CHAIN);
+        }
+        if (isTraitEnabled("burst_heatraygun")) {
             redstone.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
+        redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.02f));
     }
 
     private static void registerBlueSlimeball() {
