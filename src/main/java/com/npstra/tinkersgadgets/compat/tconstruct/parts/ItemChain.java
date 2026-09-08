@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ItemChain extends ToolPart {
-    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("iron", "cobalt", "stone", "nether_quartz", "slimeball", "blue_slimeball", "redstone"));
+    private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList("iron", "cobalt", "stone", "nether_quartz", "slimeball", "blue_slimeball", "redstone", "leather"));
 
     public ItemChain() {
         super(Material.VALUE_Ingot * 2);

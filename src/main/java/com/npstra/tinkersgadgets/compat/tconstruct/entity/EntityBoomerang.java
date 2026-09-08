@@ -35,13 +35,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class EntityBoomerang extends EntityProjectileBase {
 
     private static final int MAX_ALIVE = 600;
     private static final double BASE_RETURN_SPEED = 0.45D;
-    private static final double SMOOTH_FACTOR = 0.5D;
     private static final double MAX_DISTANCE_BASE = 16.0D;
     private static final double SLOW_START_FACTOR = 0.75D;
     private static final double MIN_SPEED_FACTOR = 0.5D;
@@ -272,15 +270,16 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private void returnToShooter() {
         Vec3d targetPos = getShooterTargetPos();
-        double dx = targetPos.x - posX;
-        double dy = targetPos.y - posY;
-        double dz = targetPos.z - posZ;
-        double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        Vec3d delta = targetPos.subtract(new Vec3d(posX, posY, posZ));
+        double dist = delta.length();
         if (dist > RETURN_DIST_THRESHOLD) {
-            double returnSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
-            motionX = dx / dist * returnSpeed;
-            motionY = dy / dist * returnSpeed;
-            motionZ = dz / dist * returnSpeed;
+            Vec3d dir = delta.normalize();
+            double desiredSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
+            double currentSpeed = getCurrentSpeed();
+            double smoothFactor = 0.3D;
+            motionX += (dir.x * desiredSpeed - motionX) * smoothFactor;
+            motionY += (dir.y * desiredSpeed - motionY) * smoothFactor;
+            motionZ += (dir.z * desiredSpeed - motionZ) * smoothFactor;
         } else {
             if (shootingEntity instanceof EntityPlayer) onCollideWithPlayer((EntityPlayer) shootingEntity);
             setDead();
@@ -291,19 +290,14 @@ public class EntityBoomerang extends EntityProjectileBase {
     protected void doMoveUpdate() {
         if (returning && shootingEntity != null) {
             double dx = shootingEntity.posX - posX;
-            double dy = (shootingEntity.posY + shootingEntity.getEyeHeight()) - posY;
             double dz = shootingEntity.posZ - posZ;
             double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
             this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-            this.rotationPitch = (float) (-(MathHelper.atan2(dy, horizontalDist) * (180D / Math.PI)));
+            this.rotationPitch = (float) (-(MathHelper.atan2(shootingEntity.posY + shootingEntity.getEyeHeight() - posY, horizontalDist) * (180D / Math.PI)));
             this.prevRotationYaw = this.rotationYaw;
             this.prevRotationPitch = this.rotationPitch;
-            this.posX += this.motionX;
-            this.posY += this.motionY;
-            this.posZ += this.motionZ;
-        } else {
-            super.doMoveUpdate();
         }
+        super.doMoveUpdate();
     }
 
     @Override
