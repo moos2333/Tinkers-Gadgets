@@ -211,16 +211,15 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     private void dealReturnDamage() {
         if (shooter == null) return;
+        float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
         double radius = 2.0D;
         AxisAlignedBB box = getEntityBoundingBox().grow(radius);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
         for (EntityLivingBase target : targets) {
-            float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
             float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
-            hitCount++;
             hitEntities.add(target.getUniqueID());
             pullEntityTowardsPlayer(target, shooter, PULL_STRENGTH_RETURN);
             playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);

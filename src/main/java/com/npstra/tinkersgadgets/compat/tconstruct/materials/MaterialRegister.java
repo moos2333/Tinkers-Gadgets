@@ -127,12 +127,16 @@ public class MaterialRegister {
         }
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
-        netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.02f));
+        netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
     }
 
     private static void registerMagmaCream() {
         if (!isMaterialEnabled("magma_cream")) return;
         magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
+        if (isTraitEnabled("superheat")) {
+            magmaCream.addTrait(TinkerTraits.superheat, ChainPartType.CHAIN);
+        }
+        magmaCream.addStats(new ChainMaterialStats(3, 3.0f, 0, -0.15f, 0.02f));
     }
 
     private static void registerShulkerShell() {
@@ -180,7 +184,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
-        redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.02f));
+        redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
     }
 
     private static void registerBlueSlimeball() {
