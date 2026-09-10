@@ -165,7 +165,6 @@ public class MaterialRegister {
     private static void registerLeather() {
         if (!isMaterialEnabled("leather")) return;
         leather = createMaterial("leather", 0xC76A43, null, null);
-        TinkerRegistry.addMaterialStats(leather, new ConnectorMaterialStats());
         TinkerRegistry.addMaterialStats(leather, new GripMaterialStats());
         leather.addStats(new ChainMaterialStats(2, 2.0f, 0, -0.25f, 0.0f));
     }
