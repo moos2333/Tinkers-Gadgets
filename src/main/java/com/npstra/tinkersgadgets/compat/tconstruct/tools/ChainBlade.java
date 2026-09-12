@@ -23,7 +23,6 @@ import net.minecraft.world.World;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.materials.Material;
-import slimeknights.tconstruct.library.materials.MaterialTypes;
 import slimeknights.tconstruct.library.tinkering.Category;
 import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 import slimeknights.tconstruct.library.tools.ProjectileNBT;
