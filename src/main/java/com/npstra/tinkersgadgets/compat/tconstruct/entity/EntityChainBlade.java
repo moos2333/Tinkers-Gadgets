@@ -32,6 +32,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private static final float PULL_STRENGTH_HIT = 0.5f;
     private static final float PULL_STRENGTH_RETURN = 1.0f;
     private static final int STUCK_TIMEOUT = 80;
+    private static final int COMBO_MAX_STACKS = 10;
 
     private EntityPlayer shooter;
     private ItemStack weaponStack = ItemStack.EMPTY;
@@ -42,6 +43,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private int bounceCount;
     protected boolean returning;
     private int hitCount;
+    private int totalHitCount;
     private double baseDamage;
     private String toolId = "";
     private String weaponUuid = "";
@@ -82,6 +84,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         }
         this.shootingEntity = shooter;
         this.hitCount = 0;
+        this.totalHitCount = 0;
         this.bounceCount = 0;
         this.returning = false;
         this.stuckTicks = 0;
@@ -211,7 +214,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     private void dealReturnDamage() {
         if (shooter == null) return;
-        float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
         double radius = 2.0D;
         AxisAlignedBB box = getEntityBoundingBox().grow(radius);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
@@ -219,9 +221,11 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         ItemStack actual = findActualWeapon();
         if (actual.isEmpty()) actual = weaponStack;
         for (EntityLivingBase target : targets) {
+            float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
             float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
+            totalHitCount++;
             hitEntities.add(target.getUniqueID());
             pullEntityTowardsPlayer(target, shooter, PULL_STRENGTH_RETURN);
             playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
@@ -252,13 +256,14 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         UUID id = target.getUniqueID();
         if (hitEntities.contains(id)) return;
         if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
-            float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
+            float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
             float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
             damage = Math.min((float) (baseDamage * 4.0D), damage);
             ItemStack actual = findActualWeapon();
             if (actual.isEmpty()) actual = weaponStack;
             ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
             hitCount++;
+            totalHitCount++;
             hitEntities.add(id);
             if (target instanceof EntityLivingBase) {
                 pullEntityTowardsPlayer((EntityLivingBase) target, shooter, PULL_STRENGTH_HIT);
@@ -395,6 +400,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         data.writeInt(bounceCount);
         data.writeBoolean(returning);
         data.writeInt(hitCount);
+        data.writeInt(totalHitCount);
         data.writeDouble(baseDamage);
         ByteBufUtils.writeUTF8String(data, weaponUuid);
     }
@@ -417,6 +423,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         bounceCount = data.readInt();
         returning = data.readBoolean();
         hitCount = data.readInt();
+        totalHitCount = data.readInt();
         baseDamage = data.readDouble();
         weaponUuid = ByteBufUtils.readUTF8String(data);
     }
