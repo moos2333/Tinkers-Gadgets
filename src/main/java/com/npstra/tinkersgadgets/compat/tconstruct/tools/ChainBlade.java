@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
@@ -78,13 +79,14 @@ public class ChainBlade extends ProjectileCore {
             return;
         }
         ToolCore tool = (ToolCore) weaponStack.getItem();
-        double currentAttack = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        IAttributeInstance attackAttr = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+        double currentAttack = attackAttr.getAttributeValue();
         float cooldown = player.getCooledAttackStrength(0.5F);
         float cooldownFactor = 0.2F + cooldown * cooldown * 0.8F;
         float modifierAmount = customDamage / cooldownFactor - (float) currentAttack;
         AttributeModifier mod = new AttributeModifier(CUSTOM_DAMAGE_UUID, "chain_blade_damage", modifierAmount, 0);
-        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(CUSTOM_DAMAGE_UUID);
-        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(mod);
+        attackAttr.removeModifier(CUSTOM_DAMAGE_UUID);
+        attackAttr.applyModifier(mod);
         try {
             if (projectile != null) {
                 ToolHelper.attackEntity(weaponStack, tool, player, target, projectile);
@@ -92,7 +94,7 @@ public class ChainBlade extends ProjectileCore {
                 ToolHelper.attackEntity(weaponStack, tool, player, target);
             }
         } finally {
-            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(CUSTOM_DAMAGE_UUID);
+            attackAttr.removeModifier(CUSTOM_DAMAGE_UUID);
         }
     }
 
