@@ -67,6 +67,10 @@ public class ChainBlade extends ProjectileCore {
         setTranslationKey("tinkersgadgets.chain_blade");
     }
 
+    @Override
+    public void reduceDurabilityOnHit(ItemStack stack, EntityPlayer player, float damage) {
+    }
+
     public static void attackWithTraits(ItemStack weaponStack, EntityPlayer player, Entity target, Entity projectile, float customDamage) {
         if (player == null || target == null) return;
         if (weaponStack == null || weaponStack.isEmpty() || !(weaponStack.getItem() instanceof ToolCore)) {
