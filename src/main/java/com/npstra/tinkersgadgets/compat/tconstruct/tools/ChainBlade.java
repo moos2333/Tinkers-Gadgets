@@ -5,6 +5,8 @@ import com.npstra.tinkersgadgets.compat.tconstruct.materials.ChainMaterialStats;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.ChainPartType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
@@ -26,6 +28,7 @@ import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tinkering.Category;
 import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 import slimeknights.tconstruct.library.tools.ProjectileNBT;
+import slimeknights.tconstruct.library.tools.ToolCore;
 import slimeknights.tconstruct.library.tools.ToolNBT;
 import slimeknights.tconstruct.library.tools.ranged.ProjectileCore;
 import slimeknights.tconstruct.library.utils.TagUtil;
@@ -43,6 +46,7 @@ import java.util.WeakHashMap;
 
 public class ChainBlade extends ProjectileCore {
     private static final Map<String, Set<Entity>> activeChainBlades = new WeakHashMap<>();
+    private static final UUID CUSTOM_DAMAGE_UUID = UUID.fromString("c8f7e6d5-a4b3-2910-8271-6a5b4c3d2e1f");
     private static final int CHARGE_COST = 10;
     private static final int SWEEP_COOLDOWN_BASE = 40;
     private static final float SWEEP_BASE_RADIUS = 3.5f;
@@ -61,6 +65,31 @@ public class ChainBlade extends ProjectileCore {
         addCategory(Category.NO_MELEE);
         setRegistryName("chain_blade");
         setTranslationKey("tinkersgadgets.chain_blade");
+    }
+
+    public static void attackWithTraits(ItemStack weaponStack, EntityPlayer player, Entity target, Entity projectile, float customDamage) {
+        if (player == null || target == null) return;
+        if (weaponStack == null || weaponStack.isEmpty() || !(weaponStack.getItem() instanceof ToolCore)) {
+            target.attackEntityFrom(DamageSource.causePlayerDamage(player), customDamage);
+            return;
+        }
+        ToolCore tool = (ToolCore) weaponStack.getItem();
+        double currentAttack = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        float cooldown = player.getCooledAttackStrength(0.5F);
+        float cooldownFactor = 0.2F + cooldown * cooldown * 0.8F;
+        float modifierAmount = customDamage / cooldownFactor - (float) currentAttack;
+        AttributeModifier mod = new AttributeModifier(CUSTOM_DAMAGE_UUID, "chain_blade_damage", modifierAmount, 0);
+        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(mod);
+        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(mod);
+        try {
+            if (projectile != null) {
+                ToolHelper.attackEntity(weaponStack, tool, player, target, projectile);
+            } else {
+                ToolHelper.attackEntity(weaponStack, tool, player, target);
+            }
+        } finally {
+            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(mod);
+        }
     }
 
     @Override
@@ -238,7 +267,7 @@ public class ChainBlade extends ProjectileCore {
 
         int count = targets.size();
         float comboBonus = getComboBonus(stack);
-        float comboMult = 1.0f + Math.min(count * comboBonus, 1.0f); // 上限100%
+        float comboMult = 1.0f + Math.min(count * comboBonus, 1.0f);
 
         if (!targets.isEmpty()) {
             EntityLivingBase primary = null;
@@ -252,7 +281,7 @@ public class ChainBlade extends ProjectileCore {
             }
             if (primary != null) {
                 float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult * comboMult;
-                primary.attackEntityFrom(DamageSource.causePlayerDamage(player), primaryDamage);
+                attackWithTraits(stack, player, primary, null, primaryDamage);
             }
             for (EntityLivingBase e : targets) {
                 if (e == primary) continue;

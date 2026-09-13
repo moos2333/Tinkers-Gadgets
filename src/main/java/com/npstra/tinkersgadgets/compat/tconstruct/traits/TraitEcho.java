@@ -52,8 +52,8 @@ public class TraitEcho extends AbstractTrait {
                             previous.hurtResistantTime = 0;
                             previous.lastDamage = 0;
                             previous.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) player), extra);
-                            previous.hurtResistantTime = Math.max(oldHurt, previous.hurtResistantTime);
-                            previous.lastDamage = Math.max(oldLast, previous.lastDamage);
+                            previous.hurtResistantTime = oldHurt;
+                            previous.lastDamage = oldLast;
                         }
                     }
                 }

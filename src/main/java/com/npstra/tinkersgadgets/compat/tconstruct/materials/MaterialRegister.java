@@ -103,11 +103,13 @@ public class MaterialRegister {
         if (isTraitEnabled("echo_throwingknife")) {
             poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
             poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+            poppedChorus.addTrait(TraitsRegistry.ECHO, ChainPartType.CHAIN);
         }
         TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
         if (poppedChorus.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
             poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
         }
+        poppedChorus.addStats(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f));
     }
 
     private static void registerNetherQuartz() {

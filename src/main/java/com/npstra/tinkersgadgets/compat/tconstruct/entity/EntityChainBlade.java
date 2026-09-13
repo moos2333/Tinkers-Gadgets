@@ -71,14 +71,14 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
                 this.bounceRange = Math.max(0.5f, bounceRange);
             }
             if (toolTag.hasKey("comboBonus")) {
-                this.comboBonus = Math.max(0.0f, Math.min(0.1f, toolTag.getFloat("comboBonus")));
+                this.comboBonus = Math.max(-0.05f, Math.min(0.1f, toolTag.getFloat("comboBonus")));
             } else {
-                this.comboBonus = Math.max(0.0f, Math.min(0.1f, comboBonus));
+                this.comboBonus = Math.max(-0.05f, Math.min(0.1f, comboBonus));
             }
         } else {
             this.maxBounces = Math.max(1, maxBounces);
             this.bounceRange = Math.max(0.5f, bounceRange);
-            this.comboBonus = Math.max(0.0f, Math.min(0.1f, comboBonus));
+            this.comboBonus = Math.max(-0.05f, Math.min(0.1f, comboBonus));
         }
         this.shootingEntity = shooter;
         this.hitCount = 0;
@@ -216,10 +216,12 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         AxisAlignedBB box = getEntityBoundingBox().grow(radius);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
+        ItemStack actual = findActualWeapon();
+        if (actual.isEmpty()) actual = weaponStack;
         for (EntityLivingBase target : targets) {
             float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
             damage = Math.min((float) (baseDamage * 4.0D), damage);
-            target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
+            ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
             hitEntities.add(target.getUniqueID());
             pullEntityTowardsPlayer(target, shooter, PULL_STRENGTH_RETURN);
             playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
@@ -253,7 +255,9 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             float comboMult = 1.0f + Math.min(hitCount * comboBonus, 1.0f);
             float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
             damage = Math.min((float) (baseDamage * 4.0D), damage);
-            target.attackEntityFrom(DamageSource.causePlayerDamage(shooter), damage);
+            ItemStack actual = findActualWeapon();
+            if (actual.isEmpty()) actual = weaponStack;
+            ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
             hitCount++;
             hitEntities.add(id);
             if (target instanceof EntityLivingBase) {
