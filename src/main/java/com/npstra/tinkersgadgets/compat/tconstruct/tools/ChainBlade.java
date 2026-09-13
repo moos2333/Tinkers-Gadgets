@@ -83,7 +83,7 @@ public class ChainBlade extends ProjectileCore {
         float cooldownFactor = 0.2F + cooldown * cooldown * 0.8F;
         float modifierAmount = customDamage / cooldownFactor - (float) currentAttack;
         AttributeModifier mod = new AttributeModifier(CUSTOM_DAMAGE_UUID, "chain_blade_damage", modifierAmount, 0);
-        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(mod);
+        player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(CUSTOM_DAMAGE_UUID);
         player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(mod);
         try {
             if (projectile != null) {
@@ -92,7 +92,7 @@ public class ChainBlade extends ProjectileCore {
                 ToolHelper.attackEntity(weaponStack, tool, player, target);
             }
         } finally {
-            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(mod);
+            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(CUSTOM_DAMAGE_UUID);
         }
     }
 
