@@ -26,5 +26,6 @@ public class TraitsRegistry {
     public static final AbstractTrait CONDENSATION =  new TraitCondensation();
     public static final AbstractTrait FOCUS =  new TraitFocus();
     public static final AbstractTrait BURST = new TraitBurst();
-    public static final TraitConduction CONDUCTION = new TraitConduction();
+    public static final AbstractTrait CONDUCTION = new TraitConduction();
+    public static final AbstractTrait KINETIC = new TraitKinetic();
 }

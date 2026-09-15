@@ -289,8 +289,12 @@ public class MaterialRegister {
             if (iron.getStats(ChainPartType.CHAIN) == null) {
                 iron.addStats(new ChainMaterialStats(3, 4.0f, 10, 0.0f, 0.0f));
             }
+            if (iron.getStats(ConnectorPartType.CONNECTOR) == null) {
+                TinkerRegistry.addMaterialStats(iron, new ConnectorMaterialStats());
+            }
             if (isTraitEnabled("inertia_throwingknife")) {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
+                iron.addTrait(TraitsRegistry.INERTIA, ConnectorPartType.CONNECTOR);
             }
         }
 
@@ -317,6 +321,12 @@ public class MaterialRegister {
             }
             if (cobalt.getStats(ChainPartType.CHAIN) == null) {
                 cobalt.addStats(new ChainMaterialStats(4, 3.0f, 15, 0.75f, 0.01f));
+            }
+            if (cobalt.getStats(ConnectorPartType.CONNECTOR) == null) {
+                cobalt.addStats(new ConnectorMaterialStats());
+            }
+            if (isTraitEnabled("kinetic_boomerang")) {
+                cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
             }
         }
 

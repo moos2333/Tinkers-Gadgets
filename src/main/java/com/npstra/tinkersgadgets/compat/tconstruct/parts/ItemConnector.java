@@ -10,7 +10,7 @@ public class ItemConnector extends ToolPart {
     private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
             "glass", "slimeball", "popped_chorus", "nether_quartz", "magma_cream",
             "shulker_shell", "leather", "redstone", "blue_slimeball",
-            "enderpearl", "prismarine_crystals"
+            "enderpearl", "prismarine_crystals", "iron", "cobalt"
     ));
 
     public ItemConnector() {
