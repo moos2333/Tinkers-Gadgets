@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -21,6 +22,7 @@ import slimeknights.tconstruct.library.tinkering.Category;
 import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 import slimeknights.tconstruct.library.tools.ProjectileNBT;
 import slimeknights.tconstruct.library.tools.ranged.ProjectileCore;
+import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.tools.TinkerTools;
 
@@ -79,7 +81,7 @@ public class ThrowingKnife extends ProjectileCore {
         if (player instanceof EntityPlayer) {
             EntityPlayer entityPlayer = (EntityPlayer) player;
             int useTime = this.getMaxItemUseDuration(stack) - count;
-            int required = entityPlayer.isSneaking() ? SNEAK_CHARGE : NORMAL_CHARGE;
+            int required = getChargeTime(stack, entityPlayer.isSneaking());
             if (useTime >= required && !entityPlayer.world.isRemote) {
                 entityPlayer.stopActiveHand();
             }
@@ -95,7 +97,7 @@ public class ThrowingKnife extends ProjectileCore {
         boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
         boolean sneaking = player.isSneaking();
-        int required = sneaking ? SNEAK_CHARGE : NORMAL_CHARGE;
+        int required = getChargeTime(stack, sneaking);
         if (useDuration < required) {
             return;
         }
@@ -121,6 +123,17 @@ public class ThrowingKnife extends ProjectileCore {
                 ToolHelper.breakTool(stack, player);
             }
         }
+    }
+
+    private int getRapidLevel(ItemStack stack) {
+        NBTTagCompound tag = TagUtil.getToolTag(stack);
+        return tag != null && tag.hasKey("rapid_level") ? tag.getInteger("rapid_level") : 0;
+    }
+
+    private int getChargeTime(ItemStack stack, boolean sneaking) {
+        int base = sneaking ? SNEAK_CHARGE : NORMAL_CHARGE;
+        float reduction = 0.2f * getRapidLevel(stack);
+        return Math.max(1, Math.round(base * (1.0f - reduction)));
     }
 
     private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, Vec3d direction, boolean usedAmmo) {

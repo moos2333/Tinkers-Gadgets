@@ -82,7 +82,8 @@ public class Boomerang extends ProjectileCore {
         EntityPlayer player = (EntityPlayer) entityLiving;
         boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
         int useDuration = this.getMaxItemUseDuration(stack) - timeLeft;
-        float progress = Math.min(1.0F, (float) useDuration / 20.0F);
+        int chargeTime = getChargeTime(stack);
+        float progress = Math.min(1.0F, (float) useDuration / (float) chargeTime);
         if (progress < 0.1F) {
             progress = 0.1F;
         }
@@ -111,6 +112,16 @@ public class Boomerang extends ProjectileCore {
                 ToolHelper.breakTool(stack, player);
             }
         }
+    }
+
+    private int getRapidLevel(ItemStack stack) {
+        NBTTagCompound tag = TagUtil.getToolTag(stack);
+        return tag != null && tag.hasKey("rapid_level") ? tag.getInteger("rapid_level") : 0;
+    }
+
+    private int getChargeTime(ItemStack stack) {
+        float reduction = 0.2f * getRapidLevel(stack);
+        return Math.max(1, Math.round(20.0F * (1.0f - reduction)));
     }
 
     @Override
