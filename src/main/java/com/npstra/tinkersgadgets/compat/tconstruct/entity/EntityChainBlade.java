@@ -348,11 +348,11 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         if (!world.isRemote && !toolId.isEmpty()) {
             ChainBlade.removeActiveChainBlade(toolId, this);
         }
-        if (!world.isRemote && !weaponUuid.isEmpty() && shooter != null && hitCount > 0) {
+        if (!world.isRemote && !weaponUuid.isEmpty() && shooter != null && totalHitCount > 0) {
             ItemStack actual = findActualWeapon();
             if (!actual.isEmpty()) {
                 int charge = getCharge(actual);
-                charge = Math.min(30, charge + hitCount);
+                charge = Math.min(30, charge + totalHitCount);
                 setCharge(actual, charge);
             }
         }
