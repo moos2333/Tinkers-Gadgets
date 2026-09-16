@@ -14,8 +14,9 @@ import slimeknights.tconstruct.library.utils.TagUtil;
 
 public class ModRapid extends ModifierTrait {
     private static final int MAX_LEVEL = 3;
-    private static final int POINTS_PER_LEVEL = 45;
+    private static final int POINTS_PER_LEVEL = 20;
     private static final float[] LEVEL_BONUS = {0.10f, 0.18f, 0.24f};
+    private static final float MAX_THROW_BONUS = 0.60f;
 
     public ModRapid() {
         super("rapid_heatraygun", 0xF5F5DC, MAX_LEVEL, POINTS_PER_LEVEL);
@@ -46,7 +47,8 @@ public class ModRapid extends ModifierTrait {
             int base = toolTag.getInteger("baseChargeTime");
             toolTag.setInteger("chargeTime", Math.max(1, Math.round(base / (1.0f + calculateBonus(modData.current)))));
         } else {
-            toolTag.setInteger("rapid_level", Math.min(MAX_LEVEL, modData.current / POINTS_PER_LEVEL));
+            float bonus = Math.min(MAX_THROW_BONUS, modData.current * 0.01f);
+            toolTag.setFloat("rapid_bonus", bonus);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }

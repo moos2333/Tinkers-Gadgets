@@ -125,14 +125,14 @@ public class ThrowingKnife extends ProjectileCore {
         }
     }
 
-    private int getRapidLevel(ItemStack stack) {
+    private float getRapidBonus(ItemStack stack) {
         NBTTagCompound tag = TagUtil.getToolTag(stack);
-        return tag != null && tag.hasKey("rapid_level") ? tag.getInteger("rapid_level") : 0;
+        return tag != null && tag.hasKey("rapid_bonus") ? tag.getFloat("rapid_bonus") : 0.0f;
     }
 
     private int getChargeTime(ItemStack stack, boolean sneaking) {
         int base = sneaking ? SNEAK_CHARGE : NORMAL_CHARGE;
-        float reduction = 0.2f * getRapidLevel(stack);
+        float reduction = getRapidBonus(stack);
         return Math.max(1, Math.round(base * (1.0f - reduction)));
     }
 

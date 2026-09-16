@@ -114,13 +114,13 @@ public class Boomerang extends ProjectileCore {
         }
     }
 
-    private int getRapidLevel(ItemStack stack) {
+    private float getRapidBonus(ItemStack stack) {
         NBTTagCompound tag = TagUtil.getToolTag(stack);
-        return tag != null && tag.hasKey("rapid_level") ? tag.getInteger("rapid_level") : 0;
+        return tag != null && tag.hasKey("rapid_bonus") ? tag.getFloat("rapid_bonus") : 0.0f;
     }
 
     private int getChargeTime(ItemStack stack) {
-        float reduction = 0.2f * getRapidLevel(stack);
+        float reduction = getRapidBonus(stack);
         return Math.max(1, Math.round(20.0F * (1.0f - reduction)));
     }
 
