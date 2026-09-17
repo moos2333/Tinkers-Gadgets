@@ -14,9 +14,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+
+import java.nio.FloatBuffer;
 
 @SideOnly(Side.CLIENT)
 public class RenderChainBlade extends Render<EntityChainBlade> {
@@ -86,19 +90,28 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
         GlStateManager.enableRescaleNormal();
         GlStateManager.scale(0.6F, 0.6F, 0.6F);
 
-        double dx = entity.motionX;
-        double dy = entity.motionY;
-        double dz = entity.motionZ;
-        if (dx == 0 && dy == 0 && dz == 0) {
-            dx = 1;
+        net.minecraft.entity.Entity view = Minecraft.getMinecraft().getRenderViewEntity();
+        Vec3d look = view != null ? view.getLookVec() : new Vec3d(0, 0, 1);
+        double hx = look.x;
+        double hz = look.z;
+        double hlen = Math.sqrt(hx * hx + hz * hz);
+        if (hlen < 0.001) {
+            hx = 0;
+            hz = 1;
+        } else {
+            hx /= hlen;
+            hz /= hlen;
         }
 
-        float yaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-        float pitch = (float) (-(MathHelper.atan2(dy, MathHelper.sqrt(dx * dx + dz * dz)) * (180D / Math.PI)));
-
-        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+        float[] m = new float[] {
+                (float) hx, 0.0F, (float) hz, 0.0F,
+                0.0F, 1.0F, 0.0F, 0.0F,
+                (float) -hz, 0.0F, (float) hx, 0.0F,
+                0.0F, 0.0F, 0.0F, 1.0F
+        };
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        buffer.put(m).flip();
+        GL11.glMultMatrix(buffer);
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         itemRenderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE);
