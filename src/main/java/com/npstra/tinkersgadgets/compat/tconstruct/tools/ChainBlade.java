@@ -140,20 +140,9 @@ public class ChainBlade extends ProjectileCore {
                 setCooldown(stack);
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-        } else {
-            if (!world.isRemote) {
-                String toolId = getToolId(stack);
-                Set<Entity> set = activeChainBlades.get(toolId);
-                if (set != null) {
-                    set.removeIf(e -> !e.isEntityAlive());
-                    if (!set.isEmpty()) {
-                        return new ActionResult<>(EnumActionResult.FAIL, stack);
-                    }
-                }
-            }
-            player.setActiveHand(hand);
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
+        player.setActiveHand(hand);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
     @Override

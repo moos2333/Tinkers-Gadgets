@@ -275,7 +275,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         if (dist > RETURN_DIST_THRESHOLD) {
             Vec3d dir = delta.normalize();
             double desiredSpeed = Math.max(BASE_RETURN_SPEED, initialSpeed * 0.6D);
-            double currentSpeed = getCurrentSpeed();
             double smoothFactor = 0.3D;
             motionX += (dir.x * desiredSpeed - motionX) * smoothFactor;
             motionY += (dir.y * desiredSpeed - motionY) * smoothFactor;
