@@ -178,9 +178,13 @@ public class MaterialRegister {
             redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
             redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
             redstone.addTrait(TraitsRegistry.PULSE, ChainPartType.CHAIN);
+            redstone.addTrait(TraitsRegistry.PULSE, ConnectorPartType.CONNECTOR);
         }
         if (isTraitEnabled("burst_heatraygun")) {
             redstone.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
+        }
+        if (isTraitEnabled("interact_boomerang")) {
+            redstone.addTrait(TraitsRegistry.INTERACT, ConnectorPartType.CONNECTOR);
         }
         TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
@@ -213,8 +217,8 @@ public class MaterialRegister {
             enderpearl.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
             enderpearl.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
         }
-        if (isTraitEnabled("instant_return_boomerang")) {
-            enderpearl.addTrait(TraitsRegistry.INSTANT_RETURN, ConnectorPartType.CONNECTOR);
+        if (isTraitEnabled("burst_heatraygun")) {
+            enderpearl.addTrait(TraitsRegistry.BURST, ConnectorPartType.CONNECTOR);
         }
         if (isTraitEnabled("guidance_throwingknife")) {
             enderpearl.addTrait(TraitsRegistry.GUIDANCE, GripPartType.GRIP);
@@ -325,8 +329,12 @@ public class MaterialRegister {
             if (cobalt.getStats(ConnectorPartType.CONNECTOR) == null) {
                 cobalt.addStats(new ConnectorMaterialStats());
             }
+            if (cobalt.getStats(GripPartType.GRIP) == null) {
+                cobalt.addStats(new GripMaterialStats());
+            }
             if (isTraitEnabled("kinetic_boomerang")) {
                 cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
+                cobalt.addTrait(TraitsRegistry.KINETIC, GripPartType.GRIP);
             }
         }
 
