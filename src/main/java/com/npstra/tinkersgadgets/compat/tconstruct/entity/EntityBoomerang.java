@@ -379,7 +379,6 @@ public class EntityBoomerang extends EntityProjectileBase {
             inGround = false;
             arrowShake = 0;
             ticksInGround = 0;
-            totalDistanceTraveled = 0.0D;
             return;
         }
 
