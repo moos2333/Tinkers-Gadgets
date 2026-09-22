@@ -27,4 +27,5 @@ public class TraitsRegistry {
     public static final AbstractTrait BURST = new TraitBurst();
     public static final AbstractTrait CONDUCTION = new TraitConduction();
     public static final AbstractTrait KINETIC = new TraitKinetic();
+    public static final AbstractTrait SNIPING = new TraitSniping();
 }
