@@ -431,9 +431,9 @@ public class ChainBlade extends ProjectileCore {
         tag.setFloat("bounceRange", stats.bounceRange);
         tag.setFloat("speedRate", stats.speedRate);
         tag.setFloat("comboBonus", stats.comboBonus);
-        tag.setInteger("ammoBonus", stats.ammoBonus);
         ProjectileNBT data = new ProjectileNBT(tag);
         data.accuracy = 0.9f;
+        data.durability += stats.ammoBonus * 10;
         data.write(tag);
         return data;
     }
