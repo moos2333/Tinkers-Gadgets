@@ -235,6 +235,7 @@ public class MaterialRegister {
         wool.setCraftable(true).setCastable(false);
         TinkerRegistry.addMaterial(wool);
         TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
+        TinkerRegistry.addMaterialStats(wool, new ConnectorMaterialStats());
         wool.setVisible();
     }
 
