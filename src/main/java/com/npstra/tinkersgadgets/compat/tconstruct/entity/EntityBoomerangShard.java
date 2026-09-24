@@ -235,13 +235,9 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
 
         if (piercing && pierceCount > 0) {
             pierceCount--;
-            Vec3d motion = new Vec3d(motionX, motionY, motionZ);
-            if (motion.lengthSquared() > 0.0D) {
-                motion = motion.normalize();
-                motionX = motion.x * PIERCING_SPEED_REDUCTION;
-                motionY = motion.y * PIERCING_SPEED_REDUCTION;
-                motionZ = motion.z * PIERCING_SPEED_REDUCTION;
-            }
+            motionX *= PIERCING_SPEED_REDUCTION;
+            motionY *= PIERCING_SPEED_REDUCTION;
+            motionZ *= PIERCING_SPEED_REDUCTION;
             double speed = getCurrentSpeed();
             if (speed < PIERCING_MIN_SPEED || pierceCount <= 0) {
                 returning = true;

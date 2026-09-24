@@ -271,11 +271,10 @@ public class HeatRayGun extends TinkerToolCore {
             if (invStack.isEmpty()) continue;
             int burnTime = TileEntityFurnace.getItemBurnTime(invStack);
             if (burnTime <= 0) continue;
-            int fuelValue = (int) (burnTime / 20.0 * 20);
             ItemStack copy = invStack.copy();
             copy.shrink(1);
             player.inventory.setInventorySlotContents(i, copy.isEmpty() ? ItemStack.EMPTY : copy);
-            int newFuel = Math.min(currentFuel + fuelValue, maxFuel);
+            int newFuel = Math.min(currentFuel + burnTime, maxFuel);
             setFuel(stack, newFuel);
             world.playSound(null, player.posX, player.posY, player.posZ,
                     SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8F, 1.2F);
