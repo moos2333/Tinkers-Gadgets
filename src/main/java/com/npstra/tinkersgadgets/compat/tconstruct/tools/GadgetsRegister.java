@@ -37,6 +37,8 @@ public class GadgetsRegister {
     public static ToolPart heatRayEmitter;
     public static ItemChain chain;
     public static ChainBlade chainBlade;
+    public static ItemGunBarrel gunBarrel;
+    public static PistolSword pistolSword;
 
 
     @SubscribeEvent
@@ -88,6 +90,17 @@ public class GadgetsRegister {
             chainBlade = new ChainBlade();
             event.getRegistry().register(chainBlade);
             TinkerRegistry.registerToolCrafting(chainBlade);
+        }
+
+        if (Config.enablePistolSword) {
+            gunBarrel = new ItemGunBarrel();
+            event.getRegistry().register(gunBarrel);
+            TinkerRegistry.registerToolPart(gunBarrel);
+            TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), gunBarrel));
+
+            pistolSword = new PistolSword();
+            event.getRegistry().register(pistolSword);
+            TinkerRegistry.registerToolCrafting(pistolSword);
         }
     }
 
@@ -153,6 +166,11 @@ public class GadgetsRegister {
             if (chainBlade != null) {
                 ModelRegisterUtil.registerToolModel(chainBlade);
             }
+        }
+
+        if (Config.enablePistolSword) {
+            if (gunBarrel != null) ModelRegisterUtil.registerPartModel(gunBarrel);
+            if (pistolSword != null) ModelRegisterUtil.registerToolModel(pistolSword);
         }
     }
 }

@@ -14,6 +14,7 @@ public class Config {
     public static boolean enableRapid = true;
     public static boolean enablePower = true;
     public static boolean enableEfficiency = true;
+    public static boolean enablePistolSword = true;
     public static String[] disabledMaterials = new String[0];
     public static String[] disabledTraits = new String[0];
 
@@ -44,6 +45,8 @@ public class Config {
                 "Enable the Power modifier for Heat Ray Gun.");
         enableEfficiency = config.getBoolean("enableEfficiency", general, true,
                 "Enable the Efficiency modifier for Heat Ray Gun.");
+        enablePistolSword = config.getBoolean("enablePistolSword", general, true,
+                "Enable the Pistol Sword tool and its Gun Barrel part.");
         disabledMaterials = config.getStringList("disabledMaterials", "materials",
                 new String[0],
                 "List of material IDs to disable. Valid IDs: glass, slimeball, popped_chorus, nether_quartz, magma_cream, shulker_shell, leather, redstone, blue_slimeball, enderpearl, wool, prismarine_crystals, brick, netherbrick.");

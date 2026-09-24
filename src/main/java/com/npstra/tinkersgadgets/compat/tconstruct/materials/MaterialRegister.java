@@ -45,6 +45,7 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(new GripMaterialStats());
         Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
         Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
+        Material.UNKNOWN.addStats(GunBarrelMaterialStats.UNKNOWN);
 
         registerGlass();
         registerSlimeball();
@@ -301,6 +302,9 @@ public class MaterialRegister {
             if (iron.getStats(ConnectorPartType.CONNECTOR) == null) {
                 TinkerRegistry.addMaterialStats(iron, new ConnectorMaterialStats());
             }
+            if (iron.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                iron.addStats(new GunBarrelMaterialStats(0, 1.0f, 100));
+            }
             if (isTraitEnabled("inertia_throwingknife")) {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
                 iron.addTrait(TraitsRegistry.INERTIA, ConnectorPartType.CONNECTOR);
@@ -317,6 +321,9 @@ public class MaterialRegister {
             }
             if (stone.getStats(ChainPartType.CHAIN) == null) {
                 stone.addStats(new ChainMaterialStats(1, 1.0f, 0, -0.5f, -0.05f));
+            }
+            if (stone.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                stone.addStats(new GunBarrelMaterialStats(-2, 0.75f, 0));
             }
         }
 
@@ -336,6 +343,9 @@ public class MaterialRegister {
             }
             if (cobalt.getStats(GripPartType.GRIP) == null) {
                 cobalt.addStats(new GripMaterialStats());
+            }
+            if (cobalt.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                cobalt.addStats(new GunBarrelMaterialStats(1, 1.15f, 80));
             }
             if (isTraitEnabled("kinetic_boomerang")) {
                 cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
