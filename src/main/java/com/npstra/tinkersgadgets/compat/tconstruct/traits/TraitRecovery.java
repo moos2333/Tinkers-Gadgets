@@ -25,7 +25,7 @@ public class TraitRecovery extends ProjectileModifierTrait {
     public static void handleBlockHit(EntityThrowingKnife knife) {
         if (!knife.world.isRemote && knife.shootingEntity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) knife.shootingEntity;
-            if (player != null && knife.tinkerProjectile != null) {
+            if (knife.tinkerProjectile != null) {
                 knife.tinkerProjectile.pickup(player, false);
                 knife.setDead();
             }
