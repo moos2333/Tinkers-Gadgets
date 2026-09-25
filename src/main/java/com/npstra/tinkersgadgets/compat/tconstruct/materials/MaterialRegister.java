@@ -196,7 +196,7 @@ public class MaterialRegister {
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
         redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
-        redstone.addStats(new GunBarrelMaterialStats(1, 0.85f, 0));
+        redstone.addStats(new GunBarrelMaterialStats(-1, 0.9f, 0));
     }
 
     private static void registerBlueSlimeball() {
@@ -331,7 +331,7 @@ public class MaterialRegister {
                 stone.addStats(new ChainMaterialStats(1, 1.0f, 0, -0.5f, -0.05f));
             }
             if (stone.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                stone.addStats(new GunBarrelMaterialStats(-5, 0.75f, 0));
+                stone.addStats(new GunBarrelMaterialStats(-5, 0.5f, 0));
             }
         }
 
