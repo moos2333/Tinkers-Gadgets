@@ -105,12 +105,14 @@ public class MaterialRegister {
             poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
             poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
             poppedChorus.addTrait(TraitsRegistry.ECHO, ChainPartType.CHAIN);
+            poppedChorus.addTrait(TraitsRegistry.ECHO, GunBarrelPartType.GUN_BARREL);
         }
         TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
         if (poppedChorus.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
             poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
         }
         poppedChorus.addStats(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f));
+        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.05f, 90));
     }
 
     private static void registerNetherQuartz() {
@@ -121,16 +123,17 @@ public class MaterialRegister {
         }
         if (isTraitEnabled("trauma_throwingknife")) {
             netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
+            netherQuartz.addTrait(TraitsRegistry.TRAUMA, GunBarrelPartType.GUN_BARREL);
+            netherQuartz.addTrait(TraitsRegistry.TRAUMA, ChainPartType.CHAIN);
         }
         if (isTraitEnabled("burst_heatraygun")) {
             netherQuartz.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
         }
-        if (isTraitEnabled("trauma_throwingknife")) {
-            netherQuartz.addTrait(TraitsRegistry.TRAUMA, ChainPartType.CHAIN);
-        }
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
+        netherQuartz.addStats(new GunBarrelMaterialStats(-1, 1.15f, 60));
+
     }
 
     private static void registerMagmaCream() {
@@ -180,9 +183,11 @@ public class MaterialRegister {
             redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
             redstone.addTrait(TraitsRegistry.PULSE, ChainPartType.CHAIN);
             redstone.addTrait(TraitsRegistry.PULSE, ConnectorPartType.CONNECTOR);
+            redstone.addTrait(TraitsRegistry.PULSE, GunBarrelPartType.GUN_BARREL);
         }
         if (isTraitEnabled("burst_heatraygun")) {
             redstone.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
+            redstone.addTrait(TraitsRegistry.BURST, GunBarrelPartType.GUN_BARREL);
         }
         if (isTraitEnabled("interact_boomerang")) {
             redstone.addTrait(TraitsRegistry.INTERACT, ConnectorPartType.CONNECTOR);
@@ -191,6 +196,7 @@ public class MaterialRegister {
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
         redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
+        redstone.addStats(new GunBarrelMaterialStats(1, 0.85f, 30));
     }
 
     private static void registerBlueSlimeball() {
@@ -269,6 +275,7 @@ public class MaterialRegister {
         if (isTraitEnabled("temper_heatraygun")) {
             brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
         }
+        brick.addStats(new GunBarrelMaterialStats(-1, 0.85f, 40));
         brick.setVisible();
     }
 
@@ -281,6 +288,7 @@ public class MaterialRegister {
         if (isTraitEnabled("pressurized_heatraygun")) {
             netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
         }
+        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.9f, 80));
         netherbrick.setVisible();
     }
 
