@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
@@ -54,6 +55,7 @@ public class PistolSword extends TinkerToolCore {
     public static final int POISON_DURATION = 100;
     public static final int POISON_AMPLIFIER = 2;
     public static final float PIERCE_RATIO = 0.5f;
+    public static final float POISON_RANGED_BONUS = 1.5f;
     public static final int SHOT_COOLDOWN = 20;
 
     private static final String KEY_AMMO = "pistolSwordAmmo";
@@ -82,6 +84,7 @@ public class PistolSword extends TinkerToolCore {
         return 1.4d;
     }
 
+    @Override
     public float damageCutoff() {
         return 18.0f;
     }
@@ -114,13 +117,13 @@ public class PistolSword extends TinkerToolCore {
         ChainBlade.attackWithTraits(stack, player, primary, null, baseDamage);
 
         byte pending = getPending(stack);
-        if (pending == AMMO_POISON) {
-            primary.addPotionEffect(new PotionEffect(MobEffects.POISON, POISON_DURATION, POISON_AMPLIFIER));
+        if (pending != AMMO_EMPTY) {
             clearPending(stack);
-            performBurst(stack, player, primary, baseDamage);
-        } else if (pending == AMMO_PIERCE) {
-            primary.attackEntityFrom(DamageSource.causePlayerDamage(player), baseDamage * PIERCE_RATIO);
-            clearPending(stack);
+            if (pending == AMMO_POISON) {
+                primary.addPotionEffect(new PotionEffect(MobEffects.POISON, POISON_DURATION, POISON_AMPLIFIER));
+            } else if (pending == AMMO_PIERCE) {
+                primary.attackEntityFrom(DamageSource.causePlayerDamage(player), baseDamage * PIERCE_RATIO);
+            }
             performBurst(stack, player, primary, baseDamage);
         }
 
@@ -164,15 +167,13 @@ public class PistolSword extends TinkerToolCore {
         }
 
         byte fired = consumeAmmo(stack);
-        if (fired == AMMO_POISON || fired == AMMO_PIERCE) {
-            setPending(stack, fired);
-        }
-        fireShot(world, player, stack);
+        setPending(stack, fired);
+        fireShot(world, player, stack, fired);
         player.getCooldownTracker().setCooldown(stack.getItem(), SHOT_COOLDOWN);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
-    private void fireShot(World world, EntityPlayer player, ItemStack stack) {
+    private void fireShot(World world, EntityPlayer player, ItemStack stack, byte fired) {
         world.playSound(null, player.posX, player.posY, player.posZ,
                 SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5F, 1.8F);
 
@@ -184,10 +185,21 @@ public class PistolSword extends TinkerToolCore {
         if (blockHit != null) end = blockHit.hitVec;
 
         EntityLivingBase hit = findFirstHit(world, player, eye, end);
-        if (hit != null) {
-            ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
-            float baseDamage = (float) data.attack;
-            float damage = baseDamage * getRangedMultiplier(stack);
+        if (hit == null) return;
+
+        ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
+        float baseDamage = (float) data.attack;
+        float damage = baseDamage * getRangedMultiplier(stack);
+
+        if (fired == AMMO_POISON) {
+            if (!hit.isEntityUndead()) {
+                damage *= POISON_RANGED_BONUS;
+            }
+            ChainBlade.attackWithTraits(stack, player, hit, null, damage);
+        } else if (fired == AMMO_PIERCE) {
+            DamageSource pierce = new EntityDamageSource("pistol_sword.pierce", player).setDamageBypassesArmor();
+            hit.attackEntityFrom(pierce, damage);
+        } else {
             ChainBlade.attackWithTraits(stack, player, hit, null, damage);
         }
     }
