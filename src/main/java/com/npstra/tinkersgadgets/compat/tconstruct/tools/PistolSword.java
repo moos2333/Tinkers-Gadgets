@@ -22,7 +22,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
@@ -49,11 +48,7 @@ public class PistolSword extends TinkerToolCore {
     public static final byte AMMO_PIERCE = 2;
     public static final byte AMMO_NORMAL = 3;
 
-    public static final float SWEEP_DAMAGE = 1.0f;
-    public static final double SWEEP_RADIUS = 1.0;
-    public static final double SWEEP_HEIGHT = 0.25;
-    public static final double SWEEP_RANGE_SQ = 9.0;
-    public static final float SWEEP_KNOCKBACK = 0.4f;
+    public static final double BURST_RADIUS = 1.0;
 
     public static final double RANGE = 12.0;
     public static final int POISON_DURATION = 100;
@@ -118,47 +113,26 @@ public class PistolSword extends TinkerToolCore {
         if (pending == AMMO_POISON) {
             primary.addPotionEffect(new PotionEffect(MobEffects.POISON, POISON_DURATION, POISON_AMPLIFIER));
             clearPending(stack);
+            performBurst(stack, player, primary, baseDamage);
         } else if (pending == AMMO_PIERCE) {
             primary.attackEntityFrom(DamageSource.causePlayerDamage(player), baseDamage * PIERCE_RATIO);
             clearPending(stack);
+            performBurst(stack, player, primary, baseDamage);
         }
 
         collectAmmo(stack, determineAmmoType(primary));
 
-        if (canSweep(player)) {
-            performSweep(stack, player, primary);
-        }
-
         return true;
     }
 
-    private boolean canSweep(EntityPlayer player) {
-        if (!player.onGround) return false;
-        if (player.isSprinting()) return false;
-        if (player.getCooledAttackStrength(0.5F) <= 0.9F) return false;
-        return true;
-    }
-
-    private void performSweep(ItemStack stack, EntityPlayer player, EntityLivingBase primary) {
-        AxisAlignedBB box = primary.getEntityBoundingBox().grow(SWEEP_RADIUS, SWEEP_HEIGHT, SWEEP_RADIUS);
+    private void performBurst(ItemStack stack, EntityPlayer player, EntityLivingBase primary, float baseDamage) {
+        AxisAlignedBB box = primary.getEntityBoundingBox().grow(BURST_RADIUS);
         List<EntityLivingBase> nearby = player.world.getEntitiesWithinAABB(EntityLivingBase.class, box,
-                e -> e != player && e != primary && e.isEntityAlive()
-                        && !player.isOnSameTeam(e)
-                        && player.getDistanceSq(e) < SWEEP_RANGE_SQ);
+                e -> e != player && e != primary && e.isEntityAlive());
         if (nearby.isEmpty()) return;
-
-        player.spawnSweepParticles();
-
-        float yawRad = player.rotationYaw * 0.017453292F;
-        float sin = MathHelper.sin(yawRad);
-        float cos = -MathHelper.cos(yawRad);
         for (EntityLivingBase target : nearby) {
-            target.knockBack(player, SWEEP_KNOCKBACK, sin, cos);
-            ChainBlade.attackWithTraits(stack, player, target, null, SWEEP_DAMAGE);
+            ChainBlade.attackWithTraits(stack, player, target, null, baseDamage);
         }
-
-        player.world.playSound(null, player.posX, player.posY, player.posZ,
-                SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     @Nonnull
