@@ -22,6 +22,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
@@ -48,9 +49,12 @@ public class PistolSword extends TinkerToolCore {
     public static final byte AMMO_PIERCE = 2;
     public static final byte AMMO_NORMAL = 3;
 
-    public static final float SWEEP_RATIO = 0.5f;
-    public static final double SWEEP_RADIUS = 2.0;
-    public static final double SWEEP_HEIGHT = 1.0;
+    public static final float SWEEP_DAMAGE = 1.0f;
+    public static final double SWEEP_RADIUS = 1.0;
+    public static final double SWEEP_HEIGHT = 0.25;
+    public static final double SWEEP_RANGE_SQ = 9.0;
+    public static final float SWEEP_KNOCKBACK = 0.4f;
+
     public static final double RANGE = 12.0;
     public static final int POISON_DURATION = 100;
     public static final int POISON_AMPLIFIER = 2;
@@ -120,20 +124,41 @@ public class PistolSword extends TinkerToolCore {
         }
 
         collectAmmo(stack, determineAmmoType(primary));
-        performSweep(stack, player, primary, baseDamage);
+
+        if (canSweep(player)) {
+            performSweep(stack, player, primary);
+        }
 
         return true;
     }
 
-    private void performSweep(ItemStack stack, EntityPlayer player, EntityLivingBase primary, float baseDamage) {
-        AxisAlignedBB box = player.getEntityBoundingBox().grow(SWEEP_RADIUS, SWEEP_HEIGHT, SWEEP_RADIUS);
+    private boolean canSweep(EntityPlayer player) {
+        if (!player.onGround) return false;
+        if (player.isSprinting()) return false;
+        if (player.getCooledAttackStrength(0.5F) <= 0.9F) return false;
+        return true;
+    }
+
+    private void performSweep(ItemStack stack, EntityPlayer player, EntityLivingBase primary) {
+        AxisAlignedBB box = primary.getEntityBoundingBox().grow(SWEEP_RADIUS, SWEEP_HEIGHT, SWEEP_RADIUS);
         List<EntityLivingBase> nearby = player.world.getEntitiesWithinAABB(EntityLivingBase.class, box,
-                e -> e != player && e != primary && e.isEntityAlive());
+                e -> e != player && e != primary && e.isEntityAlive()
+                        && !player.isOnSameTeam(e)
+                        && player.getDistanceSq(e) < SWEEP_RANGE_SQ);
         if (nearby.isEmpty()) return;
-        float sweepDamage = baseDamage * SWEEP_RATIO;
+
+        player.spawnSweepParticles();
+
+        float yawRad = player.rotationYaw * 0.017453292F;
+        float sin = MathHelper.sin(yawRad);
+        float cos = -MathHelper.cos(yawRad);
         for (EntityLivingBase target : nearby) {
-            ChainBlade.attackWithTraits(stack, player, target, null, sweepDamage);
+            target.knockBack(player, SWEEP_KNOCKBACK, sin, cos);
+            ChainBlade.attackWithTraits(stack, player, target, null, SWEEP_DAMAGE);
         }
+
+        player.world.playSound(null, player.posX, player.posY, player.posZ,
+                SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     @Nonnull
