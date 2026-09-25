@@ -49,9 +49,9 @@ public class ClientProxy extends CommonProxy {
         }
         if (GadgetsRegister.pistolSword != null) {
             ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.pistolSword);
-            info.addSlotPosition(33 + 18, 42 - 18);
-            info.addSlotPosition(33, 42);
-            info.addSlotPosition(33 - 18, 42 + 18);
+            info.addSlotPosition(33 + 15, 42 - 15);
+            info.addSlotPosition(33 - 15, 42 + 15);
+            info.addSlotPosition(33 + 15, 42 + 15);
             TinkerRegistryClient.addToolBuilding(info);
         }
     }
