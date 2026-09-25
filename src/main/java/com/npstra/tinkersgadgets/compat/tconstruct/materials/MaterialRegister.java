@@ -154,6 +154,9 @@ public class MaterialRegister {
         if (isTraitEnabled("recovery_throwingknife")) {
             shulkerShell.addTrait(TraitsRegistry.RECOVERY, GripPartType.GRIP);
         }
+        if (isTraitEnabled("sniping_throwingknife")) {
+            shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
+        }
         if (isTraitEnabled("enderference")) {
             shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
             shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
@@ -166,6 +169,7 @@ public class MaterialRegister {
         if (isTraitEnabled("thermostatic_heatraygun")) {
             shulkerShell.addTrait(TraitsRegistry.THERMOSTATIC, FuelTankPartType.FUEL_TANK);
         }
+        shulkerShell.addStats(new GunBarrelMaterialStats(2, 1.0f, 0));
     }
 
     private static void registerLeather() {

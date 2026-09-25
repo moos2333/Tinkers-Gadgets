@@ -354,15 +354,7 @@ public class PistolSword extends TinkerToolCore {
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        if (flagIn.isAdvanced()) return;
         tooltip.add(buildAmmoTooltip(stack));
-    }
-
-    @Override
-    public List<String> getInformation(ItemStack stack, boolean detailed) {
-        List<String> info = super.getInformation(stack, detailed);
-        info.add(buildAmmoTooltip(stack));
-        return info;
     }
 
     private String buildAmmoTooltip(ItemStack stack) {

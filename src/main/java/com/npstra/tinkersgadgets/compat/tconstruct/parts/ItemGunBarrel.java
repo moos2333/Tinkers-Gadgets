@@ -10,7 +10,7 @@ import java.util.Set;
 public class ItemGunBarrel extends ToolPart {
 
     private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
-            "stone", "iron", "cobalt", "nether_brick", "brick", "popped_chorus", "redstone", "nether_quartz"
+            "stone", "iron", "cobalt", "nether_brick", "brick", "popped_chorus", "redstone", "nether_quartz", "shulker_shell"
     ));
 
     public ItemGunBarrel() {
