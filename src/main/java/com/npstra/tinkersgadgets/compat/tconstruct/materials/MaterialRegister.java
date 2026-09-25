@@ -112,7 +112,7 @@ public class MaterialRegister {
             poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
         }
         poppedChorus.addStats(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f));
-        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.05f, 90));
+        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.05f, 0));
     }
 
     private static void registerNetherQuartz() {
@@ -132,7 +132,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
-        netherQuartz.addStats(new GunBarrelMaterialStats(-1, 1.0f, 60));
+        netherQuartz.addStats(new GunBarrelMaterialStats(-1, 1.0f, 0));
 
     }
 
@@ -196,7 +196,7 @@ public class MaterialRegister {
         redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
         redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
-        redstone.addStats(new GunBarrelMaterialStats(1, 0.85f, 30));
+        redstone.addStats(new GunBarrelMaterialStats(1, 0.85f, 0));
     }
 
     private static void registerBlueSlimeball() {
@@ -275,7 +275,7 @@ public class MaterialRegister {
         if (isTraitEnabled("temper_heatraygun")) {
             brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
         }
-        brick.addStats(new GunBarrelMaterialStats(-1, 0.85f, 40));
+        brick.addStats(new GunBarrelMaterialStats(-1, 0.85f, 0));
         brick.setVisible();
     }
 
@@ -288,7 +288,7 @@ public class MaterialRegister {
         if (isTraitEnabled("pressurized_heatraygun")) {
             netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
         }
-        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.9f, 80));
+        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.9f, 0));
         netherbrick.setVisible();
     }
 
