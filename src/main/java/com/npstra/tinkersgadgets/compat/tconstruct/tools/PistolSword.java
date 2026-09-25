@@ -74,12 +74,16 @@ public class PistolSword extends TinkerToolCore {
 
     @Override
     public float damagePotential() {
-        return 1.0f;
+        return 1.1f;
     }
 
     @Override
     public double attackSpeed() {
         return 1.4d;
+    }
+
+    public float damageCutoff() {
+        return 18.0f;
     }
 
     @Override
