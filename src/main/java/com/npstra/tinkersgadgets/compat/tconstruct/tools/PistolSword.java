@@ -146,19 +146,26 @@ public class PistolSword extends TinkerToolCore {
         if (player.getCooldownTracker().hasCooldown(stack.getItem())) {
             return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
-        if (!world.isRemote) {
-            if (getAmmo(stack).length == 0) {
-                world.playSound(null, player.posX, player.posY, player.posZ,
-                        SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.PLAYERS, 0.8F, 1.2F);
-                return new ActionResult<>(EnumActionResult.FAIL, stack);
+
+        if (world.isRemote) {
+            if (getAmmo(stack).length > 0) {
+                spawnMuzzleParticles(world, player);
             }
-            byte fired = consumeAmmo(stack);
-            if (fired == AMMO_POISON || fired == AMMO_PIERCE) {
-                setPending(stack, fired);
-            }
-            fireShot(world, player, stack);
-            player.getCooldownTracker().setCooldown(stack.getItem(), SHOT_COOLDOWN);
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
+
+        if (getAmmo(stack).length == 0) {
+            world.playSound(null, player.posX, player.posY, player.posZ,
+                    SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.PLAYERS, 0.8F, 1.2F);
+            return new ActionResult<>(EnumActionResult.FAIL, stack);
+        }
+
+        byte fired = consumeAmmo(stack);
+        if (fired == AMMO_POISON || fired == AMMO_PIERCE) {
+            setPending(stack, fired);
+        }
+        fireShot(world, player, stack);
+        player.getCooldownTracker().setCooldown(stack.getItem(), SHOT_COOLDOWN);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
@@ -172,15 +179,6 @@ public class PistolSword extends TinkerToolCore {
 
         RayTraceResult blockHit = world.rayTraceBlocks(eye, end, false, true, false);
         if (blockHit != null) end = blockHit.hitVec;
-
-        Vec3d muzzle = eye.add(look.scale(1.2));
-        for (int i = 0; i < 4; i++) {
-            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
-                    muzzle.x + (world.rand.nextDouble() - 0.5) * 0.3,
-                    muzzle.y + (world.rand.nextDouble() - 0.5) * 0.3,
-                    muzzle.z + (world.rand.nextDouble() - 0.5) * 0.3,
-                    0, 0.01, 0);
-        }
 
         EntityLivingBase hit = findFirstHit(world, player, eye, end);
         if (hit != null) {
@@ -196,13 +194,44 @@ public class PistolSword extends TinkerToolCore {
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != player && e.isEntityAlive());
         if (targets.isEmpty()) return null;
-        targets.sort((a, b) -> Double.compare(a.getDistanceSq(player), b.getDistanceSq(player)));
+
+        EntityLivingBase closest = null;
+        double closestDistSq = Double.MAX_VALUE;
         for (EntityLivingBase target : targets) {
-            if (target.getEntityBoundingBox().grow(0.3).calculateIntercept(eye, end) != null) {
-                return target;
+            RayTraceResult result = target.getEntityBoundingBox().grow(0.3).calculateIntercept(eye, end);
+            if (result == null) continue;
+            double distSq = eye.squareDistanceTo(result.hitVec);
+            if (distSq < closestDistSq) {
+                closestDistSq = distSq;
+                closest = target;
             }
         }
-        return null;
+        return closest;
+    }
+
+    private void spawnMuzzleParticles(World world, EntityPlayer player) {
+        Vec3d eye = player.getPositionEyes(1.0F);
+        Vec3d look = player.getLookVec();
+        Vec3d muzzle = eye.add(look.scale(1.2));
+
+        for (int i = 0; i < 6; i++) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+                    muzzle.x + (world.rand.nextDouble() - 0.5) * 0.4,
+                    muzzle.y + (world.rand.nextDouble() - 0.5) * 0.4,
+                    muzzle.z + (world.rand.nextDouble() - 0.5) * 0.4,
+                    look.x * 0.15,
+                    0.02,
+                    look.z * 0.15);
+        }
+        for (int i = 0; i < 2; i++) {
+            world.spawnParticle(EnumParticleTypes.FLAME,
+                    muzzle.x + (world.rand.nextDouble() - 0.5) * 0.2,
+                    muzzle.y + (world.rand.nextDouble() - 0.5) * 0.2,
+                    muzzle.z + (world.rand.nextDouble() - 0.5) * 0.2,
+                    look.x * 0.05,
+                    0.01,
+                    look.z * 0.05);
+        }
     }
 
     private byte determineAmmoType(EntityLivingBase target) {
