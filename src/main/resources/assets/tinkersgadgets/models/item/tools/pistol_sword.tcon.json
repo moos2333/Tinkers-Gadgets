@@ -2,8 +2,8 @@
   "loader": "tconstruct:tool",
   "parent": "forge:item/default",
   "textures": {
-    "layer0": "tinkersgadgets:items/tools/pistol_sword/blade",
-    "layer1": "tinkersgadgets:items/tools/pistol_sword/handle",
+    "layer0": "tinkersgadgets:items/tools/pistol_sword/handle",
+    "layer1": "tinkersgadgets:items/tools/pistol_sword/blade",
     "layer2": "tinkersgadgets:items/tools/pistol_sword/barrel",
     "broken1": "tinkersgadgets:items/tools/pistol_sword/blade_broken"
   }
