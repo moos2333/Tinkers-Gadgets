@@ -132,7 +132,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
-        netherQuartz.addStats(new GunBarrelMaterialStats(-1, 1.15f, 60));
+        netherQuartz.addStats(new GunBarrelMaterialStats(-1, 1.0f, 60));
 
     }
 
