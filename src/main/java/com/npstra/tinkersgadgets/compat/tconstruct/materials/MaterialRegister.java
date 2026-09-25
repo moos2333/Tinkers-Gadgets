@@ -323,7 +323,7 @@ public class MaterialRegister {
                 stone.addStats(new ChainMaterialStats(1, 1.0f, 0, -0.5f, -0.05f));
             }
             if (stone.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                stone.addStats(new GunBarrelMaterialStats(-2, 0.75f, 0));
+                stone.addStats(new GunBarrelMaterialStats(-5, 0.75f, 0));
             }
         }
 
@@ -345,7 +345,7 @@ public class MaterialRegister {
                 cobalt.addStats(new GripMaterialStats());
             }
             if (cobalt.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                cobalt.addStats(new GunBarrelMaterialStats(1, 1.15f, 80));
+                cobalt.addStats(new GunBarrelMaterialStats(1, 1.15f, 300));
             }
             if (isTraitEnabled("kinetic_boomerang")) {
                 cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
