@@ -64,8 +64,8 @@ public class PistolSword extends TinkerToolCore {
     private static final byte[] EMPTY_AMMO = new byte[0];
 
     public PistolSword() {
-        super(PartMaterialType.head(TinkerTools.swordBlade),
-                PartMaterialType.handle(TinkerTools.toolRod),
+        super(PartMaterialType.handle(TinkerTools.toolRod),
+                PartMaterialType.head(TinkerTools.swordBlade),
                 new PartMaterialType(GadgetsRegister.gunBarrel, GunBarrelPartType.GUN_BARREL));
         addCategory(Category.WEAPON);
         setRegistryName("pistol_sword");
@@ -84,7 +84,7 @@ public class PistolSword extends TinkerToolCore {
 
     @Override
     public int[] getRepairParts() {
-        return new int[]{0};
+        return new int[]{1};
     }
 
     @Nonnull
