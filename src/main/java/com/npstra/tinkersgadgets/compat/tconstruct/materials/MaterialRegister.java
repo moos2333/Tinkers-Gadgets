@@ -96,6 +96,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
         slimeball.addStats(new FuelTankMaterialStats(4000, 8, 1.2f));
         slimeball.addStats(new ChainMaterialStats(5, 3.0f, 0, 0.0f, 0.0f));
+        slimeball.addStats(new GunBarrelMaterialStats(2, 0.8f, 0));
     }
 
     private static void registerPoppedChorus() {
@@ -218,6 +219,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
         blueSlimeball.addStats(new FuelTankMaterialStats(3000, 9, 1.1f));
         blueSlimeball.addStats(new ChainMaterialStats(3, 5.0f, 0, 0.0f, 0.0f));
+        blueSlimeball.addStats(new GunBarrelMaterialStats(3, 0.75f, 0));
     }
 
     private static void registerEnderpearl() {
