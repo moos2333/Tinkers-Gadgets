@@ -4,10 +4,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.materials.GunBarrelMaterialSt
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.GunBarrelPartType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityCaveSpider;
-import net.minecraft.entity.monster.EntityEndermite;
-import net.minecraft.entity.monster.EntitySilverfish;
-import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
@@ -256,10 +253,7 @@ public class PistolSword extends TinkerToolCore {
     }
 
     private boolean isArthropod(EntityLivingBase target) {
-        return target instanceof EntitySpider
-                || target instanceof EntityCaveSpider
-                || target instanceof EntitySilverfish
-                || target instanceof EntityEndermite;
+        return target.getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD;
     }
 
     private void collectAmmo(ItemStack stack, byte type) {
@@ -352,6 +346,16 @@ public class PistolSword extends TinkerToolCore {
     }
 
     @Override
+    public List<String> getInformation(ItemStack stack, boolean detailed) {
+        List<String> info = super.getInformation(stack, detailed);
+        int percent = Math.round(getRangedMultiplier(stack) * 100.0f);
+        TextFormatting color = percent >= 100 ? TextFormatting.GREEN : TextFormatting.RED;
+        info.add(Util.translateFormatted("stat.gun_barrel.damage.name",
+                color + String.valueOf(percent) + "%" + TextFormatting.RESET));
+        return info;
+    }
+
+    @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         tooltip.add(buildAmmoTooltip(stack));
@@ -372,7 +376,7 @@ public class PistolSword extends TinkerToolCore {
 
     private static String colorFor(byte ammoType) {
         switch (ammoType) {
-            case AMMO_POISON: return TextFormatting.GREEN.toString();
+            case AMMO_POISON: return TextFormatting.DARK_GREEN.toString();
             case AMMO_PIERCE: return TextFormatting.RED.toString();
             case AMMO_NORMAL: return TextFormatting.YELLOW.toString();
             default: return TextFormatting.GRAY.toString();

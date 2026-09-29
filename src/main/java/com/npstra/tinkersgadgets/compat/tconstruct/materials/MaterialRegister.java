@@ -78,6 +78,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterial(glass);
         TinkerRegistry.addMaterialStats(glass, new ConnectorMaterialStats());
         TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
+        glass.addStats(new GunBarrelMaterialStats(-3, 1.1f, 0));
         glass.setVisible();
     }
 
