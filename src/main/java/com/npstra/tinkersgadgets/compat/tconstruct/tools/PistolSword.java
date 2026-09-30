@@ -55,6 +55,8 @@ public class PistolSword extends TinkerToolCore {
     public static final float POISON_RANGED_BONUS = 1.5f;
     public static final int SHOT_COOLDOWN = 20;
 
+    public static final String KEY_MAX_AMMO = "pistolSwordMaxAmmo";
+
     private static final String KEY_AMMO = "pistolSwordAmmo";
     private static final String KEY_PENDING = "pistolSwordPending";
     private static final String KEY_BARREL_AMMO = "gunBarrelAmmo";
@@ -318,8 +320,11 @@ public class PistolSword extends TinkerToolCore {
 
     public static int getCapacity(ItemStack stack) {
         NBTTagCompound tag = TagUtil.getToolTag(stack);
-        int bonus = tag.hasKey(KEY_BARREL_AMMO) ? tag.getInteger(KEY_BARREL_AMMO) : 0;
-        return Math.max(0, BASE_CAPACITY + bonus);
+        if (tag.hasKey(KEY_MAX_AMMO)) {
+            return Math.max(0, tag.getInteger(KEY_MAX_AMMO));
+        }
+        int barrelBonus = tag.hasKey(KEY_BARREL_AMMO) ? tag.getInteger(KEY_BARREL_AMMO) : 0;
+        return Math.max(0, BASE_CAPACITY + barrelBonus);
     }
 
     public static float getRangedMultiplier(ItemStack stack) {
@@ -341,6 +346,7 @@ public class PistolSword extends TinkerToolCore {
         tag.setInteger("Durability", baseDurability + stats.durabilityBonus);
         tag.setInteger(KEY_BARREL_AMMO, stats.ammoBonus);
         tag.setFloat(KEY_BARREL_RANGED, stats.rangedDamage);
+        tag.setInteger(KEY_MAX_AMMO, BASE_CAPACITY + stats.ammoBonus);
 
         return new ToolNBT(tag);
     }
