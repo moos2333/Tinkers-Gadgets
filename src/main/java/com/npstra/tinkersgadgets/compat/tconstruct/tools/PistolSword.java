@@ -261,13 +261,10 @@ public class PistolSword extends TinkerToolCore {
     }
 
     private byte determineAmmoType(EntityLivingBase target) {
-        if (target.isEntityUndead()) return AMMO_POISON;
-        if (isArthropod(target)) return AMMO_PIERCE;
+        EnumCreatureAttribute attr = target.getCreatureAttribute();
+        if (attr == EnumCreatureAttribute.UNDEAD) return AMMO_POISON;
+        if (attr == EnumCreatureAttribute.ARTHROPOD) return AMMO_PIERCE;
         return AMMO_NORMAL;
-    }
-
-    private boolean isArthropod(EntityLivingBase target) {
-        return target.getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD;
     }
 
     private void collectAmmo(ItemStack stack, byte type) {
