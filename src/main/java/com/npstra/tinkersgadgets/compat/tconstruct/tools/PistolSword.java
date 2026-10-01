@@ -54,6 +54,7 @@ public class PistolSword extends TinkerToolCore {
     public static final float PIERCE_RATIO = 0.5f;
     public static final float POISON_RANGED_BONUS = 1.5f;
     public static final int SHOT_COOLDOWN = 20;
+    public static final double MAX_SPEED_RATIO = 2.0;
 
     public static final String KEY_MAX_AMMO = "pistolSwordMaxAmmo";
 
@@ -110,6 +111,8 @@ public class PistolSword extends TinkerToolCore {
         if (!(entity instanceof EntityLivingBase)) return false;
         EntityLivingBase primary = (EntityLivingBase) entity;
 
+        boolean readyToCollect = player.getCooledAttackStrength(0.5F) > 0.9F;
+
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack;
 
@@ -126,7 +129,9 @@ public class PistolSword extends TinkerToolCore {
             performBurst(stack, player, primary, baseDamage);
         }
 
-        collectAmmo(stack, determineAmmoType(primary));
+        if (readyToCollect) {
+            collectAmmo(stack, determineAmmoType(primary));
+        }
 
         return true;
     }
@@ -168,8 +173,15 @@ public class PistolSword extends TinkerToolCore {
         byte fired = consumeAmmo(stack);
         setPending(stack, fired);
         fireShot(world, player, stack, fired);
-        player.getCooldownTracker().setCooldown(stack.getItem(), SHOT_COOLDOWN);
+        player.getCooldownTracker().setCooldown(stack.getItem(), getShotCooldown(stack));
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+    }
+
+    private int getShotCooldown(ItemStack stack) {
+        double baseSpeed = attackSpeed();
+        double currentSpeed = ToolHelper.getActualAttackSpeed(stack);
+        double ratio = Math.min(currentSpeed / baseSpeed, MAX_SPEED_RATIO);
+        return (int) Math.max(SHOT_COOLDOWN / MAX_SPEED_RATIO, Math.round(SHOT_COOLDOWN / ratio));
     }
 
     private void fireShot(World world, EntityPlayer player, ItemStack stack, byte fired) {
