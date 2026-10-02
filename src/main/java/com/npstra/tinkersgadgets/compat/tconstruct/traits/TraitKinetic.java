@@ -14,7 +14,7 @@ public class TraitKinetic extends AbstractProjectileTrait {
 
     private static final int MAX_STACKS = 10;
     private static final float PROJECTILE_SPEED_PER_STACK = 0.10F;
-    private static final float SPRINT_DAMAGE_BONUS = 0.3F;
+    private static final float SPRINT_DAMAGE_PER_STACK = 0.04F;
     private static final int DECAY_INTERVAL = 60;
 
     private static final String KEY_STACKS = "kinetic_stacks";
@@ -41,7 +41,6 @@ public class TraitKinetic extends AbstractProjectileTrait {
     public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
                          float damageDealt, boolean wasCritical, boolean wasHit) {
         if (!wasHit || player.world.isRemote) return;
-        if (!(tool.getItem() instanceof ProjectileCore)) return;
         ItemStack weapon = findWeapon(player);
         if (weapon.isEmpty()) return;
         long now = player.world.getTotalWorldTime();
@@ -55,7 +54,10 @@ public class TraitKinetic extends AbstractProjectileTrait {
         if (player == null) return newDamage;
         if (tool.getItem() instanceof ProjectileCore) return newDamage;
         if (!player.isSprinting()) return newDamage;
-        return newDamage + damage * SPRINT_DAMAGE_BONUS;
+
+        int stacks = TagUtil.getToolTag(tool).getInteger(KEY_STACKS);
+        if (stacks <= 0) return newDamage;
+        return newDamage + damage * stacks * SPRINT_DAMAGE_PER_STACK;
     }
 
     private int getStacks(ItemStack weapon, long now) {
