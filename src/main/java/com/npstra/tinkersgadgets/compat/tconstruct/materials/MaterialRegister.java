@@ -93,6 +93,8 @@ public class MaterialRegister {
         }
         if (isTraitEnabled("conduction_heatraygun")) {
             slimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+            slimeball.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
+            slimeball.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
         }
         TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
         slimeball.addStats(new FuelTankMaterialStats(4000, 8, 1.2f));
@@ -216,6 +218,8 @@ public class MaterialRegister {
         }
         if (isTraitEnabled("conduction_heatraygun")) {
             blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
+            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
         }
         TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
         blueSlimeball.addStats(new FuelTankMaterialStats(3000, 9, 1.1f));
