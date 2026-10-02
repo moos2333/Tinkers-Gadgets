@@ -370,6 +370,7 @@ public class MaterialRegister {
             if (isTraitEnabled("kinetic_boomerang")) {
                 cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
                 cobalt.addTrait(TraitsRegistry.KINETIC, GripPartType.GRIP);
+                cobalt.addTrait(TraitsRegistry.KINETIC, GunBarrelPartType.GUN_BARREL);
             }
         }
 

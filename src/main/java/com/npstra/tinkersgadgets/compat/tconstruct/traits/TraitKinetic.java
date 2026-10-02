@@ -6,14 +6,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import slimeknights.tconstruct.library.tools.ranged.ProjectileCore;
 import slimeknights.tconstruct.library.traits.AbstractProjectileTrait;
 import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.library.utils.TinkerUtil;
 
 public class TraitKinetic extends AbstractProjectileTrait {
+
     private static final int MAX_STACKS = 10;
-    private static final float BONUS_PER_STACK = 0.10F;
+    private static final float PROJECTILE_SPEED_PER_STACK = 0.10F;
+    private static final float SPRINT_DAMAGE_BONUS = 0.3F;
     private static final int DECAY_INTERVAL = 60;
+
     private static final String KEY_STACKS = "kinetic_stacks";
     private static final String KEY_LAST_HIT = "kinetic_last_hit";
 
@@ -28,20 +32,31 @@ public class TraitKinetic extends AbstractProjectileTrait {
         if (weapon.isEmpty()) return;
         int stacks = getStacks(weapon, world.getTotalWorldTime());
         if (stacks <= 0) return;
-        float mult = 1.0F + BONUS_PER_STACK * stacks;
+        float mult = 1.0F + PROJECTILE_SPEED_PER_STACK * stacks;
         projectile.motionX *= mult;
         projectile.motionY *= mult;
         projectile.motionZ *= mult;
     }
 
     @Override
-    public void afterHit(EntityProjectileBase projectile, World world, ItemStack ammoStack, EntityLivingBase attacker, Entity target, double impactSpeed) {
-        if (world.isRemote || attacker == null) return;
-        ItemStack weapon = findWeapon(attacker);
+    public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
+                         float damageDealt, boolean wasCritical, boolean wasHit) {
+        if (!wasHit || player.world.isRemote) return;
+        if (!(tool.getItem() instanceof ProjectileCore)) return;
+        ItemStack weapon = findWeapon(player);
         if (weapon.isEmpty()) return;
-        long now = world.getTotalWorldTime();
+        long now = player.world.getTotalWorldTime();
         int stacks = getStacks(weapon, now);
         setStacks(weapon, Math.min(MAX_STACKS, stacks + 1), now);
+    }
+
+    @Override
+    public float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
+                        float damage, float newDamage, boolean isCritical) {
+        if (player == null) return newDamage;
+        if (tool.getItem() instanceof ProjectileCore) return newDamage;
+        if (!player.isSprinting()) return newDamage;
+        return newDamage + damage * SPRINT_DAMAGE_BONUS;
     }
 
     private int getStacks(ItemStack weapon, long now) {
@@ -70,10 +85,6 @@ public class TraitKinetic extends AbstractProjectileTrait {
         ItemStack main = entity.getHeldItemMainhand();
         if (!main.isEmpty() && TinkerUtil.hasTrait(TagUtil.getTagSafe(main), getModifierIdentifier())) {
             return main;
-        }
-        ItemStack off = entity.getHeldItemOffhand();
-        if (!off.isEmpty() && TinkerUtil.hasTrait(TagUtil.getTagSafe(off), getModifierIdentifier())) {
-            return off;
         }
         return ItemStack.EMPTY;
     }
