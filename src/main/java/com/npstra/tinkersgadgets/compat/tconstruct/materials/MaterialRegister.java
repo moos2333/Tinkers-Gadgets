@@ -294,8 +294,9 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
         if (isTraitEnabled("pressurized_heatraygun")) {
             netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
+            netherbrick.addTrait(TraitsRegistry.PRESSURIZED, GunBarrelPartType.GUN_BARREL);
         }
-        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.9f, 0));
+        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.85f, 0));
         netherbrick.setVisible();
     }
 

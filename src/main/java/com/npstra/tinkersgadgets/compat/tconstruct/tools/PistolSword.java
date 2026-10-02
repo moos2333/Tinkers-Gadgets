@@ -57,8 +57,8 @@ public class PistolSword extends TinkerToolCore {
     public static final double MAX_SPEED_RATIO = 2.0;
 
     public static final String KEY_MAX_AMMO = "pistolSwordMaxAmmo";
+    public static final String KEY_AMMO = "pistolSwordAmmo";
 
-    private static final String KEY_AMMO = "pistolSwordAmmo";
     private static final String KEY_PENDING = "pistolSwordPending";
     private static final String KEY_BARREL_AMMO = "gunBarrelAmmo";
     private static final String KEY_BARREL_RANGED = "gunBarrelRanged";
