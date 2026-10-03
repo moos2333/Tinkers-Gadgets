@@ -17,10 +17,13 @@ public class ModCapacity extends ModifierTrait {
     private static final int POINTS_PER_LEVEL = 20;
     private static final int FUEL_PER_LEVEL = 2000;
     private static final int AMMO_PER_LEVEL = 1;
+    private static final int HEAT_PER_LEVEL = 1;
 
     private static final String KEY_BASE_FUEL = "baseMaxFuel";
     private static final String KEY_BASE_AMMO = "baseMaxAmmo";
+    private static final String KEY_BASE_HEAT = "baseHeatCapacity";
     private static final String TAG_FUEL = "maxFuel";
+    private static final String TAG_HEAT = "heatCapacity";
 
     public ModCapacity() {
         super("capacity_heatraygun", 0xCC5533, MAX_LEVEL, POINTS_PER_LEVEL);
@@ -47,13 +50,21 @@ public class ModCapacity extends ModifierTrait {
     }
 
     private void applyHeatRayGun(NBTTagCompound toolTag, int points) {
-        int base = toolTag.getInteger(KEY_BASE_FUEL);
-        if (base == 0) {
-            base = toolTag.getInteger(TAG_FUEL);
-            toolTag.setInteger(KEY_BASE_FUEL, base);
+        int levels = points / POINTS_PER_LEVEL;
+
+        int fuelBase = toolTag.getInteger(KEY_BASE_FUEL);
+        if (fuelBase == 0) {
+            fuelBase = toolTag.getInteger(TAG_FUEL);
+            toolTag.setInteger(KEY_BASE_FUEL, fuelBase);
         }
-        int bonus = points * (FUEL_PER_LEVEL / POINTS_PER_LEVEL);
-        toolTag.setInteger(TAG_FUEL, base + bonus);
+        toolTag.setInteger(TAG_FUEL, fuelBase + levels * FUEL_PER_LEVEL);
+
+        int heatBase = toolTag.getInteger(KEY_BASE_HEAT);
+        if (heatBase == 0) {
+            heatBase = toolTag.getInteger(TAG_HEAT);
+            toolTag.setInteger(KEY_BASE_HEAT, heatBase);
+        }
+        toolTag.setInteger(TAG_HEAT, heatBase + levels * HEAT_PER_LEVEL);
     }
 
     private void applyPistolSword(NBTTagCompound toolTag, int points) {

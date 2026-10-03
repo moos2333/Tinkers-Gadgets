@@ -233,7 +233,7 @@ public class ChainBlade extends ProjectileCore {
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
 
-        boolean hasCharge = consumeCharge(stack, CHARGE_COST);
+        boolean hasCharge = consumeCharge(stack, getChargeCost(stack));
         float chargeMult = hasCharge ? CHARGE_MULTIPLIER : 1.0f;
 
         float radius = hasCharge ? 4.0f : SWEEP_BASE_RADIUS;
@@ -287,6 +287,12 @@ public class ChainBlade extends ProjectileCore {
 
         world.playSound(null, player.posX, player.posY, player.posZ,
                 SoundEvents.ITEM_ARMOR_EQUIP_CHAIN, SoundCategory.PLAYERS, 0.8F, 0.8F);
+    }
+
+    private int getChargeCost(ItemStack stack) {
+        NBTTagCompound tag = TagUtil.getToolTag(stack);
+        int level = tag != null && tag.hasKey("efficiency_level") ? tag.getInteger("efficiency_level") : 0;
+        return Math.max(1, CHARGE_COST - level);
     }
 
     private boolean isOnCooldown(ItemStack stack) {
