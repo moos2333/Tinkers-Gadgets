@@ -292,7 +292,7 @@ public class ChainBlade extends ProjectileCore {
     private int getChargeCost(ItemStack stack) {
         NBTTagCompound tag = TagUtil.getToolTag(stack);
         int level = tag != null && tag.hasKey("efficiency_level") ? tag.getInteger("efficiency_level") : 0;
-        return Math.max(1, CHARGE_COST - level);
+        return Math.max(1, CHARGE_COST - level * 2);
     }
 
     private boolean isOnCooldown(ItemStack stack) {

@@ -16,7 +16,7 @@ public class ModPower extends ModifierTrait {
     private static final int MAX_LEVEL = 3;
     private static final int POINTS_PER_LEVEL = 20;
     private static final float PER_LEVEL = 0.10f;
-    private static final float CHAIN_PER_LEVEL = 0.01f;
+    private static final float CHAIN_PER_LEVEL = 0.02f;
 
     private static final String KEY_BASE = "basePower";
     private static final String KEY_BASE_COMBO = "baseComboBonus";
