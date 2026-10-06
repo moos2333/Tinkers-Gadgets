@@ -55,7 +55,9 @@ public class ChainBlade extends ProjectileCore {
     private static final float BASE_DAMAGE_RATIO = 0.4f;
     private static final int THROW_CHARGE_BASE = 20;
     private static final float CHARGE_MULTIPLIER = 2.0f;
-    private static final int MAX_CHARGE = 30;
+
+    public static final int MAX_CHARGE = 30;
+    public static final String KEY_MAX_CHARGE = "chainMaxCharge";
 
     public ChainBlade() {
         super(PartMaterialType.handle(TinkerTools.toolRod),
@@ -360,6 +362,11 @@ public class ChainBlade extends ProjectileCore {
         return tag != null && tag.hasKey("comboBonus") ? tag.getFloat("comboBonus") : 0.0f;
     }
 
+    public static int getMaxCharge(ItemStack stack) {
+        NBTTagCompound tag = TagUtil.getToolTag(stack);
+        return tag != null && tag.hasKey(KEY_MAX_CHARGE) ? tag.getInteger(KEY_MAX_CHARGE) : MAX_CHARGE;
+    }
+
     @Override
     public int getCurrentAmmo(ItemStack stack) {
         int base = super.getCurrentAmmo(stack);
@@ -398,7 +405,7 @@ public class ChainBlade extends ProjectileCore {
             int charge = getCharge(stack);
             info.add(Util.translateFormatted("stat.chain.charge.tooltip",
                     TextFormatting.GOLD + String.valueOf(charge) + TextFormatting.RESET,
-                    TextFormatting.GOLD + String.valueOf(MAX_CHARGE) + TextFormatting.RESET));
+                    TextFormatting.GOLD + String.valueOf(getMaxCharge(stack)) + TextFormatting.RESET));
         }
         return info;
     }
@@ -412,7 +419,7 @@ public class ChainBlade extends ProjectileCore {
         int charge = getCharge(stack);
         tooltip.add(Util.translateFormatted("stat.chain.charge.tooltip",
                 TextFormatting.GOLD + String.valueOf(charge) + TextFormatting.RESET,
-                TextFormatting.GOLD + String.valueOf(MAX_CHARGE) + TextFormatting.RESET));
+                TextFormatting.GOLD + String.valueOf(getMaxCharge(stack)) + TextFormatting.RESET));
     }
 
     @Override
@@ -437,6 +444,7 @@ public class ChainBlade extends ProjectileCore {
         tag.setFloat("bounceRange", stats.bounceRange);
         tag.setFloat("speedRate", stats.speedRate);
         tag.setFloat("comboBonus", stats.comboBonus);
+        tag.setInteger(KEY_MAX_CHARGE, MAX_CHARGE);
         ProjectileNBT data = new ProjectileNBT(tag);
         data.accuracy = 0.9f;
         data.durability += stats.ammoBonus * 10;

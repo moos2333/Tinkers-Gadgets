@@ -352,7 +352,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             ItemStack actual = findActualWeapon();
             if (!actual.isEmpty()) {
                 int charge = getCharge(actual);
-                charge = Math.min(30, charge + totalHitCount);
+                charge = Math.min(ChainBlade.getMaxCharge(actual), charge + totalHitCount);
                 setCharge(actual, charge);
             }
         }

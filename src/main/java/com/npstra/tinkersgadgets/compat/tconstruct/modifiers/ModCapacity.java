@@ -1,5 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.modifiers;
 
+import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.HeatRayGun;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.PistolSword;
 import net.minecraft.init.Blocks;
@@ -18,12 +19,16 @@ public class ModCapacity extends ModifierTrait {
     private static final int FUEL_PER_LEVEL = 2000;
     private static final int AMMO_PER_LEVEL = 1;
     private static final int HEAT_PER_LEVEL = 1;
+    private static final int CHARGE_PER_LEVEL = 10;
 
     private static final String KEY_BASE_FUEL = "baseMaxFuel";
     private static final String KEY_BASE_AMMO = "baseMaxAmmo";
     private static final String KEY_BASE_HEAT = "baseHeatCapacity";
+    private static final String KEY_BASE_CHARGE = "baseMaxCharge";
+
     private static final String TAG_FUEL = "maxFuel";
     private static final String TAG_HEAT = "heatCapacity";
+    private static final String TAG_COMBO = "comboBonus";
 
     public ModCapacity() {
         super("capacity_heatraygun", 0xCC5533, MAX_LEVEL, POINTS_PER_LEVEL);
@@ -34,7 +39,8 @@ public class ModCapacity extends ModifierTrait {
     @Override
     public boolean canApplyCustom(ItemStack stack) {
         return stack.getItem() instanceof HeatRayGun
-                || stack.getItem() instanceof PistolSword;
+                || stack.getItem() instanceof PistolSword
+                || stack.getItem() instanceof ChainBlade;
     }
 
     @Override
@@ -45,6 +51,8 @@ public class ModCapacity extends ModifierTrait {
             applyHeatRayGun(toolTag, modData.current);
         } else if (toolTag.hasKey(PistolSword.KEY_MAX_AMMO)) {
             applyPistolSword(toolTag, modData.current);
+        } else if (toolTag.hasKey(TAG_COMBO)) {
+            applyChainBlade(toolTag, modData.current);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }
@@ -75,5 +83,17 @@ public class ModCapacity extends ModifierTrait {
         }
         int levels = points / POINTS_PER_LEVEL;
         toolTag.setInteger(PistolSword.KEY_MAX_AMMO, base + levels * AMMO_PER_LEVEL);
+    }
+
+    private void applyChainBlade(NBTTagCompound toolTag, int points) {
+        int base = toolTag.getInteger(KEY_BASE_CHARGE);
+        if (base == 0) {
+            base = toolTag.hasKey(ChainBlade.KEY_MAX_CHARGE)
+                    ? toolTag.getInteger(ChainBlade.KEY_MAX_CHARGE)
+                    : ChainBlade.MAX_CHARGE;
+            toolTag.setInteger(KEY_BASE_CHARGE, base);
+        }
+        int levels = points / POINTS_PER_LEVEL;
+        toolTag.setInteger(ChainBlade.KEY_MAX_CHARGE, base + levels * CHARGE_PER_LEVEL);
     }
 }

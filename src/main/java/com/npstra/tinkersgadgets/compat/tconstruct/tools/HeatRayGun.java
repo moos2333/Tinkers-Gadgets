@@ -73,14 +73,6 @@ public class HeatRayGun extends TinkerToolCore {
         int chargeTicks = toolTag.hasKey("chargeTime") ? toolTag.getInteger("chargeTime") : 30;
         int fuel = itemTag.hasKey("Fuel") ? itemTag.getInteger("Fuel") : 0;
         int shots = itemTag.hasKey("ShotCount") ? itemTag.getInteger("ShotCount") : 0;
-        if (!itemTag.hasKey("Fuel")) {
-            itemTag.setInteger("Fuel", 0);
-            stack.setTagCompound(itemTag);
-        }
-        if (!itemTag.hasKey("ShotCount")) {
-            itemTag.setInteger("ShotCount", 0);
-            stack.setTagCompound(itemTag);
-        }
 
         int effPercent = (int)(efficiency * 100);
         String effColor = effPercent >= 100 ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
@@ -116,14 +108,6 @@ public class HeatRayGun extends TinkerToolCore {
         int threshold = toolTag.hasKey("heatCapacity") ? toolTag.getInteger("heatCapacity") : 10;
         int fuel = itemTag.hasKey("Fuel") ? itemTag.getInteger("Fuel") : 0;
         int shots = itemTag.hasKey("ShotCount") ? itemTag.getInteger("ShotCount") : 0;
-        if (!itemTag.hasKey("Fuel")) {
-            itemTag.setInteger("Fuel", 0);
-            stack.setTagCompound(itemTag);
-        }
-        if (!itemTag.hasKey("ShotCount")) {
-            itemTag.setInteger("ShotCount", 0);
-            stack.setTagCompound(itemTag);
-        }
         tooltip.add(Util.translateFormatted("stat.heat_ray_gun.fuel",
                 TextFormatting.GOLD + String.valueOf(fuel) + TextFormatting.RESET,
                 TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET));
@@ -305,7 +289,7 @@ public class HeatRayGun extends TinkerToolCore {
         EntityLivingBase hitEntity = null;
         AxisAlignedBB checkBox = new AxisAlignedBB(eyePos, rayEnd).grow(0.5);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, checkBox,
-                e -> e != player && e instanceof EntityLivingBase);
+                e -> e != player);
         if (!targets.isEmpty()) {
             targets.sort((a, b) -> Double.compare(a.getDistance(player), b.getDistance(player)));
             for (EntityLivingBase target : targets) {
