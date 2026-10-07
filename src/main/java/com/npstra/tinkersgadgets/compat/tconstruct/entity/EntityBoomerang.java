@@ -1,38 +1,26 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 
-import com.google.common.collect.Multimap;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.tools.ToolCore;
-import slimeknights.tconstruct.library.tools.ranged.ILauncher;
-import slimeknights.tconstruct.library.tools.ranged.IProjectile;
+import slimeknights.tconstruct.library.traits.IProjectileTrait;
 import slimeknights.tconstruct.library.utils.TagUtil;
-import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
-import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitBouncing;
+import com.npstra.tinkersgadgets.compat.tconstruct.traits.IBoomerangTrait;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nullable;
@@ -58,8 +46,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final double RETURN_DIST_THRESHOLD = 1.2D;
     private static final double STUCK_SPEED_THRESHOLD = 0.1D;
     private static final double STUCK_DIST_THRESHOLD = 2.0D;
-    private static final double DEFLECT_MULTIPLIER_XZ = -1.5D;
-    private static final double DEFLECT_MULTIPLIER_Y = -0.5D;
     private static final float SPLIT_DAMAGE_RATIO = 0.5f;
 
     private boolean returning;
@@ -72,15 +58,12 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private boolean piercing;
     private int pierceCount;
-    private boolean bouncing;
     private int bounceCount;
     private int initialBounceCount;
-    private boolean returnDamageEnabled;
     private final Set<UUID> hitEntities = new HashSet<>();
-    private boolean interactEnabled;
     private boolean interactUsed;
-    private boolean deflectProjectiles;
-    private boolean shatterEnabled;
+
+    private List<IBoomerangTrait> boomerangTraits;
 
     public EntityBoomerang(World world) {
         super(world);
@@ -96,19 +79,49 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void setAssociatedPlayer(EntityPlayer player) { associatedPlayer = player; }
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
-    public void setBouncing(boolean bouncing) { this.bouncing = bouncing; }
     public void setBounceCount(int count) {
         this.bounceCount = count;
         this.initialBounceCount = count;
     }
-    public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
-    public void setInteract(boolean enabled) { this.interactEnabled = enabled; }
-    public void setDeflectProjectiles(boolean enabled) { this.deflectProjectiles = enabled; }
-    public void setShatter(boolean shatter) { this.shatterEnabled = shatter; }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
-    public boolean isBouncing() { return this.bouncing; }
     public int getBounceCount() { return this.bounceCount; }
+    public int getInitialBounceCount() { return this.initialBounceCount; }
+    public void decrementBounceCount() { this.bounceCount--; }
+    public void resetBounceDistance() { this.totalDistanceTraveled = 0.0D; }
+    public void resetStuckTicks() { this.stuckTicks = 0; }
+    public boolean isReturning() { return this.returning; }
+    public boolean isPiercing() { return this.piercing; }
+    public int getPierceCount() { return this.pierceCount; }
+    public void decrementPierceCount() { this.pierceCount--; }
+    public boolean hasInteracted() { return this.interactUsed; }
+    public void markInteracted() { this.interactUsed = true; }
+    public EntityPlayer getShooterPlayer() {
+        return shootingEntity instanceof EntityPlayer ? (EntityPlayer) shootingEntity : null;
+    }
+    public EntityLivingBase getShooterLiving() {
+        return shootingEntity instanceof EntityLivingBase ? (EntityLivingBase) shootingEntity : null;
+    }
+    public boolean hasHitEntity(Entity entity) {
+        return hitEntities.contains(entity.getUniqueID());
+    }
+    public void markHitEntity(Entity entity) {
+        hitEntities.add(entity.getUniqueID());
+    }
+
+    private List<IBoomerangTrait> getBoomerangTraits() {
+        if (boomerangTraits == null) {
+            List<IBoomerangTrait> list = new ArrayList<>();
+            for (IProjectileTrait trait : tinkerProjectile.getProjectileTraits()) {
+                if (trait instanceof IBoomerangTrait) {
+                    list.add((IBoomerangTrait) trait);
+                }
+            }
+            list.sort(Comparator.comparingInt(IBoomerangTrait::getBoomerangPriority));
+            boomerangTraits = list;
+        }
+        return boomerangTraits;
+    }
 
     private void beginReturn() {
         if (returning) return;
@@ -183,18 +196,19 @@ public class EntityBoomerang extends EntityProjectileBase {
         Vec3d[] directions = new Vec3d[]{right, left};
         Vec3d spawnPos = target.getPositionVector().add(forward.scale(1.5D)).add(0, target.height * 0.5, 0);
         float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * SPLIT_DAMAGE_RATIO);
+        List<IBoomerangTrait> traits = getBoomerangTraits();
         for (int i = 0; i < 2; i++) {
             EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
-            shard.setPiercing(this.piercing);
-            shard.setPierceCount(this.pierceCount);
-            shard.setReturnDamageEnabled(this.returnDamageEnabled);
             shard.setPosition(spawnPos.x, spawnPos.y, spawnPos.z);
             shard.motionX = directions[i].x * speed;
             shard.motionY = directions[i].y * speed;
             shard.motionZ = directions[i].z * speed;
             shard.rotationYaw = (float) (MathHelper.atan2(directions[i].z, directions[i].x) * (180D / Math.PI)) - 90.0F;
             shard.rotationPitch = (float) (-MathHelper.atan2(directions[i].y, MathHelper.sqrt(directions[i].x * directions[i].x + directions[i].z * directions[i].z)) * (180D / Math.PI));
+            for (IBoomerangTrait trait : traits) {
+                trait.onBoomerangShardCreated(this, shard);
+            }
             world.spawnEntity(shard);
             Boomerang.addActiveBoomerang(this.toolId, shard);
         }
@@ -222,8 +236,8 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (world.isRemote) return;
 
-        if (deflectProjectiles && !returning) {
-            deflectNearbyProjectiles();
+        for (IBoomerangTrait trait : getBoomerangTraits()) {
+            trait.onBoomerangUpdate(this, world);
         }
 
         double maxDistance = MAX_DISTANCE_BASE * Math.min(1.0D, initialSpeed / 1.8D);
@@ -242,7 +256,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         }
 
         if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
-            if (returnDamageEnabled) checkReturnHit();
             returnToShooter();
             double dist = getDistance(shootingEntity);
             double speed = getCurrentSpeed();
@@ -255,69 +268,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         }
 
         if (ticksExisted > MAX_ALIVE) setDead();
-    }
-
-    private void deflectNearbyProjectiles() {
-        AxisAlignedBB box = getEntityBoundingBox().grow(1.5D);
-        List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, box);
-        for (Entity entity : list) {
-            if (entity instanceof EntityArrow || entity instanceof EntityFireball || entity instanceof EntityThrowable || entity instanceof EntityProjectileBase) {
-                entity.motionX *= DEFLECT_MULTIPLIER_XZ;
-                entity.motionY *= DEFLECT_MULTIPLIER_Y;
-                entity.motionZ *= DEFLECT_MULTIPLIER_XZ;
-                entity.velocityChanged = true;
-            }
-        }
-    }
-
-    private void checkReturnHit() {
-        if (!(shootingEntity instanceof EntityLivingBase)) return;
-        EntityLivingBase attacker = (EntityLivingBase) shootingEntity;
-        ItemStack stack = tinkerProjectile.getItemStack();
-        if (stack.isEmpty() || !(stack.getItem() instanceof ToolCore)) return;
-
-        AxisAlignedBB box = getEntityBoundingBox().grow(0.5D);
-        List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, box);
-        List<EntityLivingBase> targets = new ArrayList<>(entities.size());
-        for (Entity entity : entities) {
-            if (entity instanceof EntityLivingBase && entity != attacker && !hitEntities.contains(entity.getUniqueID())) {
-                targets.add((EntityLivingBase) entity);
-            }
-        }
-        if (targets.isEmpty()) return;
-
-        ItemStack mainhand = attacker.getHeldItemMainhand();
-        ItemStack offhand = attacker.getHeldItemOffhand();
-        Multimap<String, AttributeModifier> mainhandMods = mainhand.isEmpty() ? null : mainhand.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
-        Multimap<String, AttributeModifier> offhandMods = offhand.isEmpty() ? null : offhand.getAttributeModifiers(EntityEquipmentSlot.OFFHAND);
-        if (mainhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(mainhandMods);
-        if (offhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(offhandMods);
-
-        Multimap<String, AttributeModifier> projectileMods;
-        if (stack.getItem() instanceof IProjectile) {
-            projectileMods = ((IProjectile) stack.getItem()).getProjectileAttributeModifier(stack);
-        } else {
-            projectileMods = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
-        }
-        ItemStack launcher = tinkerProjectile.getLaunchingStack();
-        if (launcher.getItem() instanceof ILauncher) {
-            ((ILauncher) launcher.getItem()).modifyProjectileAttributes(projectileMods, launcher, stack, tinkerProjectile.getPower());
-        }
-        projectileMods.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-                new AttributeModifier(PROJECTILE_POWER_MODIFIER, "Weapon damage multiplier",
-                        (double) (tinkerProjectile.getPower() - 1.0F), 2));
-        attacker.getAttributeMap().applyAttributeModifiers(projectileMods);
-
-        try {
-            for (EntityLivingBase target : targets) {
-                ToolHelper.attackEntity(stack, (ToolCore) stack.getItem(), attacker, target, this);
-                hitEntities.add(target.getUniqueID());
-            }
-        } finally {
-            attacker.getAttributeMap().removeAttributeModifiers(projectileMods);
-            if (mainhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(mainhandMods);
-            if (offhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(offhandMods);
-        }
     }
 
     private void returnToShooter() {
@@ -353,27 +303,8 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
-        if (!world.isRemote && interactEnabled && !interactUsed && !returning && raytraceResult.sideHit != null && shootingEntity instanceof EntityPlayer) {
-            BlockPos pos = raytraceResult.getBlockPos();
-            IBlockState state = world.getBlockState(pos);
-            if (!state.getBlock().isAir(state, world, pos)) {
-                state.getBlock().onBlockActivated(world, pos, state, (EntityPlayer) shootingEntity,
-                        EnumHand.MAIN_HAND, raytraceResult.sideHit,
-                        (float) raytraceResult.hitVec.x - pos.getX(),
-                        (float) raytraceResult.hitVec.y - pos.getY(),
-                        (float) raytraceResult.hitVec.z - pos.getZ());
-                interactUsed = true;
-            }
-        }
-        if (!world.isRemote && shatterEnabled && !returning && raytraceResult.sideHit != null) {
-            BlockPos pos = raytraceResult.getBlockPos();
-            IBlockState state = world.getBlockState(pos);
-            float hardness = state.getBlockHardness(world, pos);
-            if (hardness >= 0.0F && hardness <= 2.0F) {
-                world.destroyBlock(pos, true);
-                setDead();
-                return;
-            }
+        for (IBoomerangTrait trait : getBoomerangTraits()) {
+            if (trait.onBoomerangHitBlock(this, raytraceResult)) return;
         }
         beginReturn();
     }
@@ -381,17 +312,12 @@ public class EntityBoomerang extends EntityProjectileBase {
     @Override
     public void onHitEntity(RayTraceResult raytraceResult) {
         Entity entityHit = raytraceResult.entityHit;
-        if (deflectProjectiles && !returning) {
-            if (entityHit instanceof EntityArrow || entityHit instanceof EntityFireball || entityHit instanceof EntityThrowable || entityHit instanceof EntityProjectileBase) {
-                entityHit.motionX *= DEFLECT_MULTIPLIER_XZ;
-                entityHit.motionY *= DEFLECT_MULTIPLIER_Y;
-                entityHit.motionZ *= DEFLECT_MULTIPLIER_XZ;
-                entityHit.velocityChanged = true;
-                return;
-            }
+
+        for (IBoomerangTrait trait : getBoomerangTraits()) {
+            if (trait.onBoomerangHitEntity(this, entityHit)) return;
         }
 
-        boolean allowRehit = bouncing && bounceCount > 0;
+        boolean allowRehit = bounceCount > 0;
         if (!allowRehit && hitEntities.contains(entityHit.getUniqueID())) return;
 
         hitEntities.add(entityHit.getUniqueID());
@@ -399,47 +325,11 @@ public class EntityBoomerang extends EntityProjectileBase {
             entityHit.hurtResistantTime = 0;
         }
 
-        if (bouncing) {
-            int count = initialBounceCount - bounceCount;
-            float mult = Math.max(0.0F, 1.0F - 0.25F * count);
-            TraitBouncing.setDamageMult(entityHit.getUniqueID(), mult);
-        }
-
         Vec3d savedMotion = new Vec3d(motionX, motionY, motionZ);
         super.onHitEntity(raytraceResult);
 
-        if (piercing && !returning) {
-            motionX = savedMotion.x;
-            motionY = savedMotion.y;
-            motionZ = savedMotion.z;
-        }
-
-        ItemStack toolStack = tinkerProjectile.getItemStack();
-        NBTTagCompound toolTag = TagUtil.getToolTag(toolStack);
-        boolean hasFracture = TinkerUtil.hasTrait(toolTag, "fracture");
-
-        if (!split && !returning && hasFracture && entityHit instanceof EntityLivingBase) {
-            split((EntityLivingBase) entityHit);
-            return;
-        }
-
-        if (piercing && !returning) {
-            pierceCount--;
-            inGround = false;
-            arrowShake = 0;
-            ticksInGround = 0;
-            return;
-        }
-
-        if (bouncing && bounceCount > 0) {
-            EntityLivingBase nextTarget = findNextBounceTarget(entityHit);
-            if (nextTarget != null) {
-                bounceCount--;
-                totalDistanceTraveled = 0.0D;
-                redirectToTarget(nextTarget);
-                this.stuckTicks = 0;
-                return;
-            }
+        for (IBoomerangTrait trait : getBoomerangTraits()) {
+            if (trait.onBoomerangAfterHitEntity(this, entityHit, savedMotion)) return;
         }
 
         beginReturn();
@@ -483,7 +373,7 @@ public class EntityBoomerang extends EntityProjectileBase {
                 .orElse(null);
     }
 
-    private void redirectToTarget(Entity target) {
+    public void redirectToTarget(Entity target) {
         double dx = target.posX - posX;
         double dy = (target.posY + target.height / 2) - posY;
         double dz = target.posZ - posZ;
@@ -527,11 +417,8 @@ public class EntityBoomerang extends EntityProjectileBase {
         data.writeBoolean(returning);
         data.writeBoolean(piercing);
         data.writeInt(pierceCount);
-        data.writeBoolean(bouncing);
         data.writeInt(bounceCount);
-        data.writeBoolean(returnDamageEnabled);
         data.writeBoolean(split);
-        data.writeBoolean(shatterEnabled);
         data.writeDouble(totalDistanceTraveled);
         data.writeDouble(initialSpeed);
     }
@@ -542,11 +429,8 @@ public class EntityBoomerang extends EntityProjectileBase {
         returning = data.readBoolean();
         piercing = data.readBoolean();
         pierceCount = data.readInt();
-        bouncing = data.readBoolean();
         bounceCount = data.readInt();
-        returnDamageEnabled = data.readBoolean();
         split = data.readBoolean();
-        shatterEnabled = data.readBoolean();
         totalDistanceTraveled = data.readDouble();
         initialSpeed = data.readDouble();
     }

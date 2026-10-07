@@ -17,6 +17,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import slimeknights.tconstruct.library.materials.HeadMaterialStats;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.materials.MaterialTypes;
 import slimeknights.tconstruct.library.tinkering.Category;
@@ -127,12 +128,14 @@ public class Boomerang extends ProjectileCore {
     @Override
     public ProjectileNBT buildTagData(List<Material> materials) {
         ProjectileNBT data = new ProjectileNBT();
-        data.head(materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD),
-                materials.get(2).getStatsOrUnknown(MaterialTypes.HEAD));
+        HeadMaterialStats head0 = materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD);
+        HeadMaterialStats head2 = materials.get(2).getStatsOrUnknown(MaterialTypes.HEAD);
+        data.head(head0, head2);
         data.extra(materials.get(0).getStatsOrUnknown(MaterialTypes.EXTRA),
                 materials.get(1).getStatsOrUnknown(MaterialTypes.EXTRA),
                 materials.get(2).getStatsOrUnknown(MaterialTypes.EXTRA));
         data.accuracy = 0.95f;
+        data.harvestLevel = Math.max(head0.harvestLevel, head2.harvestLevel);
         return data;
     }
 
