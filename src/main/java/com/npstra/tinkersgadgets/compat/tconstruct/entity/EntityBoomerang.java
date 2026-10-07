@@ -1,15 +1,19 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 
+import com.google.common.collect.Multimap;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -21,15 +25,18 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
+import slimeknights.tconstruct.library.tools.ToolCore;
+import slimeknights.tconstruct.library.tools.ranged.ILauncher;
+import slimeknights.tconstruct.library.tools.ranged.IProjectile;
 import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
-import slimeknights.tconstruct.library.tools.ToolCore;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitBouncing;
 import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +110,15 @@ public class EntityBoomerang extends EntityProjectileBase {
     public boolean isBouncing() { return this.bouncing; }
     public int getBounceCount() { return this.bounceCount; }
 
+    private void beginReturn() {
+        if (returning) return;
+        hitEntities.clear();
+        returning = true;
+        inGround = false;
+        arrowShake = 0;
+        ticksInGround = 0;
+    }
+
     private double getCurrentSpeed() {
         return Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
     }
@@ -118,7 +134,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         if (materialsTagList.tagCount() == 0) {
             materialsTagList = TagUtil.getBaseMaterialsTagList(root);
         }
-        List<String> ids = new java.util.ArrayList<>();
+        List<String> ids = new ArrayList<>();
         for (int i = 0; i < materialsTagList.tagCount(); i++) {
             String id = materialsTagList.getStringTagAt(i);
             if (id != null && !id.isEmpty()) ids.add(id);
@@ -215,7 +231,7 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (!returning) {
             if (totalDistanceTraveled >= maxDistance) {
-                returning = true;
+                beginReturn();
             } else if (totalDistanceTraveled > slowStartDistance) {
                 double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
                 double speedMultiplier = 1.0D - progress * (1.0D - MIN_SPEED_FACTOR);
@@ -255,16 +271,52 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     private void checkReturnHit() {
+        if (!(shootingEntity instanceof EntityLivingBase)) return;
+        EntityLivingBase attacker = (EntityLivingBase) shootingEntity;
+        ItemStack stack = tinkerProjectile.getItemStack();
+        if (stack.isEmpty() || !(stack.getItem() instanceof ToolCore)) return;
+
         AxisAlignedBB box = getEntityBoundingBox().grow(0.5D);
         List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, box);
+        List<EntityLivingBase> targets = new ArrayList<>(entities.size());
         for (Entity entity : entities) {
-            if (entity instanceof EntityLivingBase && entity != shootingEntity && !hitEntities.contains(entity.getUniqueID())) {
-                ItemStack stack = tinkerProjectile.getItemStack();
-                if (!stack.isEmpty() && stack.getItem() instanceof ToolCore) {
-                    ToolHelper.attackEntity(stack, (ToolCore) stack.getItem(), (EntityLivingBase) shootingEntity, entity, this);
-                    hitEntities.add(entity.getUniqueID());
-                }
+            if (entity instanceof EntityLivingBase && entity != attacker && !hitEntities.contains(entity.getUniqueID())) {
+                targets.add((EntityLivingBase) entity);
             }
+        }
+        if (targets.isEmpty()) return;
+
+        ItemStack mainhand = attacker.getHeldItemMainhand();
+        ItemStack offhand = attacker.getHeldItemOffhand();
+        Multimap<String, AttributeModifier> mainhandMods = mainhand.isEmpty() ? null : mainhand.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+        Multimap<String, AttributeModifier> offhandMods = offhand.isEmpty() ? null : offhand.getAttributeModifiers(EntityEquipmentSlot.OFFHAND);
+        if (mainhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(mainhandMods);
+        if (offhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(offhandMods);
+
+        Multimap<String, AttributeModifier> projectileMods;
+        if (stack.getItem() instanceof IProjectile) {
+            projectileMods = ((IProjectile) stack.getItem()).getProjectileAttributeModifier(stack);
+        } else {
+            projectileMods = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+        }
+        ItemStack launcher = tinkerProjectile.getLaunchingStack();
+        if (launcher.getItem() instanceof ILauncher) {
+            ((ILauncher) launcher.getItem()).modifyProjectileAttributes(projectileMods, launcher, stack, tinkerProjectile.getPower());
+        }
+        projectileMods.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+                new AttributeModifier(PROJECTILE_POWER_MODIFIER, "Weapon damage multiplier",
+                        (double) (tinkerProjectile.getPower() - 1.0F), 2));
+        attacker.getAttributeMap().applyAttributeModifiers(projectileMods);
+
+        try {
+            for (EntityLivingBase target : targets) {
+                ToolHelper.attackEntity(stack, (ToolCore) stack.getItem(), attacker, target, this);
+                hitEntities.add(target.getUniqueID());
+            }
+        } finally {
+            attacker.getAttributeMap().removeAttributeModifiers(projectileMods);
+            if (mainhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(mainhandMods);
+            if (offhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(offhandMods);
         }
     }
 
@@ -323,10 +375,7 @@ public class EntityBoomerang extends EntityProjectileBase {
                 return;
             }
         }
-        returning = true;
-        inGround = false;
-        arrowShake = 0;
-        ticksInGround = 0;
+        beginReturn();
     }
 
     @Override
@@ -393,7 +442,7 @@ public class EntityBoomerang extends EntityProjectileBase {
             }
         }
 
-        returning = true;
+        beginReturn();
         redirectSpeedToShooter();
     }
 
@@ -412,9 +461,6 @@ public class EntityBoomerang extends EntityProjectileBase {
             }
         }
         stuckTicks = 0;
-        inGround = false;
-        arrowShake = 0;
-        ticksInGround = 0;
     }
 
     public EntityLivingBase findNextBounceTarget(Entity currentHit) {

@@ -1,10 +1,14 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.entity;
 
+import com.google.common.collect.Multimap;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
@@ -15,6 +19,8 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.tools.ToolCore;
+import slimeknights.tconstruct.library.tools.ranged.ILauncher;
+import slimeknights.tconstruct.library.tools.ranged.IProjectile;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 
@@ -91,6 +97,39 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         return new Vec3d(shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ);
     }
 
+    private void hitWithProjectileAttributes(EntityLivingBase attacker, EntityLivingBase target) {
+        if (damageStack.isEmpty() || !(damageStack.getItem() instanceof ToolCore)) return;
+        ItemStack mainhand = attacker.getHeldItemMainhand();
+        ItemStack offhand = attacker.getHeldItemOffhand();
+        Multimap<String, AttributeModifier> mainhandMods = mainhand.isEmpty() ? null : mainhand.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+        Multimap<String, AttributeModifier> offhandMods = offhand.isEmpty() ? null : offhand.getAttributeModifiers(EntityEquipmentSlot.OFFHAND);
+        if (mainhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(mainhandMods);
+        if (offhandMods != null) attacker.getAttributeMap().removeAttributeModifiers(offhandMods);
+
+        Multimap<String, AttributeModifier> projectileMods;
+        if (damageStack.getItem() instanceof IProjectile) {
+            projectileMods = ((IProjectile) damageStack.getItem()).getProjectileAttributeModifier(damageStack);
+        } else {
+            projectileMods = damageStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+        }
+        ItemStack launcher = tinkerProjectile.getLaunchingStack();
+        if (!launcher.isEmpty() && launcher.getItem() instanceof ILauncher) {
+            ((ILauncher) launcher.getItem()).modifyProjectileAttributes(projectileMods, launcher, damageStack, tinkerProjectile.getPower());
+        }
+        projectileMods.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+                new AttributeModifier(PROJECTILE_POWER_MODIFIER, "Weapon damage multiplier",
+                        (double) (tinkerProjectile.getPower() - 1.0F), 2));
+        attacker.getAttributeMap().applyAttributeModifiers(projectileMods);
+
+        try {
+            ToolHelper.attackEntity(damageStack, (ToolCore) damageStack.getItem(), attacker, target, this);
+        } finally {
+            attacker.getAttributeMap().removeAttributeModifiers(projectileMods);
+            if (mainhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(mainhandMods);
+            if (offhandMods != null) attacker.getAttributeMap().applyAttributeModifiers(offhandMods);
+        }
+    }
+
     @Override
     protected void init() {
         bounceOnNoDamage = false;
@@ -160,14 +199,15 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     }
 
     private void checkReturnHit() {
+        if (!(shootingEntity instanceof EntityLivingBase)) return;
+        EntityLivingBase attacker = (EntityLivingBase) shootingEntity;
+        if (damageStack.isEmpty() || !(damageStack.getItem() instanceof ToolCore)) return;
         AxisAlignedBB box = getEntityBoundingBox().grow(0.5D);
         List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, box);
         for (Entity entity : entities) {
-            if (entity instanceof EntityLivingBase && entity != shootingEntity && !hitEntities.contains(entity.getUniqueID())) {
-                if (!damageStack.isEmpty() && damageStack.getItem() instanceof ToolCore) {
-                    ToolHelper.attackEntity(damageStack, (ToolCore) damageStack.getItem(), (EntityLivingBase) shootingEntity, entity, this);
-                    hitEntities.add(entity.getUniqueID());
-                }
+            if (entity instanceof EntityLivingBase && entity != attacker && !hitEntities.contains(entity.getUniqueID())) {
+                hitWithProjectileAttributes(attacker, (EntityLivingBase) entity);
+                hitEntities.add(entity.getUniqueID());
             }
         }
     }
@@ -227,10 +267,8 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         if (hitEntities.contains(entityHit.getUniqueID())) return;
         hitEntities.add(entityHit.getUniqueID());
 
-        if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
-            if (!damageStack.isEmpty() && damageStack.getItem() instanceof ToolCore) {
-                ToolHelper.attackEntity(damageStack, (ToolCore) damageStack.getItem(), (EntityLivingBase) shootingEntity, entityHit, this);
-            }
+        if (!world.isRemote && shootingEntity instanceof EntityLivingBase && entityHit instanceof EntityLivingBase) {
+            hitWithProjectileAttributes((EntityLivingBase) shootingEntity, (EntityLivingBase) entityHit);
         }
 
         if (piercing && pierceCount > 0) {
