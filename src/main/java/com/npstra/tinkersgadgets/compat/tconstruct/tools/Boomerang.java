@@ -32,6 +32,8 @@ import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
 
 public class Boomerang extends ProjectileCore {
 
+    public static final String KEY_MAX_ACTIVE = "maxActiveBoomerangs";
+
     private static final Map<String, Set<Entity>> activeBoomerangs = new WeakHashMap<>();
 
     public Boomerang() {
@@ -90,10 +92,11 @@ public class Boomerang extends ProjectileCore {
         }
         if (!worldIn.isRemote) {
             String toolId = getToolId(stack);
+            int maxActive = getMaxActive(stack);
             Set<Entity> set = activeBoomerangs.get(toolId);
             if (set != null) {
                 set.removeIf(e -> !e.isEntityAlive());
-                if (!set.isEmpty()) {
+                if (set.size() >= maxActive) {
                     return;
                 }
             }
@@ -127,6 +130,11 @@ public class Boomerang extends ProjectileCore {
     private int getCooldown(ItemStack stack) {
         float reduction = getRapidBonus(stack);
         return Math.max(1, Math.round(5.0F * (1.0f - reduction)));
+    }
+
+    private int getMaxActive(ItemStack stack) {
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        return toolTag.hasKey(KEY_MAX_ACTIVE) ? toolTag.getInteger(KEY_MAX_ACTIVE) : 1;
     }
 
     @Override

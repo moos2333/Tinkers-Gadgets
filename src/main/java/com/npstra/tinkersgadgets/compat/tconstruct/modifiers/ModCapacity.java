@@ -1,5 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.modifiers;
 
+import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.HeatRayGun;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.PistolSword;
@@ -20,11 +21,13 @@ public class ModCapacity extends ModifierTrait {
     private static final int AMMO_PER_LEVEL = 1;
     private static final int HEAT_PER_LEVEL = 1;
     private static final int CHARGE_PER_LEVEL = 10;
+    private static final int BOOMERANG_PER_LEVEL = 1;
 
     private static final String KEY_BASE_FUEL = "baseMaxFuel";
     private static final String KEY_BASE_AMMO = "baseMaxAmmo";
     private static final String KEY_BASE_HEAT = "baseHeatCapacity";
     private static final String KEY_BASE_CHARGE = "baseMaxCharge";
+    private static final String KEY_BASE_BOOMERANG = "baseMaxActiveBoomerangs";
 
     private static final String TAG_FUEL = "maxFuel";
     private static final String TAG_HEAT = "heatCapacity";
@@ -40,7 +43,8 @@ public class ModCapacity extends ModifierTrait {
     public boolean canApplyCustom(ItemStack stack) {
         return stack.getItem() instanceof HeatRayGun
                 || stack.getItem() instanceof PistolSword
-                || stack.getItem() instanceof ChainBlade;
+                || stack.getItem() instanceof ChainBlade
+                || stack.getItem() instanceof Boomerang;
     }
 
     @Override
@@ -53,6 +57,8 @@ public class ModCapacity extends ModifierTrait {
             applyPistolSword(toolTag, modData.current);
         } else if (toolTag.hasKey(TAG_COMBO)) {
             applyChainBlade(toolTag, modData.current);
+        } else {
+            applyBoomerang(toolTag, modData.current);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }
@@ -95,5 +101,17 @@ public class ModCapacity extends ModifierTrait {
         }
         int levels = points / POINTS_PER_LEVEL;
         toolTag.setInteger(ChainBlade.KEY_MAX_CHARGE, base + levels * CHARGE_PER_LEVEL);
+    }
+
+    private void applyBoomerang(NBTTagCompound toolTag, int points) {
+        int base;
+        if (toolTag.hasKey(KEY_BASE_BOOMERANG)) {
+            base = toolTag.getInteger(KEY_BASE_BOOMERANG);
+        } else {
+            base = 1;
+            toolTag.setInteger(KEY_BASE_BOOMERANG, base);
+        }
+        int levels = points / POINTS_PER_LEVEL;
+        toolTag.setInteger(Boomerang.KEY_MAX_ACTIVE, base + levels * BOOMERANG_PER_LEVEL);
     }
 }
