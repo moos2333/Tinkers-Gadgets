@@ -125,9 +125,8 @@ public class Boomerang extends ProjectileCore {
     }
 
     private int getCooldown(ItemStack stack) {
-        double base = 20.0D / ToolHelper.getActualAttackSpeed(stack);
-        double reduction = getRapidBonus(stack);
-        return Math.max(5, (int) (base * (1.0D - reduction)));
+        float reduction = getRapidBonus(stack);
+        return Math.max(1, Math.round(5.0F * (1.0f - reduction)));
     }
 
     @Override
