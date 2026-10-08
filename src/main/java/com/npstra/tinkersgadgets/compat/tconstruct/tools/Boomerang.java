@@ -107,8 +107,7 @@ public class Boomerang extends ProjectileCore {
             }
             worldIn.spawnEntity(projectile);
             worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, net.minecraft.util.SoundCategory.PLAYERS, 1.0F, 0.8F + worldIn.rand.nextFloat() * 0.4F);
-            int cooldown = Math.max(5, (int)(20.0D / ToolHelper.getActualAttackSpeed(stack)));
-            player.getCooldownTracker().setCooldown(stack.getItem(), cooldown);
+            player.getCooldownTracker().setCooldown(stack.getItem(), getCooldown(stack));
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
             }
@@ -123,6 +122,12 @@ public class Boomerang extends ProjectileCore {
     private int getChargeTime(ItemStack stack) {
         float reduction = getRapidBonus(stack);
         return Math.max(1, Math.round(20.0F * (1.0f - reduction)));
+    }
+
+    private int getCooldown(ItemStack stack) {
+        double base = 20.0D / ToolHelper.getActualAttackSpeed(stack);
+        double reduction = getRapidBonus(stack);
+        return Math.max(5, (int) (base * (1.0D - reduction)));
     }
 
     @Override
