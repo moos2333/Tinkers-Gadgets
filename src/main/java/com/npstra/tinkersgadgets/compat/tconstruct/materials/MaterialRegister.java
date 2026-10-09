@@ -155,11 +155,9 @@ public class MaterialRegister {
         if (isTraitEnabled("collection_boomerang")) {
             shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
         }
-        if (isTraitEnabled("recovery_throwingknife")) {
-            shulkerShell.addTrait(TraitsRegistry.RECOVERY, GripPartType.GRIP);
-        }
         if (isTraitEnabled("sniping_throwingknife")) {
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
+            shulkerShell.addTrait(TraitsRegistry.SNIPING, GripPartType.GRIP);
         }
         if (isTraitEnabled("enderference")) {
             shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);

@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
-import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitRecovery;
 
 public class EntityThrowingKnife extends EntityProjectileBase {
 
@@ -16,7 +15,6 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     public float spin;
     private boolean permanentlyDefused;
-    private boolean recovery;
 
     public EntityThrowingKnife(World world) {
         super(world);
@@ -31,10 +29,6 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     public void setPermanentlyDefused(boolean value) {
         permanentlyDefused = value;
         defused = value;
-    }
-
-    public void setRecovery(boolean recovery) {
-        this.recovery = recovery;
     }
 
     @Override
@@ -67,10 +61,6 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
-        if (recovery) {
-            TraitRecovery.handleBlockHit(this);
-            return;
-        }
         super.onHitBlock(raytraceResult);
     }
 
@@ -89,7 +79,6 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     public void writeSpawnData(ByteBuf data) {
         super.writeSpawnData(data);
         data.writeBoolean(permanentlyDefused);
-        data.writeBoolean(recovery);
     }
 
     @Override
@@ -97,6 +86,5 @@ public class EntityThrowingKnife extends EntityProjectileBase {
         super.readSpawnData(data);
         boolean pd = data.readBoolean();
         setPermanentlyDefused(pd);
-        recovery = data.readBoolean();
     }
 }
