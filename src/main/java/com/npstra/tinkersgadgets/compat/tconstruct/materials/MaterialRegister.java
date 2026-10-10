@@ -267,9 +267,9 @@ public class MaterialRegister {
         if (isTraitEnabled("condensation_heatraygun")) {
             prismarineCrystals.addTrait(TraitsRegistry.CONDENSATION, FuelTankPartType.FUEL_TANK);
         }
-        if (isTraitEnabled("wavebreaker_throwingknife")) {
-            prismarineCrystals.addTrait(TraitsRegistry.WAVEBREAKER, GripPartType.GRIP);
-            prismarineCrystals.addTrait(TraitsRegistry.WAVEBREAKER, GunBarrelPartType.GUN_BARREL);
+        if (isTraitEnabled("vortex_throwingknife")) {
+            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GripPartType.GRIP);
+            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GunBarrelPartType.GUN_BARREL);
         }
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GripMaterialStats());
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GunBarrelMaterialStats(0, 1.05f, 0));
