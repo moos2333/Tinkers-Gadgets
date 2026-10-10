@@ -163,6 +163,7 @@ public class MaterialRegister {
             shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
             shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
             shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
+            shulkerShell.addTrait(TinkerTraits.enderference, GunBarrelPartType.GUN_BARREL);
         }
         TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
         if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
