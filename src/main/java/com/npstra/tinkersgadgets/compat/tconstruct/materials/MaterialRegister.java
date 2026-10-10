@@ -301,7 +301,7 @@ public class MaterialRegister {
             netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
             netherbrick.addTrait(TraitsRegistry.PRESSURIZED, GunBarrelPartType.GUN_BARREL);
         }
-        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.85f, 0));
+        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.8f, 0));
         netherbrick.setVisible();
     }
 
