@@ -251,7 +251,7 @@ public class MaterialRegister {
         TinkerRegistry.addMaterial(wool);
         TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
         TinkerRegistry.addMaterialStats(wool, new ConnectorMaterialStats());
-        wool.addStats(new ChainMaterialStats(3, 2.5f, 0, -0.15f, 0.0f));
+        wool.addStats(new ChainMaterialStats(3, 2.5f, 0, -0.35f, 0.0f));
         wool.setVisible();
     }
 
