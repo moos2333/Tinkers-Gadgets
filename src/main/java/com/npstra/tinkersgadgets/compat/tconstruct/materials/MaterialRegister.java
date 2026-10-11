@@ -129,9 +129,7 @@ public class MaterialRegister {
             netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
             netherQuartz.addTrait(TraitsRegistry.TRAUMA, GunBarrelPartType.GUN_BARREL);
             netherQuartz.addTrait(TraitsRegistry.TRAUMA, ChainPartType.CHAIN);
-        }
-        if (isTraitEnabled("burst_heatraygun")) {
-            netherQuartz.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
+            netherQuartz.addTrait(TraitsRegistry.TRAUMA, FuelTankPartType.FUEL_TANK);
         }
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
