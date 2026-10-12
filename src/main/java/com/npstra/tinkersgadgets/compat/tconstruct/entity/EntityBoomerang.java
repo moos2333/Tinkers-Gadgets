@@ -50,7 +50,7 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private static final String TAG_EFFICIENCY_LEVEL = "efficiency_level";
     private static final int DURABILITY_PER_AMMO = 10;
-    private static final float[] REFUND_CHANCE = {0.0f, 0.20f, 0.45f, 0.75f};
+    private static final float REFUND_CHANCE_PER_LEVEL = 0.25f;
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -304,10 +304,9 @@ public class EntityBoomerang extends EntityProjectileBase {
             stack = player.getHeldItemOffhand();
             if (!(stack.getItem() instanceof Boomerang)) return;
         }
-        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        int level = toolTag.getInteger(TAG_EFFICIENCY_LEVEL);
-        if (level <= 0 || level >= REFUND_CHANCE.length) return;
-        if (rand.nextFloat() >= REFUND_CHANCE[level]) return;
+        int level = TagUtil.getToolTag(stack).getInteger(TAG_EFFICIENCY_LEVEL);
+        if (level <= 0) return;
+        if (rand.nextFloat() >= level * REFUND_CHANCE_PER_LEVEL) return;
         int dmg = stack.getItemDamage();
         if (dmg < DURABILITY_PER_AMMO) return;
         stack.setItemDamage(dmg - DURABILITY_PER_AMMO);
