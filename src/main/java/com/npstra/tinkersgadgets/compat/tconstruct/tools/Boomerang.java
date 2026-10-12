@@ -105,6 +105,7 @@ public class Boomerang extends ProjectileCore {
             if (projectile instanceof EntityBoomerang) {
                 EntityBoomerang boomerang = (EntityBoomerang) projectile;
                 boomerang.setToolId(toolId);
+                boomerang.setConsumedAmmo(usedAmmo);
                 addActiveBoomerang(toolId, boomerang);
                 boomerang.setAssociatedPlayer(player);
             }

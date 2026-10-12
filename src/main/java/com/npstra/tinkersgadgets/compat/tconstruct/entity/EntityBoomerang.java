@@ -49,7 +49,8 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final float SPLIT_DAMAGE_RATIO = 0.5f;
 
     private static final String TAG_EFFICIENCY_LEVEL = "efficiency_level";
-    private static final float AMMO_REFUND_CHANCE_PER_LEVEL = 0.20f;
+    private static final int DURABILITY_PER_AMMO = 10;
+    private static final float[] REFUND_CHANCE = {0.0f, 0.20f, 0.45f, 0.75f};
 
     private boolean returning;
     private EntityPlayer associatedPlayer;
@@ -58,6 +59,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private double initialSpeed;
     private int stuckTicks;
     private String toolId = "";
+    private boolean consumedAmmo;
 
     private boolean piercing;
     private int pierceCount;
@@ -88,6 +90,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
     public boolean hasSplit() { return split; }
     public void setToolId(String id) { this.toolId = id; }
+    public void setConsumedAmmo(boolean value) { this.consumedAmmo = value; }
     public int getBounceCount() { return this.bounceCount; }
     public int getInitialBounceCount() { return this.initialBounceCount; }
     public void decrementBounceCount() { this.bounceCount--; }
@@ -295,6 +298,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     private void tryRefundAmmo(EntityPlayer player) {
+        if (!consumedAmmo) return;
         ItemStack stack = player.getHeldItemMainhand();
         if (!(stack.getItem() instanceof Boomerang)) {
             stack = player.getHeldItemOffhand();
@@ -302,11 +306,11 @@ public class EntityBoomerang extends EntityProjectileBase {
         }
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);
         int level = toolTag.getInteger(TAG_EFFICIENCY_LEVEL);
-        if (level <= 0) return;
-        if (rand.nextFloat() >= level * AMMO_REFUND_CHANCE_PER_LEVEL) return;
+        if (level <= 0 || level >= REFUND_CHANCE.length) return;
+        if (rand.nextFloat() >= REFUND_CHANCE[level]) return;
         int dmg = stack.getItemDamage();
-        if (dmg <= 0) return;
-        stack.setItemDamage(dmg - 1);
+        if (dmg < DURABILITY_PER_AMMO) return;
+        stack.setItemDamage(dmg - DURABILITY_PER_AMMO);
     }
 
     @Override
