@@ -329,6 +329,10 @@ public class MaterialRegister {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
                 iron.addTrait(TraitsRegistry.INERTIA, ConnectorPartType.CONNECTOR);
             }
+            if (isTraitEnabled("anchor_chainblade")) {
+                iron.addTrait(TraitsRegistry.ANCHOR, ChainPartType.CHAIN);
+                iron.addTrait(TraitsRegistry.ANCHOR, GunBarrelPartType.GUN_BARREL);
+            }
         }
 
         Material stone = TinkerRegistry.getMaterial("stone");
@@ -371,6 +375,9 @@ public class MaterialRegister {
                 cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
                 cobalt.addTrait(TraitsRegistry.KINETIC, GripPartType.GRIP);
                 cobalt.addTrait(TraitsRegistry.KINETIC, GunBarrelPartType.GUN_BARREL);
+            }
+            if (isTraitEnabled("ebb_chainblade")) {
+                cobalt.addTrait(TraitsRegistry.EBB, ChainPartType.CHAIN);
             }
         }
 
