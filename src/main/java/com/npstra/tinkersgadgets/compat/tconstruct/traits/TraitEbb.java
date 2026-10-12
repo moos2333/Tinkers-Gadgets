@@ -23,7 +23,9 @@ public class TraitEbb extends AbstractTrait {
         int max = toolTag.hasKey(ChainBlade.KEY_MAX_CHARGE)
                 ? toolTag.getInteger(ChainBlade.KEY_MAX_CHARGE)
                 : ChainBlade.MAX_CHARGE;
-        int missing = max - toolTag.getInteger(TAG_CHARGE);
+        NBTTagCompound rootTag = tool.getTagCompound();
+        int current = rootTag != null ? rootTag.getInteger(TAG_CHARGE) : 0;
+        int missing = max - current;
         if (missing <= 0) return newDamage;
         return newDamage + damage * missing * BONUS_PER_MISSING;
     }
