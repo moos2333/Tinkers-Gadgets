@@ -15,7 +15,7 @@ public class TraitAnchor extends AbstractTrait {
     @Override
     public float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
                         float damage, float newDamage, boolean isCritical) {
-        if (player.moveForward != 0.0F || player.moveStrafing != 0.0F) return newDamage;
+        if (!player.isSneaking()) return newDamage;
         return newDamage + damage * DAMAGE_MULTIPLIER;
     }
 }
