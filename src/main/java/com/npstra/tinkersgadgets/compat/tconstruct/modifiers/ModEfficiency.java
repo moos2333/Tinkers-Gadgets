@@ -1,5 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.modifiers;
 
+import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.HeatRayGun;
 import net.minecraft.init.Items;
@@ -29,7 +30,8 @@ public class ModEfficiency extends ModifierTrait {
     @Override
     public boolean canApplyCustom(ItemStack stack) {
         return stack.getItem() instanceof HeatRayGun
-                || stack.getItem() instanceof ChainBlade;
+                || stack.getItem() instanceof ChainBlade
+                || stack.getItem() instanceof Boomerang;
     }
 
     @Override
@@ -40,6 +42,8 @@ public class ModEfficiency extends ModifierTrait {
             applyHeatRayGun(toolTag, modData.current);
         } else if (toolTag.hasKey(TAG_COMBO_BONUS)) {
             applyChainBlade(toolTag, modData.current);
+        } else {
+            applyBoomerang(toolTag, modData.current);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }
@@ -55,6 +59,11 @@ public class ModEfficiency extends ModifierTrait {
     }
 
     private void applyChainBlade(NBTTagCompound toolTag, int points) {
+        int level = Math.min(points / POINTS_PER_LEVEL, MAX_LEVEL);
+        toolTag.setInteger(TAG_EFFICIENCY_LEVEL, level);
+    }
+
+    private void applyBoomerang(NBTTagCompound toolTag, int points) {
         int level = Math.min(points / POINTS_PER_LEVEL, MAX_LEVEL);
         toolTag.setInteger(TAG_EFFICIENCY_LEVEL, level);
     }

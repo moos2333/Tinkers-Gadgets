@@ -48,6 +48,9 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final double STUCK_DIST_THRESHOLD = 2.0D;
     private static final float SPLIT_DAMAGE_RATIO = 0.5f;
 
+    private static final String TAG_EFFICIENCY_LEVEL = "efficiency_level";
+    private static final float AMMO_REFUND_CHANCE_PER_LEVEL = 0.20f;
+
     private boolean returning;
     private EntityPlayer associatedPlayer;
     private boolean split;
@@ -282,9 +285,28 @@ public class EntityBoomerang extends EntityProjectileBase {
             motionY += (dir.y * desiredSpeed - motionY) * smoothFactor;
             motionZ += (dir.z * desiredSpeed - motionZ) * smoothFactor;
         } else {
-            if (shootingEntity instanceof EntityPlayer) onCollideWithPlayer((EntityPlayer) shootingEntity);
+            if (shootingEntity instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) shootingEntity;
+                tryRefundAmmo(player);
+                onCollideWithPlayer(player);
+            }
             setDead();
         }
+    }
+
+    private void tryRefundAmmo(EntityPlayer player) {
+        ItemStack stack = player.getHeldItemMainhand();
+        if (!(stack.getItem() instanceof Boomerang)) {
+            stack = player.getHeldItemOffhand();
+            if (!(stack.getItem() instanceof Boomerang)) return;
+        }
+        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
+        int level = toolTag.getInteger(TAG_EFFICIENCY_LEVEL);
+        if (level <= 0) return;
+        if (rand.nextFloat() >= level * AMMO_REFUND_CHANCE_PER_LEVEL) return;
+        int dmg = stack.getItemDamage();
+        if (dmg <= 0) return;
+        stack.setItemDamage(dmg - 1);
     }
 
     @Override
