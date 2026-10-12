@@ -329,9 +329,9 @@ public class MaterialRegister {
                 iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
                 iron.addTrait(TraitsRegistry.INERTIA, ConnectorPartType.CONNECTOR);
             }
-            if (isTraitEnabled("anchor_chainblade")) {
-                iron.addTrait(TraitsRegistry.ANCHOR, ChainPartType.CHAIN);
-                iron.addTrait(TraitsRegistry.ANCHOR, GunBarrelPartType.GUN_BARREL);
+            if (isTraitEnabled("seasoned_chainblade")) {
+                iron.addTrait(TraitsRegistry.SEASONED, ChainPartType.CHAIN);
+                iron.addTrait(TraitsRegistry.SEASONED, GunBarrelPartType.GUN_BARREL);
             }
         }
 

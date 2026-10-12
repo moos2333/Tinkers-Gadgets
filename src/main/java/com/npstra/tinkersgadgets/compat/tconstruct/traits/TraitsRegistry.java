@@ -29,5 +29,5 @@ public class TraitsRegistry {
     public static final AbstractTrait SNIPING = new TraitSniping();
     public static final AbstractTrait VORTEX = new TraitVortex();
     public static final AbstractTrait EBB = new TraitEbb();
-    public static final AbstractTrait ANCHOR = new TraitAnchor();
+    public static final AbstractTrait SEASONED = new TraitSeasoned();
 }
