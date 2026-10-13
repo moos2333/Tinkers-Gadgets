@@ -47,6 +47,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final double STUCK_SPEED_THRESHOLD = 0.1D;
     private static final double STUCK_DIST_THRESHOLD = 2.0D;
     private static final float SPLIT_DAMAGE_RATIO = 0.5f;
+    private static final double SPLIT_SEARCH_RADIUS = 3.0D;
 
     private static final String TAG_EFFICIENCY_LEVEL = "efficiency_level";
     private static final int DURABILITY_PER_AMMO = 10;
@@ -197,21 +198,64 @@ public class EntityBoomerang extends EntityProjectileBase {
         Vec3d forward = new Vec3d(motionX, motionY, motionZ).normalize();
         double speed = getCurrentSpeed() * SPLIT_SPEED_FACTOR;
         double angle = Math.toRadians(SPLIT_ANGLE_DEG);
-        Vec3d right = forward.rotateYaw((float) angle);
-        Vec3d left = forward.rotateYaw((float) -angle);
-        Vec3d[] directions = new Vec3d[]{right, left};
-        Vec3d spawnPos = target.getPositionVector().add(forward.scale(1.5D)).add(0, target.height * 0.5, 0);
+        Vec3d rightDir = forward.rotateYaw((float) angle);
+        Vec3d leftDir = forward.rotateYaw((float) -angle);
+
+        AxisAlignedBB searchBox = new AxisAlignedBB(
+                posX - SPLIT_SEARCH_RADIUS, posY - SPLIT_SEARCH_RADIUS, posZ - SPLIT_SEARCH_RADIUS,
+                posX + SPLIT_SEARCH_RADIUS, posY + SPLIT_SEARCH_RADIUS, posZ + SPLIT_SEARCH_RADIUS);
+        List<EntityLivingBase> candidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
+                e -> e != target && e != shootingEntity && e.isEntityAlive());
+
+        EntityLivingBase rightTarget = null;
+        EntityLivingBase leftTarget = null;
+        double rightDistSq = Double.MAX_VALUE;
+        double leftDistSq = Double.MAX_VALUE;
+        for (EntityLivingBase candidate : candidates) {
+            double dx = candidate.posX - posX;
+            double dz = candidate.posZ - posZ;
+            double cross = forward.x * dz - forward.z * dx;
+            double distSq = dx * dx + dz * dz;
+            if (cross > 0) {
+                if (distSq < rightDistSq) {
+                    rightDistSq = distSq;
+                    rightTarget = candidate;
+                }
+            } else if (cross < 0) {
+                if (distSq < leftDistSq) {
+                    leftDistSq = distSq;
+                    leftTarget = candidate;
+                }
+            }
+        }
+
+        Vec3d rightFinal = rightTarget == null ? rightDir : new Vec3d(
+                rightTarget.posX - posX,
+                rightTarget.posY + rightTarget.height * 0.5 - posY,
+                rightTarget.posZ - posZ
+        ).normalize();
+
+        Vec3d leftFinal = leftTarget == null ? leftDir : new Vec3d(
+                leftTarget.posX - posX,
+                leftTarget.posY + leftTarget.height * 0.5 - posY,
+                leftTarget.posZ - posZ
+        ).normalize();
+
+        Vec3d[] directions = new Vec3d[]{rightFinal, leftFinal};
+        Vec3d targetCenter = target.getPositionVector().add(0, target.height * 0.5, 0);
         float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * SPLIT_DAMAGE_RATIO);
         List<IBoomerangTrait> traits = getBoomerangTraits();
         for (int i = 0; i < 2; i++) {
+            Vec3d dir = directions[i];
+            Vec3d spawnPos = targetCenter.add(dir.scale(1.5D));
             EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
             shard.setPosition(spawnPos.x, spawnPos.y, spawnPos.z);
-            shard.motionX = directions[i].x * speed;
-            shard.motionY = directions[i].y * speed;
-            shard.motionZ = directions[i].z * speed;
-            shard.rotationYaw = (float) (MathHelper.atan2(directions[i].z, directions[i].x) * (180D / Math.PI)) - 90.0F;
-            shard.rotationPitch = (float) (-MathHelper.atan2(directions[i].y, MathHelper.sqrt(directions[i].x * directions[i].x + directions[i].z * directions[i].z)) * (180D / Math.PI));
+            shard.motionX = dir.x * speed;
+            shard.motionY = dir.y * speed;
+            shard.motionZ = dir.z * speed;
+            shard.rotationYaw = (float) (MathHelper.atan2(dir.z, dir.x) * (180D / Math.PI)) - 90.0F;
+            shard.rotationPitch = (float) (-MathHelper.atan2(dir.y, MathHelper.sqrt(dir.x * dir.x + dir.z * dir.z)) * (180D / Math.PI));
             for (IBoomerangTrait trait : traits) {
                 trait.onBoomerangShardCreated(this, shard);
             }
