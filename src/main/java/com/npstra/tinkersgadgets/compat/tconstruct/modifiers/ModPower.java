@@ -53,8 +53,10 @@ public class ModPower extends ModifierTrait {
     }
 
     private void applyMultiplicative(NBTTagCompound toolTag, int points, String baseKey, String targetKey, float perLevel) {
-        float base = toolTag.getFloat(baseKey);
-        if (base == 0.0f) {
+        float base;
+        if (toolTag.hasKey(baseKey)) {
+            base = toolTag.getFloat(baseKey);
+        } else {
             base = toolTag.getFloat(targetKey);
             toolTag.setFloat(baseKey, base);
         }
@@ -63,8 +65,10 @@ public class ModPower extends ModifierTrait {
     }
 
     private void applyAdditive(NBTTagCompound toolTag, int points, String baseKey, String targetKey, float perLevel) {
-        float base = toolTag.getFloat(baseKey);
-        if (base == 0.0f) {
+        float base;
+        if (toolTag.hasKey(baseKey)) {
+            base = toolTag.getFloat(baseKey);
+        } else {
             base = toolTag.getFloat(targetKey);
             toolTag.setFloat(baseKey, base);
         }

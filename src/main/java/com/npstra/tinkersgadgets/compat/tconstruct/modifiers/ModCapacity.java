@@ -66,15 +66,19 @@ public class ModCapacity extends ModifierTrait {
     private void applyHeatRayGun(NBTTagCompound toolTag, int points) {
         int levels = points / POINTS_PER_LEVEL;
 
-        int fuelBase = toolTag.getInteger(KEY_BASE_FUEL);
-        if (fuelBase == 0) {
+        int fuelBase;
+        if (toolTag.hasKey(KEY_BASE_FUEL)) {
+            fuelBase = toolTag.getInteger(KEY_BASE_FUEL);
+        } else {
             fuelBase = toolTag.getInteger(TAG_FUEL);
             toolTag.setInteger(KEY_BASE_FUEL, fuelBase);
         }
         toolTag.setInteger(TAG_FUEL, fuelBase + levels * FUEL_PER_LEVEL);
 
-        int heatBase = toolTag.getInteger(KEY_BASE_HEAT);
-        if (heatBase == 0) {
+        int heatBase;
+        if (toolTag.hasKey(KEY_BASE_HEAT)) {
+            heatBase = toolTag.getInteger(KEY_BASE_HEAT);
+        } else {
             heatBase = toolTag.getInteger(TAG_HEAT);
             toolTag.setInteger(KEY_BASE_HEAT, heatBase);
         }
@@ -82,8 +86,10 @@ public class ModCapacity extends ModifierTrait {
     }
 
     private void applyPistolSword(NBTTagCompound toolTag, int points) {
-        int base = toolTag.getInteger(KEY_BASE_AMMO);
-        if (base == 0) {
+        int base;
+        if (toolTag.hasKey(KEY_BASE_AMMO)) {
+            base = toolTag.getInteger(KEY_BASE_AMMO);
+        } else {
             base = toolTag.getInteger(PistolSword.KEY_MAX_AMMO);
             toolTag.setInteger(KEY_BASE_AMMO, base);
         }
@@ -92,8 +98,10 @@ public class ModCapacity extends ModifierTrait {
     }
 
     private void applyChainBlade(NBTTagCompound toolTag, int points) {
-        int base = toolTag.getInteger(KEY_BASE_CHARGE);
-        if (base == 0) {
+        int base;
+        if (toolTag.hasKey(KEY_BASE_CHARGE)) {
+            base = toolTag.getInteger(KEY_BASE_CHARGE);
+        } else {
             base = toolTag.hasKey(ChainBlade.KEY_MAX_CHARGE)
                     ? toolTag.getInteger(ChainBlade.KEY_MAX_CHARGE)
                     : ChainBlade.MAX_CHARGE;
