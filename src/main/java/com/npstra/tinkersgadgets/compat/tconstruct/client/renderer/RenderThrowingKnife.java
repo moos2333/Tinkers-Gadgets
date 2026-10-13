@@ -47,10 +47,8 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
         GlStateManager.rotate(-pitch, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
 
-        if (!entity.inGround) {
-            entity.spin += 20.0F * partialTicks;
-        }
-        GlStateManager.rotate(entity.spin, 0.0F, 0.0F, 1.0F);
+        float spinAngle = entity.prevSpin + (entity.spin - entity.prevSpin) * partialTicks;
+        GlStateManager.rotate(spinAngle, 0.0F, 0.0F, 1.0F);
 
         if (entity.onGround) {
             GlStateManager.translate(0.0F, 0.0F, -entity.getStuckDepth());

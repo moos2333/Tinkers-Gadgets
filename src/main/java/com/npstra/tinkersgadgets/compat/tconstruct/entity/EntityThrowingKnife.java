@@ -12,8 +12,10 @@ public class EntityThrowingKnife extends EntityProjectileBase {
 
     private static final double GRAVITY = 0.065D;
     private static final double SLOWDOWN = 0.01D;
+    public static final float SPIN_SPEED = 30.0F;
 
     public float spin;
+    public float prevSpin;
     private boolean permanentlyDefused;
 
     public EntityThrowingKnife(World world) {
@@ -41,6 +43,10 @@ public class EntityThrowingKnife extends EntityProjectileBase {
         super.onUpdate();
         if (permanentlyDefused && !defused) {
             defused = true;
+        }
+        prevSpin = spin;
+        if (!inGround) {
+            spin += SPIN_SPEED;
         }
     }
 

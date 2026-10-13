@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,6 +24,7 @@ import java.nio.FloatBuffer;
 @SideOnly(Side.CLIENT)
 public class RenderChainBlade extends Render<EntityChainBlade> {
     private final RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public RenderChainBlade(RenderManager manager) {
         super(manager);
@@ -61,13 +61,13 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
         double offX = this.renderManager.viewerPosX;
         double offY = this.renderManager.viewerPosY;
         double offZ = this.renderManager.viewerPosZ;
+        float alpha = entity.isReturning() ? 0.6F : 1.0F;
 
         for (int i = 0; i <= segments; i++) {
             float t = i / (float) segments;
             double lx = playerX + (renderX - playerX) * t;
             double ly = playerY + (renderY - playerY) * t + Math.sin(t * Math.PI * 2) * 0.1;
             double lz = playerZ + (renderZ - playerZ) * t;
-            float alpha = entity.isReturning() ? 0.6F : 1.0F;
             buffer.pos(lx - offX, ly - offY, lz - offZ).color(0.6F, 0.6F, 0.6F, alpha).endVertex();
         }
 
@@ -103,15 +103,13 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
             hz /= hlen;
         }
 
-        float[] m = new float[] {
-                (float) hx, 0.0F, (float) hz, 0.0F,
-                0.0F, 1.0F, 0.0F, 0.0F,
-                (float) -hz, 0.0F, (float) hx, 0.0F,
-                0.0F, 0.0F, 0.0F, 1.0F
-        };
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        buffer.put(m).flip();
-        GL11.glMultMatrix(buffer);
+        matrixBuffer.clear();
+        matrixBuffer.put((float) hx).put(0.0F).put((float) hz).put(0.0F);
+        matrixBuffer.put(0.0F).put(1.0F).put(0.0F).put(0.0F);
+        matrixBuffer.put((float) -hz).put(0.0F).put((float) hx).put(0.0F);
+        matrixBuffer.put(0.0F).put(0.0F).put(0.0F).put(1.0F);
+        matrixBuffer.flip();
+        GL11.glMultMatrix(matrixBuffer);
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         itemRenderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE);
