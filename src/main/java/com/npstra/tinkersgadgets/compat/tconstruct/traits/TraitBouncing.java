@@ -14,8 +14,8 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 public class TraitBouncing extends ProjectileModifierTrait implements IBoomerangTrait {
 
     private static final String KEY_DAMAGE_MULT = "bouncing_mult";
-    private static final int BOUNCE_COUNT = 4;
-    private static final float DECAY_PER_BOUNCE = 0.20F;
+    private static final int BOUNCE_COUNT = 3;
+    private static final float DECAY_PER_BOUNCE = 0.25F;
 
     public TraitBouncing() {
         super("bouncing_boomerang", 0x32CD32);
