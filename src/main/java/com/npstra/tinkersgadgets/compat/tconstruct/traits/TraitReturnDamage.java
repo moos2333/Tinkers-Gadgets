@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.traits;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -18,7 +17,6 @@ import slimeknights.tconstruct.library.utils.ToolHelper;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,13 +45,8 @@ public class TraitReturnDamage extends ProjectileModifierTrait implements IBoome
         if (stack.isEmpty() || !(stack.getItem() instanceof ToolCore)) return;
 
         AxisAlignedBB box = boomerang.getEntityBoundingBox().grow(RETURN_HIT_RADIUS);
-        List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(boomerang, box);
-        List<EntityLivingBase> targets = new ArrayList<>(entities.size());
-        for (Entity entity : entities) {
-            if (entity instanceof EntityLivingBase && entity != attacker && !boomerang.hasHitEntity(entity)) {
-                targets.add((EntityLivingBase) entity);
-            }
-        }
+        List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
+                e -> e != attacker && !boomerang.hasHitEntity(e));
         if (targets.isEmpty()) return;
 
         ItemStack mainhand = attacker.getHeldItemMainhand();

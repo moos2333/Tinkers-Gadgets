@@ -157,20 +157,23 @@ public class PistolSword extends TinkerToolCore {
             return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
 
+        byte[] ammo = getAmmo(stack);
+
         if (world.isRemote) {
-            if (getAmmo(stack).length > 0) {
+            if (ammo.length > 0) {
                 spawnMuzzleParticles(world, player);
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
 
-        if (getAmmo(stack).length == 0) {
+        if (ammo.length == 0) {
             world.playSound(null, player.posX, player.posY, player.posZ,
                     SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.PLAYERS, 0.8F, 1.2F);
             return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
 
-        byte fired = consumeAmmo(stack);
+        byte fired = ammo[0];
+        setAmmo(stack, Arrays.copyOfRange(ammo, 1, ammo.length));
         setPending(stack, fired);
         fireShot(world, player, stack, fired);
         player.getCooldownTracker().setCooldown(stack.getItem(), getShotCooldown(stack));
@@ -282,14 +285,6 @@ public class PistolSword extends TinkerToolCore {
         newAmmo[0] = type;
         System.arraycopy(current, 0, newAmmo, 1, current.length);
         setAmmo(stack, newAmmo);
-    }
-
-    private byte consumeAmmo(ItemStack stack) {
-        byte[] current = getAmmo(stack);
-        if (current.length == 0) return AMMO_EMPTY;
-        byte fired = current[0];
-        setAmmo(stack, Arrays.copyOfRange(current, 1, current.length));
-        return fired;
     }
 
     private byte[] getAmmo(ItemStack stack) {

@@ -21,14 +21,18 @@ public class TraitCollection extends ProjectileModifierTrait {
     @Override
     public void onProjectileUpdate(EntityProjectileBase projectile, World world, ItemStack toolStack) {
         if (world.isRemote) return;
-        if (projectile.getPassengers().size() >= MAX_PASSENGERS) return;
+        int count = projectile.getPassengers().size();
+        if (count >= MAX_PASSENGERS) return;
+
         List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(projectile,
                 projectile.getEntityBoundingBox().grow(1.5D));
         for (Entity entity : entities) {
+            if (count >= MAX_PASSENGERS) break;
             if (!(entity instanceof EntityItem) && !(entity instanceof EntityXPOrb)) continue;
-            if (projectile.getPassengers().size() >= MAX_PASSENGERS) break;
             if (entity.isDead || entity.isRiding()) continue;
-            entity.startRiding(projectile, true);
+            if (entity.startRiding(projectile, true)) {
+                count++;
+            }
         }
     }
 }

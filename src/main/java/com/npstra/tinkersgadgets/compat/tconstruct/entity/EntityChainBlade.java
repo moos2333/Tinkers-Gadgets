@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -218,6 +217,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         AxisAlignedBB box = getEntityBoundingBox().grow(radius);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
+        if (targets.isEmpty()) return;
         ItemStack actual = findActualWeapon();
         if (actual.isEmpty()) actual = weaponStack;
         for (EntityLivingBase target : targets) {
@@ -253,24 +253,26 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     public void onHitEntity(RayTraceResult result) {
         Entity target = result.entityHit;
         if (target == shooter || target == this) return;
+        if (world.isRemote) return;
         UUID id = target.getUniqueID();
         if (hitEntities.contains(id)) return;
-        if (!world.isRemote && shootingEntity instanceof EntityLivingBase) {
-            float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
-            damage = Math.min((float) (baseDamage * 4.0D), damage);
-            ItemStack actual = findActualWeapon();
-            if (actual.isEmpty()) actual = weaponStack;
-            ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
-            hitCount++;
-            totalHitCount++;
-            hitEntities.add(id);
-            if (target instanceof EntityLivingBase) {
-                pullEntityTowardsPlayer((EntityLivingBase) target, shooter, PULL_STRENGTH_HIT);
-            }
-            playHitEntitySound();
-            playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
+        if (!(shootingEntity instanceof EntityLivingBase)) return;
+
+        float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
+        float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
+        damage = Math.min((float) (baseDamage * 4.0D), damage);
+        ItemStack actual = findActualWeapon();
+        if (actual.isEmpty()) actual = weaponStack;
+        ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
+        hitCount++;
+        totalHitCount++;
+        hitEntities.add(id);
+        if (target instanceof EntityLivingBase) {
+            pullEntityTowardsPlayer((EntityLivingBase) target, shooter, PULL_STRENGTH_HIT);
         }
+        playHitEntitySound();
+        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
+
         if (bounceCount < maxBounces) {
             EntityLivingBase next = findNextTarget();
             if (next != null) {

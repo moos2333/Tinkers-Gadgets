@@ -9,7 +9,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
-import slimeknights.tconstruct.library.utils.TagUtil;
+import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 
 public class TraitEcho extends AbstractTrait {
@@ -23,14 +23,15 @@ public class TraitEcho extends AbstractTrait {
     }
 
     @Override
-    public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
+    public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
+                         float damageDealt, boolean wasCritical, boolean wasHit) {
         if (!wasHit || target.world.isRemote) return;
         if (!(player instanceof EntityPlayer)) return;
         if (tool.isEmpty()) return;
 
         float baseDamage = ToolHelper.getActualAttack(tool) + 1.0f;
         World world = target.world;
-        NBTTagCompound tag = TagUtil.getTagSafe(tool);
+        NBTTagCompound tag = TinkerUtil.getModifierTag(tool, getModifierIdentifier());
         int stacks = tag.getInteger(TAG_STACKS);
         int lastId = tag.getInteger(TAG_LAST_TARGET_ID);
         int currentId = target.getEntityId();
@@ -38,23 +39,21 @@ public class TraitEcho extends AbstractTrait {
 
         if (sameTarget) {
             if (stacks > 0) stacks--;
-        } else {
-            if (lastId != 0) {
-                if (stacks < MAX_STACKS) stacks++;
-                if (stacks > 0) {
-                    Entity entity = world.getEntityByID(lastId);
-                    if (entity instanceof EntityLivingBase && entity.isEntityAlive()) {
-                        EntityLivingBase previous = (EntityLivingBase) entity;
-                        float extra = baseDamage * stacks * ECHO_DAMAGE_RATIO;
-                        if (extra > 0.001f) {
-                            int oldHurt = previous.hurtResistantTime;
-                            float oldLast = previous.lastDamage;
-                            previous.hurtResistantTime = 0;
-                            previous.lastDamage = 0;
-                            previous.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) player), extra);
-                            previous.hurtResistantTime = oldHurt;
-                            previous.lastDamage = oldLast;
-                        }
+        } else if (lastId != 0) {
+            if (stacks < MAX_STACKS) stacks++;
+            if (stacks > 0) {
+                Entity entity = world.getEntityByID(lastId);
+                if (entity instanceof EntityLivingBase && entity.isEntityAlive()) {
+                    EntityLivingBase previous = (EntityLivingBase) entity;
+                    float extra = baseDamage * stacks * ECHO_DAMAGE_RATIO;
+                    if (extra > 0.001f) {
+                        int oldHurt = previous.hurtResistantTime;
+                        float oldLast = previous.lastDamage;
+                        previous.hurtResistantTime = 0;
+                        previous.lastDamage = 0;
+                        previous.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) player), extra);
+                        previous.hurtResistantTime = oldHurt;
+                        previous.lastDamage = oldLast;
                     }
                 }
             }
@@ -62,6 +61,5 @@ public class TraitEcho extends AbstractTrait {
 
         tag.setInteger(TAG_LAST_TARGET_ID, currentId);
         tag.setInteger(TAG_STACKS, stacks);
-        tool.setTagCompound(tag);
     }
 }

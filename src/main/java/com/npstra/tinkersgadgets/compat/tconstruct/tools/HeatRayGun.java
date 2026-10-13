@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
@@ -171,7 +172,7 @@ public class HeatRayGun extends TinkerToolCore {
             int useDuration = getMaxItemUseDuration(stack) - timeLeft;
             int chargeTicks = getChargeTicks(stack);
             if (useDuration < chargeTicks) return;
-            if (isOverheated(stack, player)) return;
+            if (checkOverheat(stack, player)) return;
             int fuel = getFuel(stack);
             int fuelCost = getFuelCost(stack);
             if (fuel < fuelCost) {
@@ -306,15 +307,19 @@ public class HeatRayGun extends TinkerToolCore {
         float baseDamage = data.attack;
         float finalDamage = baseDamage * 2.0f * power;
         if (hitEntity != null) {
-            double currentAttack = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+            IAttributeInstance attackAttr = player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+            double currentAttack = attackAttr.getAttributeValue();
             float cooldown = player.getCooledAttackStrength(0.5F);
             float cooldownFactor = 0.2F + cooldown * cooldown * 0.8F;
             float modifierAmount = (float)(finalDamage / cooldownFactor - currentAttack);
             AttributeModifier damageMod = new AttributeModifier(DAMAGE_BONUS_UUID, "HeatRay damage bonus", modifierAmount, 0);
-            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
-            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(damageMod);
-            ToolHelper.attackEntity(stack, this, player, hitEntity);
-            player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(damageMod);
+            attackAttr.removeModifier(damageMod);
+            attackAttr.applyModifier(damageMod);
+            try {
+                ToolHelper.attackEntity(stack, this, player, hitEntity);
+            } finally {
+                attackAttr.removeModifier(damageMod);
+            }
             hitEntity.setFire(4);
             world.playSound(null, hitEntity.posX, hitEntity.posY, hitEntity.posZ,
                     SoundEvents.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.7F, 0.9F);
@@ -371,13 +376,13 @@ public class HeatRayGun extends TinkerToolCore {
         }
     }
 
-    private boolean isOverheated(ItemStack stack, EntityPlayer player) {
+    private boolean checkOverheat(ItemStack stack, EntityPlayer player) {
         NBTTagCompound itemTag = stack.getTagCompound();
         if (itemTag == null) return false;
         long overheatEnd = itemTag.getLong("OverheatEndTick");
         long currentTime = player.world.getTotalWorldTime();
         if (currentTime < overheatEnd) return true;
-        else if (itemTag.hasKey("OverheatEndTick")) {
+        if (itemTag.hasKey("OverheatEndTick")) {
             itemTag.removeTag("OverheatEndTick");
             setShotCount(stack, 0);
         }

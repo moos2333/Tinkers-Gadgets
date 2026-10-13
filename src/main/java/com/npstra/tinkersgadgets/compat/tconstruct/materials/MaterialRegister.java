@@ -121,16 +121,7 @@ public class MaterialRegister {
 
     private static void registerNetherQuartz() {
         if (!isMaterialEnabled("nether_quartz")) return;
-        netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.KEEN, "keen");
-        if (isTraitEnabled("keen")) {
-            netherQuartz.addTrait(TraitsRegistry.KEEN, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("trauma_throwingknife")) {
-            netherQuartz.addTrait(TraitsRegistry.TRAUMA, GripPartType.GRIP);
-            netherQuartz.addTrait(TraitsRegistry.TRAUMA, GunBarrelPartType.GUN_BARREL);
-            netherQuartz.addTrait(TraitsRegistry.TRAUMA, ChainPartType.CHAIN);
-            netherQuartz.addTrait(TraitsRegistry.TRAUMA, FuelTankPartType.FUEL_TANK);
-        }
+        netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.TRAUMA, "trauma_throwingknife");
         TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
