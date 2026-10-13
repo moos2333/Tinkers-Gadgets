@@ -12,7 +12,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 
 public class TraitPiercing extends ProjectileModifierTrait implements IBoomerangTrait {
 
-    private static final int PIERCE_COUNT = 5;
+    private static final int PIERCE_COUNT = 10;
 
     public TraitPiercing() {
         super("boomerang_piercing", 0x8B0000);
