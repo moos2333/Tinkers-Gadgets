@@ -18,9 +18,9 @@ public class ChainMaterialStats extends AbstractMaterialStats {
 
     public ChainMaterialStats(int maxBounces, float bounceRange, int ammoBonus, float speedRate, float comboBonus) {
         super(ChainPartType.CHAIN);
-        this.maxBounces = Math.max(1, Math.min(6, maxBounces));
+        this.maxBounces = Math.max(1, Math.min(10, maxBounces));
         this.bounceRange = Math.max(1.0f, Math.min(6.0f, bounceRange));
-        this.ammoBonus = Math.max(0, Math.min(30, ammoBonus));
+        this.ammoBonus = Math.max(0, Math.min(999, ammoBonus));
         this.speedRate = Math.max(-0.5f, Math.min(1.0f, speedRate));
         this.comboBonus = Math.max(-0.05f, Math.min(0.1f, comboBonus));
     }

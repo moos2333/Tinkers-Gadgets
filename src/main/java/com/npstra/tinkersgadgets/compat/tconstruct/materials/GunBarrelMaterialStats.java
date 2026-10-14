@@ -21,9 +21,9 @@ public class GunBarrelMaterialStats extends AbstractMaterialStats {
 
     public GunBarrelMaterialStats(int ammoBonus, float rangedDamage, int durabilityBonus) {
         super(GunBarrelPartType.GUN_BARREL);
-        this.ammoBonus = Math.max(-3, Math.min(3, ammoBonus));
-        this.rangedDamage = Math.max(0.5f, Math.min(1.5f, rangedDamage));
-        this.durabilityBonus = Math.max(0, Math.min(500, durabilityBonus));
+        this.ammoBonus = Math.max(-3, Math.min(6, ammoBonus));
+        this.rangedDamage = Math.max(0.5f, Math.min(10.0f, rangedDamage));
+        this.durabilityBonus = Math.max(0, Math.min(9999, durabilityBonus));
     }
 
     @Override
