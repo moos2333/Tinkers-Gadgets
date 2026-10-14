@@ -45,6 +45,7 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(new GripMaterialStats());
         Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
         Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
+        Material.UNKNOWN.addStats(ChainMaterialStats.UNKNOWN);
         Material.UNKNOWN.addStats(GunBarrelMaterialStats.UNKNOWN);
 
         registerGlass();
@@ -351,7 +352,7 @@ public class MaterialRegister {
                 cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
             }
             if (cobalt.getStats(ChainPartType.CHAIN) == null) {
-                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 15, 0.75f, 0.01f));
+                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 30, 0.75f, 0.01f));
             }
             if (cobalt.getStats(ConnectorPartType.CONNECTOR) == null) {
                 cobalt.addStats(new ConnectorMaterialStats());
