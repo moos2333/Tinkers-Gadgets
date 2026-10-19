@@ -15,7 +15,8 @@ import slimeknights.tconstruct.library.utils.TagUtil;
 public class ModRapid extends ModifierTrait {
     private static final int MAX_LEVEL = 3;
     private static final int POINTS_PER_LEVEL = 20;
-    private static final float[] LEVEL_BONUS = {0.10f, 0.18f, 0.24f};
+    private static final float[] HEAT_GUN_BONUS = {0.15f, 0.30f, 0.45f};
+    private static final float[] CHAIN_BONUS = {0.25f, 0.45f, 0.60f};
     private static final float MAX_THROW_BONUS = 0.60f;
 
     public ModRapid() {
@@ -39,13 +40,15 @@ public class ModRapid extends ModifierTrait {
             if (!toolTag.hasKey("baseSpeedRate")) {
                 toolTag.setFloat("baseSpeedRate", toolTag.getFloat("speedRate"));
             }
-            toolTag.setFloat("speedRate", toolTag.getFloat("baseSpeedRate") + calculateBonus(modData.current));
+            float bonus = calculateBonus(modData.current, CHAIN_BONUS);
+            toolTag.setFloat("speedRate", toolTag.getFloat("baseSpeedRate") + bonus);
         } else if (toolTag.hasKey("chargeTime")) {
             if (!toolTag.hasKey("baseChargeTime")) {
                 toolTag.setInteger("baseChargeTime", toolTag.getInteger("chargeTime"));
             }
             int base = toolTag.getInteger("baseChargeTime");
-            toolTag.setInteger("chargeTime", Math.max(1, Math.round(base / (1.0f + calculateBonus(modData.current)))));
+            float bonus = calculateBonus(modData.current, HEAT_GUN_BONUS);
+            toolTag.setInteger("chargeTime", Math.max(1, Math.round(base / (1.0f + bonus))));
         } else {
             float bonus = Math.min(MAX_THROW_BONUS, modData.current * 0.01f);
             toolTag.setFloat("rapid_bonus", bonus);
@@ -53,13 +56,13 @@ public class ModRapid extends ModifierTrait {
         TagUtil.setToolTag(rootCompound, toolTag);
     }
 
-    private float calculateBonus(int points) {
+    private float calculateBonus(int points, float[] levelBonus) {
         float bonus = 0;
         int remaining = points;
         for (int i = 0; i < MAX_LEVEL && remaining > 0; i++) {
             int seg = Math.min(remaining, POINTS_PER_LEVEL);
-            float start = (i == 0) ? 0 : LEVEL_BONUS[i - 1];
-            bonus += (LEVEL_BONUS[i] - start) * seg / (float) POINTS_PER_LEVEL;
+            float start = (i == 0) ? 0 : levelBonus[i - 1];
+            bonus += (levelBonus[i] - start) * seg / (float) POINTS_PER_LEVEL;
             remaining -= seg;
         }
         return Math.min(bonus, 0.99f);
