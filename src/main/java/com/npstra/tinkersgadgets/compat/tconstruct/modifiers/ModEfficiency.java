@@ -15,7 +15,7 @@ public class ModEfficiency extends ModifierTrait {
 
     private static final int MAX_LEVEL = 3;
     private static final int POINTS_PER_LEVEL = 30;
-    private static final float FUEL_BONUS_PER_POINT = 0.01f;
+    private static final float FUEL_BONUS_PER_POINT = 0.015f;
 
     private static final String KEY_BASE_FUEL = "baseEfficiency";
     private static final String TAG_FUEL_EFFICIENCY = "fuelEfficiency";
@@ -49,13 +49,15 @@ public class ModEfficiency extends ModifierTrait {
     }
 
     private void applyHeatRayGun(NBTTagCompound toolTag, int points) {
-        float base = toolTag.getFloat(KEY_BASE_FUEL);
-        if (base == 0.0f) {
+        float base;
+        if (toolTag.hasKey(KEY_BASE_FUEL)) {
+            base = toolTag.getFloat(KEY_BASE_FUEL);
+        } else {
             base = toolTag.getFloat(TAG_FUEL_EFFICIENCY);
             toolTag.setFloat(KEY_BASE_FUEL, base);
         }
         float totalBonus = points * FUEL_BONUS_PER_POINT;
-        toolTag.setFloat(TAG_FUEL_EFFICIENCY, base * (1.0f + totalBonus));
+        toolTag.setFloat(TAG_FUEL_EFFICIENCY, base + totalBonus);
     }
 
     private void applyChainBlade(NBTTagCompound toolTag, int points) {
