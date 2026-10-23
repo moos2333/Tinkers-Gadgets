@@ -368,16 +368,6 @@ public class ChainBlade extends ProjectileCore {
     }
 
     @Override
-    public int getCurrentAmmo(ItemStack stack) {
-        int base = super.getCurrentAmmo(stack);
-        NBTTagCompound toolTag = TagUtil.getToolTag(stack);
-        if (toolTag != null && toolTag.hasKey("ammoBonus")) {
-            return base + toolTag.getInteger("ammoBonus");
-        }
-        return base;
-    }
-
-    @Override
     public List<String> getInformation(ItemStack stack, boolean detailed) {
         List<String> info = super.getInformation(stack, detailed);
         NBTTagCompound toolTag = TagUtil.getToolTag(stack);

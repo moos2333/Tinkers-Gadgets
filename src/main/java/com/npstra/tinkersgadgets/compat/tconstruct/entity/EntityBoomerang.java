@@ -247,7 +247,10 @@ public class EntityBoomerang extends EntityProjectileBase {
         List<IBoomerangTrait> traits = getBoomerangTraits();
         for (int i = 0; i < 2; i++) {
             Vec3d dir = directions[i];
-            Vec3d spawnPos = targetCenter.add(dir.scale(1.5D));
+            Vec3d horizDir = new Vec3d(dir.x, 0, dir.z);
+            double horizLen = horizDir.length();
+            Vec3d spawnDir = horizLen < 0.001D ? forward : horizDir.scale(1.0D / horizLen);
+            Vec3d spawnPos = targetCenter.add(spawnDir.scale(1.5D));
             EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
             shard.setPosition(spawnPos.x, spawnPos.y, spawnPos.z);
