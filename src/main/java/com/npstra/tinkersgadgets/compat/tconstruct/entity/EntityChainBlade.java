@@ -387,10 +387,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 1.0F);
     }
 
-    protected boolean canFitInBlock() {
-        return true;
-    }
-
     @Override
     public void writeSpawnData(ByteBuf data) {
         super.writeSpawnData(data);

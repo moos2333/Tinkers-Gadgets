@@ -23,10 +23,8 @@ public class TraitBurst extends AbstractTrait {
     public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
         if (!wasHit || target.world.isRemote) return;
         if (!(player instanceof EntityPlayer)) return;
-        if (target.isDead) return;
         float baseDamage = ToolHelper.getActualAttack(tool) + 1.0f;
         float splashDamage = baseDamage * SPLASH_DAMAGE_RATIO;
-        if (splashDamage <= 0.0f) return;
         AxisAlignedBB aabb = target.getEntityBoundingBox().grow(SPLASH_RADIUS);
         List<EntityLivingBase> nearby = target.world.getEntitiesWithinAABB(EntityLivingBase.class, aabb,
                 e -> e != target && e != player && e.isEntityAlive());
