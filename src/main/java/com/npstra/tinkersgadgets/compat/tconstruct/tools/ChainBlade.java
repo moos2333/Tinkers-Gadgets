@@ -148,10 +148,6 @@ public class ChainBlade extends ProjectileCore {
     }
 
     @Override
-    public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-    }
-
-    @Override
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
         if (ToolHelper.isBroken(stack) || !(entityLiving instanceof EntityPlayer)) {
             return;
@@ -194,16 +190,9 @@ public class ChainBlade extends ProjectileCore {
             tag.setString("chain_uuid", UUID.randomUUID().toString());
         }
 
-        ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
-        float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;
-        int maxBounces = getMaxBounces(stack);
-        float bounceRange = getBounceRange(stack);
-        float comboBonus = getComboBonus(stack);
-
-        EntityChainBlade entity = new EntityChainBlade(
-                world, player, stack, speed, baseDamage,
-                maxBounces, bounceRange, comboBonus
-        );
+        EntityProjectileBase projectile = getProjectile(stack, stack, world, player, speed, inaccuracy, power, usedAmmo);
+        if (!(projectile instanceof EntityChainBlade)) return;
+        EntityChainBlade entity = (EntityChainBlade) projectile;
         entity.setToolId(toolId);
         entity.setPosition(player.posX, player.posY + player.getEyeHeight() - 0.1, player.posZ);
         Vec3d look = player.getLookVec();
@@ -243,6 +232,10 @@ public class ChainBlade extends ProjectileCore {
 
         Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight() * 0.5, player.posZ);
         Vec3d look = player.getLookVec();
+        Vec3d rawLook2D = new Vec3d(look.x, 0, look.z);
+        double rawLookLen = rawLook2D.length();
+        final Vec3d look2D = rawLookLen < 0.001D ? new Vec3d(0, 0, 1) : rawLook2D.scale(1.0D / rawLookLen);
+        final double halfAngleRad = Math.toRadians(angle * 0.5);
 
         player.spawnSweepParticles();
 
@@ -256,10 +249,12 @@ public class ChainBlade extends ProjectileCore {
         targets.removeIf(e -> {
             Vec3d toTarget = new Vec3d(e.posX - origin.x, e.posY + e.getEyeHeight() * 0.5 - origin.y, e.posZ - origin.z);
             if (toTarget.length() > radius) return true;
-            Vec3d toTarget2D = new Vec3d(toTarget.x, 0, toTarget.z).normalize();
-            Vec3d look2D = new Vec3d(look.x, 0, look.z).normalize();
+            Vec3d toTarget2D = new Vec3d(toTarget.x, 0, toTarget.z);
+            double toTargetLen = toTarget2D.length();
+            if (toTargetLen < 0.001D) return true;
+            toTarget2D = toTarget2D.scale(1.0D / toTargetLen);
             double cosAngle = look2D.dotProduct(toTarget2D);
-            return Math.acos(MathHelper.clamp(cosAngle, -1.0, 1.0)) > Math.toRadians(angle * 0.5);
+            return Math.acos(MathHelper.clamp(cosAngle, -1.0D, 1.0D)) > halfAngleRad;
         });
 
         int count = targets.size();
@@ -427,8 +422,8 @@ public class ChainBlade extends ProjectileCore {
             chainMat = Material.UNKNOWN;
         }
         ChainMaterialStats stats = chainMat.getStatsOrUnknown(ChainPartType.CHAIN);
-        if (stats == null || stats == ChainMaterialStats.UNKNOWN) {
-            stats = new ChainMaterialStats(3, 4.0f, 0, 0.0f, 0.0f);
+        if (stats == null) {
+            stats = ChainMaterialStats.UNKNOWN;
         }
         tag.setInteger("maxBounces", stats.maxBounces);
         tag.setFloat("bounceRange", stats.bounceRange);

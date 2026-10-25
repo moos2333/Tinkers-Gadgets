@@ -271,7 +271,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             pullEntityTowardsPlayer((EntityLivingBase) target, shooter, PULL_STRENGTH_HIT);
         }
         playHitEntitySound();
-        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
 
         if (bounceCount < maxBounces) {
             EntityLivingBase next = findNextTarget();
@@ -384,7 +383,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     @Override
     protected void playHitEntitySound() {
-        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 1.0F);
+        playSound(SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, 1.0F, 0.8F + rand.nextFloat() * 0.4F);
     }
 
     @Override
