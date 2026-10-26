@@ -128,6 +128,17 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         }
     }
 
+    private float calculateDamage() {
+        float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
+        float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
+        return Math.min((float) (baseDamage * 4.0D), damage);
+    }
+
+    private ItemStack resolveWeapon() {
+        ItemStack actual = findActualWeapon();
+        return actual.isEmpty() ? weaponStack : actual;
+    }
+
     @Override
     public double getGravity() {
         return returning ? 0.0D : GRAVITY;
@@ -143,6 +154,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         if (returning) {
             if (shooter != null && shooter.isEntityAlive()) {
                 returnToShooter();
+                if (isDead) return;
                 double dist = getDistance(shooter);
                 double speed = getCurrentSpeed();
 
@@ -213,18 +225,13 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     private void dealReturnDamage() {
         if (shooter == null) return;
-        double radius = 2.0D;
-        AxisAlignedBB box = getEntityBoundingBox().grow(radius);
+        AxisAlignedBB box = getEntityBoundingBox().grow(2.0D);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && e.isEntityAlive() && !hitEntities.contains(e.getUniqueID()));
         if (targets.isEmpty()) return;
-        ItemStack actual = findActualWeapon();
-        if (actual.isEmpty()) actual = weaponStack;
+        ItemStack actual = resolveWeapon();
         for (EntityLivingBase target : targets) {
-            float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
-            float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
-            damage = Math.min((float) (baseDamage * 4.0D), damage);
-            ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
+            ChainBlade.attackWithTraits(actual, shooter, target, this, calculateDamage());
             totalHitCount++;
             hitEntities.add(target.getUniqueID());
             pullEntityTowardsPlayer(target, shooter, PULL_STRENGTH_RETURN);
@@ -252,18 +259,14 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     @Override
     public void onHitEntity(RayTraceResult result) {
         Entity target = result.entityHit;
-        if (target == shooter || target == this) return;
+        if (target == shooter) return;
         if (world.isRemote) return;
         UUID id = target.getUniqueID();
         if (hitEntities.contains(id)) return;
         if (!(shootingEntity instanceof EntityLivingBase)) return;
 
-        float comboMult = 1.0f + Math.min(totalHitCount, COMBO_MAX_STACKS) * comboBonus;
-        float damage = (float) (baseDamage * (1.0D + hitCount * 0.5D)) * comboMult;
-        damage = Math.min((float) (baseDamage * 4.0D), damage);
-        ItemStack actual = findActualWeapon();
-        if (actual.isEmpty()) actual = weaponStack;
-        ChainBlade.attackWithTraits(actual, shooter, target, this, damage);
+        ItemStack actual = resolveWeapon();
+        ChainBlade.attackWithTraits(actual, shooter, target, this, calculateDamage());
         hitCount++;
         totalHitCount++;
         hitEntities.add(id);
