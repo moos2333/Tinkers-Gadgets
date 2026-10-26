@@ -137,8 +137,9 @@ public class ThrowingKnife extends ProjectileCore {
     }
 
     private void spawnKnife(ItemStack stack, World world, EntityPlayer player, float speed, float inaccuracy, float power, Vec3d direction, boolean usedAmmo) {
-        EntityThrowingKnife knife = new EntityThrowingKnife(world, player, speed, inaccuracy, power,
-                getProjectileStack(stack, world, player, usedAmmo), stack);
+        EntityProjectileBase projectile = getProjectile(stack, stack, world, player, speed, inaccuracy, power, usedAmmo);
+        if (!(projectile instanceof EntityThrowingKnife)) return;
+        EntityThrowingKnife knife = (EntityThrowingKnife) projectile;
         knife.shoot(direction.x, direction.y, direction.z, speed, inaccuracy);
         knife.rotationYaw = (float) (Math.atan2(direction.x, direction.z) * 180.0 / Math.PI);
         knife.rotationPitch = (float) (-Math.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)) * 180.0 / Math.PI);

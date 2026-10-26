@@ -4,6 +4,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.parts.FuelTankPartType;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.HeatRayEmitterPartType;
 import com.npstra.tinkersgadgets.compat.tconstruct.materials.FuelTankMaterialStats;
 import com.npstra.tinkersgadgets.compat.tconstruct.materials.HeatRayEmitterMaterialStats;
+import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -202,7 +203,7 @@ public class HeatRayGun extends TinkerToolCore {
     }
 
     private boolean hasPulseTrait(ItemStack stack) {
-        return TinkerUtil.hasTrait(TagUtil.getTagSafe(stack), "pulse_throwingknife");
+        return TinkerUtil.hasTrait(TagUtil.getTagSafe(stack), TraitsRegistry.PULSE.getModifierIdentifier());
     }
 
     private float getPowerMultiplier(ItemStack stack) {
