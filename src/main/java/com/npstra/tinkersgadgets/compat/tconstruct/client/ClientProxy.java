@@ -13,47 +13,31 @@ import com.npstra.tinkersgadgets.compat.tconstruct.tools.GadgetsRegister;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import slimeknights.tconstruct.library.TinkerRegistryClient;
 import slimeknights.tconstruct.library.client.ToolBuildGuiInfo;
+import slimeknights.tconstruct.library.tools.ToolCore;
 
 public class ClientProxy extends CommonProxy {
 
     @Override
     public void initToolGuis() {
-        if (GadgetsRegister.boomerang != null) {
-            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.boomerang);
-            info.addSlotPosition(33 + 12, 42 - 12);
-            info.addSlotPosition(33 - 12, 42 - 12);
-            info.addSlotPosition(33 - 12, 42 + 12);
-            TinkerRegistryClient.addToolBuilding(info);
+        registerGui(GadgetsRegister.boomerang,
+                45, 30, 21, 30, 21, 54);
+        registerGui(GadgetsRegister.throwingKnife,
+                51, 24, 33, 42, 15, 60);
+        registerGui(GadgetsRegister.heatRayGun,
+                51, 60, 51, 42, 33, 42, 15, 24);
+        registerGui(GadgetsRegister.chainBlade,
+                33, 60, 33, 24, 33, 42);
+        registerGui(GadgetsRegister.pistolSword,
+                18, 57, 48, 27, 48, 57);
+    }
+
+    private static void registerGui(ToolCore tool, int... slotCoords) {
+        if (tool == null) return;
+        ToolBuildGuiInfo info = new ToolBuildGuiInfo(tool);
+        for (int i = 0; i < slotCoords.length; i += 2) {
+            info.addSlotPosition(slotCoords[i], slotCoords[i + 1]);
         }
-        if (GadgetsRegister.throwingKnife != null) {
-            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.throwingKnife);
-            info.addSlotPosition(33 + 18, 42 - 18);
-            info.addSlotPosition(33, 42);
-            info.addSlotPosition(33 - 18, 42 + 18);
-            TinkerRegistryClient.addToolBuilding(info);
-        }
-        if (GadgetsRegister.heatRayGun != null) {
-            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.heatRayGun);
-            info.addSlotPosition(33 + 18, 42 + 18);
-            info.addSlotPosition(33 + 18, 42);
-            info.addSlotPosition(33, 42);
-            info.addSlotPosition(33 - 18, 42 - 18);
-            TinkerRegistryClient.addToolBuilding(info);
-        }
-        if (GadgetsRegister.chainBlade != null) {
-            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.chainBlade);
-            info.addSlotPosition(33, 42 + 18);
-            info.addSlotPosition(33, 42 - 18);
-            info.addSlotPosition(33, 42);
-            TinkerRegistryClient.addToolBuilding(info);
-        }
-        if (GadgetsRegister.pistolSword != null) {
-            ToolBuildGuiInfo info = new ToolBuildGuiInfo(GadgetsRegister.pistolSword);
-            info.addSlotPosition(33 - 15, 42 + 15);
-            info.addSlotPosition(33 + 15, 42 - 15);
-            info.addSlotPosition(33 + 15, 42 + 15);
-            TinkerRegistryClient.addToolBuilding(info);
-        }
+        TinkerRegistryClient.addToolBuilding(info);
     }
 
     @Override

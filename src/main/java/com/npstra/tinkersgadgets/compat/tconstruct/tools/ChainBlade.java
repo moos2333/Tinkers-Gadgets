@@ -262,22 +262,21 @@ public class ChainBlade extends ProjectileCore {
         float comboMult = 1.0f + Math.min(count * comboBonus, 1.0f);
 
         if (!targets.isEmpty()) {
-            EntityLivingBase primary = null;
-            double maxDist = -1;
-            for (EntityLivingBase e : targets) {
+            EntityLivingBase primary = targets.get(0);
+            double maxDist = primary.getDistance(player);
+            for (int i = 1; i < count; i++) {
+                EntityLivingBase e = targets.get(i);
                 double d = e.getDistance(player);
                 if (d > maxDist) {
                     maxDist = d;
                     primary = e;
                 }
             }
-            if (primary != null) {
-                float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult * comboMult;
-                attackWithTraits(stack, player, primary, null, primaryDamage);
-            }
+            float primaryDamage = (float) (baseDamage * (1.5 + count * 0.1)) * chargeMult * comboMult;
+            attackWithTraits(stack, player, primary, null, primaryDamage);
+            float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1)) * chargeMult * comboMult;
             for (EntityLivingBase e : targets) {
                 if (e == primary) continue;
-                float secondaryDamage = (float) (baseDamage * (0.5 + count * 0.1)) * chargeMult * comboMult;
                 e.attackEntityFrom(DamageSource.causePlayerDamage(player), secondaryDamage);
             }
         }

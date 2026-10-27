@@ -7,6 +7,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -26,7 +27,7 @@ import slimeknights.tconstruct.library.tools.ToolCore;
 import slimeknights.tconstruct.library.tools.ToolPart;
 import slimeknights.tconstruct.tools.TinkerTools;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = TinkersGadgets.MOD_ID)
 public class GadgetsRegister {
     public static ToolCore boomerang;
     public static ToolPart connector;
@@ -107,23 +108,25 @@ public class GadgetsRegister {
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
         if (Config.enableBoomerang) {
-            EntityEntry entry = EntityEntryBuilder.create()
-                    .entity(EntityBoomerang.class)
-                    .id(new ResourceLocation(TinkersGadgets.MOD_ID, "boomerang"), 101)
-                    .name("boomerang")
-                    .tracker(64, 1, true)
-                    .build();
-            event.getRegistry().register(entry);
-            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:boomerang_shard"), EntityBoomerangShard.class, "boomerang_shard", 102, TinkersGadgets.instance, 64, 1, true);
+            registerEntity(event, EntityBoomerang.class, "boomerang", 101);
+            registerEntity(event, EntityBoomerangShard.class, "boomerang_shard", 102);
         }
-
         if (Config.enableThrowingKnife) {
-            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:throwing_knife"), EntityThrowingKnife.class, "throwing_knife", 103, TinkersGadgets.instance, 64, 1, true);
+            registerEntity(event, EntityThrowingKnife.class, "throwing_knife", 103);
         }
-
         if (Config.enableChainBlade) {
-            EntityRegistry.registerModEntity(new ResourceLocation("tinkersgadgets:chain_blade"), EntityChainBlade.class, "chain_blade", 104, TinkersGadgets.instance, 64, 1, true);
+            registerEntity(event, EntityChainBlade.class, "chain_blade", 104);
         }
+    }
+
+    private static void registerEntity(RegistryEvent.Register<EntityEntry> event, Class<? extends Entity> entityClass, String name, int id) {
+        EntityEntry entry = EntityEntryBuilder.create()
+                .entity(entityClass)
+                .id(new ResourceLocation(TinkersGadgets.MOD_ID, name), id)
+                .name(name)
+                .tracker(64, 1, true)
+                .build();
+        event.getRegistry().register(entry);
     }
 
     @SideOnly(Side.CLIENT)
