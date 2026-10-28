@@ -46,6 +46,7 @@ public class TraitBouncing extends ProjectileModifierTrait implements IBoomerang
     @Override
     public boolean onBoomerangAfterHitEntity(EntityBoomerang boomerang, Entity target, Vec3d savedMotion) {
         if (boomerang.world.isRemote) return false;
+        target.getEntityData().removeTag(KEY_DAMAGE_MULT);
         if (boomerang.isReturning()) return false;
         if (boomerang.getBounceCount() <= 0) return false;
         EntityLivingBase nextTarget = boomerang.findNextBounceTarget(target);
