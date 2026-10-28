@@ -110,12 +110,12 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     public void onUpdate() {
         super.onUpdate();
 
+        if (world.isRemote) return;
+
         double deltaX = posX - prevPosX;
         double deltaY = posY - prevPosY;
         double deltaZ = posZ - prevPosZ;
         totalDistanceTraveled += Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-
-        if (world.isRemote) return;
 
         double maxDistance = MAX_DISTANCE_BASE * Math.min(1.0D, initialSpeed / 1.8D);
         double slowStartDistance = maxDistance * SLOW_START_FACTOR;

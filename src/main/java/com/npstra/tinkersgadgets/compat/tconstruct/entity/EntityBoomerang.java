@@ -282,12 +282,12 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void onUpdate() {
         super.onUpdate();
 
+        if (world.isRemote) return;
+
         double deltaX = posX - prevPosX;
         double deltaY = posY - prevPosY;
         double deltaZ = posZ - prevPosZ;
         totalDistanceTraveled += Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-
-        if (world.isRemote) return;
 
         for (IBoomerangTrait trait : getBoomerangTraits()) {
             trait.onBoomerangUpdate(this, world);
