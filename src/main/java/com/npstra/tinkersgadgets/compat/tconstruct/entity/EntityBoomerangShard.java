@@ -200,26 +200,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     }
 
     @Override
-    protected void doMoveUpdate() {
-        if (returning && shootingEntity != null) {
-            Vec3d targetPos = getShooterTargetPos();
-            double dx = targetPos.x - posX;
-            double dy = targetPos.y - posY;
-            double dz = targetPos.z - posZ;
-            double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
-            this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-            this.rotationPitch = (float) (-(MathHelper.atan2(dy, horizontalDist) * (180D / Math.PI)));
-            this.prevRotationYaw = this.rotationYaw;
-            this.prevRotationPitch = this.rotationPitch;
-            this.posX += this.motionX;
-            this.posY += this.motionY;
-            this.posZ += this.motionZ;
-        } else {
-            super.doMoveUpdate();
-        }
-    }
-
-    @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
         returning = true;
         stuckTicks = 0;

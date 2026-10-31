@@ -360,20 +360,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     }
 
     @Override
-    protected void doMoveUpdate() {
-        if (returning && shootingEntity != null) {
-            double dx = shootingEntity.posX - posX;
-            double dz = shootingEntity.posZ - posZ;
-            double horizontalDist = MathHelper.sqrt(dx * dx + dz * dz);
-            this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-            this.rotationPitch = (float) (-(MathHelper.atan2(shootingEntity.posY + shootingEntity.getEyeHeight() - posY, horizontalDist) * (180D / Math.PI)));
-            this.prevRotationYaw = this.rotationYaw;
-            this.prevRotationPitch = this.rotationPitch;
-        }
-        super.doMoveUpdate();
-    }
-
-    @Override
     public void onHitBlock(RayTraceResult raytraceResult) {
         for (IBoomerangTrait trait : getBoomerangTraits()) {
             if (trait.onBoomerangHitBlock(this, raytraceResult)) return;
