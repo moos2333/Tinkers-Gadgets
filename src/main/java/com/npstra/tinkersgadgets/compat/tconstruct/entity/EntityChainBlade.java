@@ -46,6 +46,7 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
     private String toolId = "";
     private String weaponUuid = "";
     private int stuckTicks;
+    private boolean deadHandled;
 
     public EntityChainBlade(World world) {
         super(world);
@@ -340,15 +341,18 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
 
     @Override
     public void setDead() {
-        if (!world.isRemote && !toolId.isEmpty()) {
-            ChainBlade.removeActiveChainBlade(toolId, this);
-        }
-        if (!world.isRemote && !weaponUuid.isEmpty() && shooter != null && totalHitCount > 0) {
-            ItemStack actual = findActualWeapon();
-            if (!actual.isEmpty()) {
-                int charge = getCharge(actual);
-                charge = Math.min(ChainBlade.getMaxCharge(actual), charge + totalHitCount);
-                setCharge(actual, charge);
+        if (!world.isRemote && !deadHandled) {
+            deadHandled = true;
+            if (!toolId.isEmpty()) {
+                ChainBlade.removeActiveChainBlade(toolId, this);
+            }
+            if (!weaponUuid.isEmpty() && shooter != null && totalHitCount > 0) {
+                ItemStack actual = findActualWeapon();
+                if (!actual.isEmpty()) {
+                    int charge = getCharge(actual);
+                    charge = Math.min(ChainBlade.getMaxCharge(actual), charge + totalHitCount);
+                    setCharge(actual, charge);
+                }
             }
         }
         super.setDead();
