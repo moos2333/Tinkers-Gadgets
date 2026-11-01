@@ -8,7 +8,6 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -178,14 +177,6 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             } else {
                 setDead();
             }
-        }
-        if (!returning) {
-            float yaw = (float) (MathHelper.atan2(motionZ, motionX) * (180D / Math.PI)) - 90.0F;
-            float pitch = (float) (-(MathHelper.atan2(motionY, MathHelper.sqrt(motionX * motionX + motionZ * motionZ)) * (180D / Math.PI)));
-            rotationYaw = yaw;
-            rotationPitch = pitch;
-            prevRotationYaw = rotationYaw;
-            prevRotationPitch = rotationPitch;
         }
     }
 
