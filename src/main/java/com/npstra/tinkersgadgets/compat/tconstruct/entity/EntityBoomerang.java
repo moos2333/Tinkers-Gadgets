@@ -149,11 +149,7 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     private List<String> getMaterialIds(ItemStack toolStack) {
         NBTTagCompound root = TagUtil.getTagSafe(toolStack);
-        NBTTagCompound tinkerData = root.getCompoundTag("TinkerData");
-        NBTTagList materialsTagList = tinkerData.getTagList("Materials", 8);
-        if (materialsTagList.tagCount() == 0) {
-            materialsTagList = TagUtil.getBaseMaterialsTagList(root);
-        }
+        NBTTagList materialsTagList = TagUtil.getBaseMaterialsTagList(root);
         List<String> ids = new ArrayList<>();
         for (int i = 0; i < materialsTagList.tagCount(); i++) {
             String id = materialsTagList.getStringTagAt(i);

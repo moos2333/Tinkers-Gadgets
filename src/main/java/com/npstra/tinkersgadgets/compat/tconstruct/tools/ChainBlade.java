@@ -181,15 +181,6 @@ public class ChainBlade extends ProjectileCore {
     }
 
     private void shootChainBlade(World world, EntityPlayer player, ItemStack stack, float speed, float inaccuracy, float power, String toolId, boolean usedAmmo) {
-        NBTTagCompound tag = stack.getTagCompound();
-        if (tag == null) {
-            tag = new NBTTagCompound();
-            stack.setTagCompound(tag);
-        }
-        if (!tag.hasKey("chain_uuid")) {
-            tag.setString("chain_uuid", UUID.randomUUID().toString());
-        }
-
         EntityProjectileBase projectile = getProjectile(stack, stack, world, player, speed, inaccuracy, power, usedAmmo);
         if (!(projectile instanceof EntityChainBlade)) return;
         EntityChainBlade entity = (EntityChainBlade) projectile;

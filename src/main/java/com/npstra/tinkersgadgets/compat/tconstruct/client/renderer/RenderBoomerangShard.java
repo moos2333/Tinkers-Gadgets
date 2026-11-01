@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -24,8 +25,8 @@ public class RenderBoomerangShard extends Render<EntityBoomerangShard> {
     @Override
     public void doRender(EntityBoomerangShard entity, double x, double y, double z, float entityYaw, float partialTicks) {
         ItemStack stack = entity.getArrowStack();
-        if (stack == null || stack.isEmpty()) {
-            stack = new ItemStack(net.minecraft.init.Items.STICK);
+        if (stack.isEmpty()) {
+            stack = new ItemStack(Items.STICK);
         }
 
         GlStateManager.pushMatrix();
