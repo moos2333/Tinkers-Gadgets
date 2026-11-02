@@ -158,7 +158,7 @@ public class Boomerang extends ProjectileCore {
         return new EntityBoomerang(world, player, speed, inaccuracy, power, getProjectileStack(stack, world, player, usedAmmo), launcher);
     }
 
-    private static String getToolId(ItemStack stack) {
+    public static String getToolId(ItemStack stack) {
         NBTTagCompound root = TagUtil.getTagSafe(stack);
         NBTTagCompound stats = TagUtil.getToolTag(root);
         if (stats.hasKey("UUID")) {

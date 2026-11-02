@@ -306,6 +306,7 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (returning && shootingEntity != null && shootingEntity.isEntityAlive()) {
             returnToShooter();
+            if (isDead) return;
             double dist = getDistance(shootingEntity);
             double speed = getCurrentSpeed();
             if (speed < STUCK_SPEED_THRESHOLD && dist > STUCK_DIST_THRESHOLD) {
@@ -343,9 +344,9 @@ public class EntityBoomerang extends EntityProjectileBase {
     private void tryRefundAmmo(EntityPlayer player) {
         if (!consumedAmmo) return;
         ItemStack stack = player.getHeldItemMainhand();
-        if (!(stack.getItem() instanceof Boomerang)) {
+        if (!isMatchingBoomerang(stack)) {
             stack = player.getHeldItemOffhand();
-            if (!(stack.getItem() instanceof Boomerang)) return;
+            if (!isMatchingBoomerang(stack)) return;
         }
         int level = TagUtil.getToolTag(stack).getInteger(TAG_EFFICIENCY_LEVEL);
         if (level <= 0) return;
@@ -353,6 +354,12 @@ public class EntityBoomerang extends EntityProjectileBase {
         int dmg = stack.getItemDamage();
         if (dmg < DURABILITY_PER_AMMO) return;
         stack.setItemDamage(dmg - DURABILITY_PER_AMMO);
+    }
+
+    private boolean isMatchingBoomerang(ItemStack stack) {
+        if (!(stack.getItem() instanceof Boomerang)) return false;
+        if (toolId.isEmpty()) return true;
+        return toolId.equals(Boomerang.getToolId(stack));
     }
 
     @Override
