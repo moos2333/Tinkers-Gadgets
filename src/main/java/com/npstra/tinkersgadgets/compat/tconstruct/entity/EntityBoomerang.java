@@ -238,18 +238,13 @@ public class EntityBoomerang extends EntityProjectileBase {
         ).normalize();
 
         Vec3d[] directions = new Vec3d[]{rightFinal, leftFinal};
-        Vec3d targetCenter = target.getPositionVector().add(0, target.height * 0.5, 0);
         float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * SPLIT_DAMAGE_RATIO);
         List<IBoomerangTrait> traits = getBoomerangTraits();
         for (int i = 0; i < 2; i++) {
             Vec3d dir = directions[i];
-            Vec3d horizDir = new Vec3d(dir.x, 0, dir.z);
-            double horizLen = horizDir.length();
-            Vec3d spawnDir = horizLen < 0.001D ? forward : horizDir.scale(1.0D / horizLen);
-            Vec3d spawnPos = targetCenter.add(spawnDir.scale(1.5D));
             EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
-            shard.setPosition(spawnPos.x, spawnPos.y, spawnPos.z);
+            shard.setPosition(posX, posY, posZ);
             shard.motionX = dir.x * speed;
             shard.motionY = dir.y * speed;
             shard.motionZ = dir.z * speed;
