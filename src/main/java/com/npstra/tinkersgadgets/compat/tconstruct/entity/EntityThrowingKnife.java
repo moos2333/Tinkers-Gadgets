@@ -8,6 +8,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 
+import javax.annotation.Nonnull;
+
 public class EntityThrowingKnife extends EntityProjectileBase {
 
     private static final double GRAVITY = 0.065D;
@@ -18,6 +20,7 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     public float prevSpin;
     private boolean permanentlyDefused;
 
+    @SuppressWarnings("unused")
     public EntityThrowingKnife(World world) {
         super(world);
     }
@@ -50,6 +53,7 @@ public class EntityThrowingKnife extends EntityProjectileBase {
         }
     }
 
+    @Nonnull
     @Override
     public ItemStack getArrowStack() {
         return tinkerProjectile.getItemStack();
@@ -63,11 +67,6 @@ public class EntityThrowingKnife extends EntityProjectileBase {
     @Override
     public double getSlowdown() {
         return SLOWDOWN;
-    }
-
-    @Override
-    public void onHitBlock(RayTraceResult raytraceResult) {
-        super.onHitBlock(raytraceResult);
     }
 
     @Override
