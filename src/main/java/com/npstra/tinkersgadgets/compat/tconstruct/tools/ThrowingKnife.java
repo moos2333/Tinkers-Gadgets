@@ -143,6 +143,8 @@ public class ThrowingKnife extends ProjectileCore {
         knife.shoot(direction.x, direction.y, direction.z, speed, inaccuracy);
         knife.rotationYaw = (float) (Math.atan2(direction.x, direction.z) * 180.0 / Math.PI);
         knife.rotationPitch = (float) (-Math.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)) * 180.0 / Math.PI);
+        knife.prevRotationYaw = knife.rotationYaw;
+        knife.prevRotationPitch = knife.rotationPitch;
         world.spawnEntity(knife);
     }
 
