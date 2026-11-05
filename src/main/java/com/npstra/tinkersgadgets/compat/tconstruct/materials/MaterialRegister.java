@@ -70,7 +70,7 @@ public class MaterialRegister {
         if (!isMaterialEnabled("glass")) return;
         glass = new Material("glass", 0xFFFFFF, false);
         glass.setCraftable(true).setCastable(false);
-        if (isTraitEnabled("fracture")) {
+        if (isTraitEnabled("fracture_boomerang")) {
             glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
         }
         if (isTraitEnabled("focus_heatraygun")) {
@@ -86,7 +86,7 @@ public class MaterialRegister {
     private static void registerSlimeball() {
         if (!isMaterialEnabled("slimeball")) return;
         slimeball = createMaterial("slimeball", 0x71ac63, null, null);
-        if (isTraitEnabled("bouncing")) {
+        if (isTraitEnabled("bouncing_boomerang")) {
             slimeball.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
         }
         if (isTraitEnabled("rebound_throwingknife")) {
