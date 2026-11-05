@@ -251,6 +251,7 @@ public class MaterialRegister {
         if (!isMaterialEnabled("prismarine_crystals")) return;
         prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
         prismarineCrystals.setCraftable(true).setCastable(false);
+        TinkerRegistry.addMaterial(prismarineCrystals);
         if (isTraitEnabled("shatter_boomerang")) {
             prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
         }
@@ -264,7 +265,6 @@ public class MaterialRegister {
         }
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GripMaterialStats());
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GunBarrelMaterialStats(0, 1.05f, 0));
-        TinkerRegistry.addMaterial(prismarineCrystals);
         TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
         prismarineCrystals.setVisible();
     }
