@@ -19,7 +19,6 @@ public class ModEfficiency extends ModifierTrait {
 
     private static final String KEY_BASE_FUEL = "baseEfficiency";
     private static final String TAG_FUEL_EFFICIENCY = "fuelEfficiency";
-    private static final String TAG_COMBO_BONUS = "comboBonus";
     private static final String TAG_EFFICIENCY_LEVEL = "efficiency_level";
 
     public ModEfficiency() {
@@ -40,10 +39,8 @@ public class ModEfficiency extends ModifierTrait {
         NBTTagCompound toolTag = TagUtil.getToolTag(rootCompound);
         if (toolTag.hasKey(TAG_FUEL_EFFICIENCY)) {
             applyHeatRayGun(toolTag, modData.current);
-        } else if (toolTag.hasKey(TAG_COMBO_BONUS)) {
-            applyChainBlade(toolTag, modData.current);
         } else {
-            applyBoomerang(toolTag, modData.current);
+            applyLevel(toolTag, modData.current);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }
@@ -60,12 +57,7 @@ public class ModEfficiency extends ModifierTrait {
         toolTag.setFloat(TAG_FUEL_EFFICIENCY, base + totalBonus);
     }
 
-    private void applyChainBlade(NBTTagCompound toolTag, int points) {
-        int level = Math.min(points / POINTS_PER_LEVEL, MAX_LEVEL);
-        toolTag.setInteger(TAG_EFFICIENCY_LEVEL, level);
-    }
-
-    private void applyBoomerang(NBTTagCompound toolTag, int points) {
+    private void applyLevel(NBTTagCompound toolTag, int points) {
         int level = Math.min(points / POINTS_PER_LEVEL, MAX_LEVEL);
         toolTag.setInteger(TAG_EFFICIENCY_LEVEL, level);
     }

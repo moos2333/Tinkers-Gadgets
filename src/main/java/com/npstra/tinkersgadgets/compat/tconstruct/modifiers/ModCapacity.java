@@ -90,7 +90,9 @@ public class ModCapacity extends ModifierTrait {
         if (toolTag.hasKey(KEY_BASE_AMMO)) {
             base = toolTag.getInteger(KEY_BASE_AMMO);
         } else {
-            base = toolTag.getInteger(PistolSword.KEY_MAX_AMMO);
+            base = toolTag.hasKey(PistolSword.KEY_MAX_AMMO)
+                    ? toolTag.getInteger(PistolSword.KEY_MAX_AMMO)
+                    : PistolSword.BASE_CAPACITY;
             toolTag.setInteger(KEY_BASE_AMMO, base);
         }
         int levels = points / POINTS_PER_LEVEL;
@@ -116,7 +118,9 @@ public class ModCapacity extends ModifierTrait {
         if (toolTag.hasKey(KEY_BASE_BOOMERANG)) {
             base = toolTag.getInteger(KEY_BASE_BOOMERANG);
         } else {
-            base = 1;
+            base = toolTag.hasKey(Boomerang.KEY_MAX_ACTIVE)
+                    ? toolTag.getInteger(Boomerang.KEY_MAX_ACTIVE)
+                    : 1;
             toolTag.setInteger(KEY_BASE_BOOMERANG, base);
         }
         int levels = points / POINTS_PER_LEVEL;
