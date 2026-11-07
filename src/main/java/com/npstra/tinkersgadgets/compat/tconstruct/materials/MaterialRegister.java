@@ -105,7 +105,17 @@ public class MaterialRegister {
 
     private static void registerPoppedChorus() {
         if (!isMaterialEnabled("popped_chorus")) return;
-        poppedChorus = createMaterial("popped_chorus", 0xb78db7, TraitsRegistry.PIERCING, "boomerang_piercing");
+        poppedChorus = createMaterial("popped_chorus", 0xb78db7, null, null);
+        if (isTraitEnabled("boomerang_piercing")) {
+            poppedChorus.addTrait(TraitsRegistry.PIERCING, ConnectorPartType.CONNECTOR);
+        }
+        if (isTraitEnabled("enderference")) {
+            poppedChorus.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
+            poppedChorus.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
+            poppedChorus.addTrait(TinkerTraits.enderference, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
+            poppedChorus.addTrait(TinkerTraits.enderference, ChainPartType.CHAIN);
+            poppedChorus.addTrait(TinkerTraits.enderference, GunBarrelPartType.GUN_BARREL);
+        }
         if (isTraitEnabled("echo_throwingknife")) {
             poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
             poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
