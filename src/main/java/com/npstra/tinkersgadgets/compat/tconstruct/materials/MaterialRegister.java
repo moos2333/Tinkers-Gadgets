@@ -158,6 +158,7 @@ public class MaterialRegister {
         if (isTraitEnabled("sniping_throwingknife")) {
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GripPartType.GRIP);
+            shulkerShell.addTrait(TraitsRegistry.SNIPING, FuelTankPartType.FUEL_TANK);
         }
         if (isTraitEnabled("enderference")) {
             shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
@@ -168,9 +169,6 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
         if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
             shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
-        }
-        if (isTraitEnabled("thermostatic_heatraygun")) {
-            shulkerShell.addTrait(TraitsRegistry.THERMOSTATIC, FuelTankPartType.FUEL_TANK);
         }
         shulkerShell.addStats(new GunBarrelMaterialStats(2, 1.0f, 0));
     }

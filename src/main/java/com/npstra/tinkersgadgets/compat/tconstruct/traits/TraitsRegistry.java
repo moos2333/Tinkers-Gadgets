@@ -19,7 +19,6 @@ public class TraitsRegistry {
     public static final AbstractTrait INERTIA =  new TraitInertia();
     public static final AbstractTrait PRESSURIZED = new TraitPressurized();
     public static final AbstractTrait TEMPER =  new TraitTemper();
-    public static final AbstractTrait THERMOSTATIC =  new TraitThermostatic();
     public static final AbstractTrait CONDENSATION =  new TraitCondensation();
     public static final AbstractTrait FOCUS =  new TraitFocus();
     public static final AbstractTrait BURST = new TraitBurst();
