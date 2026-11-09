@@ -261,7 +261,7 @@ public class MaterialRegister {
         prismarineCrystals.setCraftable(true).setCastable(false);
         TinkerRegistry.addMaterial(prismarineCrystals);
         if (isTraitEnabled("shatter_boomerang")) {
-            prismarineCrystals.addTrait(TraitsRegistry.SHATTER);
+            prismarineCrystals.addTrait(TraitsRegistry.SHATTER, ConnectorPartType.CONNECTOR);
         }
         TinkerRegistry.addMaterialStats(prismarineCrystals, new FuelTankMaterialStats(5000, 8, 0.95f));
         if (isTraitEnabled("condensation_heatraygun")) {
@@ -270,10 +270,13 @@ public class MaterialRegister {
         if (isTraitEnabled("vortex_throwingknife")) {
             prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GripPartType.GRIP);
             prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GunBarrelPartType.GUN_BARREL);
+            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, ConnectorPartType.CONNECTOR);
+            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
         }
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GripMaterialStats());
         TinkerRegistry.addMaterialStats(prismarineCrystals, new GunBarrelMaterialStats(0, 1.05f, 0));
         TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
+        TinkerRegistry.addMaterialStats(prismarineCrystals, new HeatRayEmitterMaterialStats(1.5f, 0.9f));
         prismarineCrystals.setVisible();
     }
 
