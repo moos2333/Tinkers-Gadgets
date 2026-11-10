@@ -10,7 +10,7 @@ import slimeknights.tconstruct.library.utils.TagUtil;
 
 public class TraitPressurized extends AbstractTrait {
 
-    private static final float MAX_FUEL_BONUS = 0.20F;
+    private static final float MAX_FUEL_BONUS = 0.25F;
     private static final float BONUS_PER_AMMO = 0.04F;
 
     private static final String TAG_MAX_FUEL = "maxFuel";

@@ -11,7 +11,7 @@ import slimeknights.tconstruct.library.utils.TinkerUtil;
 public class TraitSeasoned extends AbstractTrait {
 
     private static final String TAG_STACKS = "seasoned_stacks";
-    private static final int MAX_STACKS = 15;
+    private static final int MAX_STACKS = 18;
     private static final float CHANCE_PER_STACK = 0.01f;
     private static final int DECAY_INTERVAL = 100;
 
