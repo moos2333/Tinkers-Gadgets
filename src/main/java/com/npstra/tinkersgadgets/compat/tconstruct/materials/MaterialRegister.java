@@ -159,18 +159,21 @@ public class MaterialRegister {
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GripPartType.GRIP);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, FuelTankPartType.FUEL_TANK);
+            shulkerShell.addTrait(TraitsRegistry.SNIPING, ChainPartType.CHAIN);
         }
         if (isTraitEnabled("enderference")) {
             shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
             shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
             shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
             shulkerShell.addTrait(TinkerTraits.enderference, GunBarrelPartType.GUN_BARREL);
+            shulkerShell.addTrait(TinkerTraits.enderference, ChainPartType.CHAIN);
         }
         TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
         if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
             shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
         }
         shulkerShell.addStats(new GunBarrelMaterialStats(2, 1.0f, 0));
+        shulkerShell.addStats(new ChainMaterialStats(2, 3.0f, 0, 0.0f, 0.04f));
     }
 
     private static void registerLeather() {
