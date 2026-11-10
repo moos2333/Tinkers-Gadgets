@@ -173,7 +173,7 @@ public class MaterialRegister {
             shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
         }
         shulkerShell.addStats(new GunBarrelMaterialStats(2, 1.0f, 0));
-        shulkerShell.addStats(new ChainMaterialStats(2, 3.0f, 0, 0.0f, 0.04f));
+        shulkerShell.addStats(new ChainMaterialStats(1, 3.0f, 0, 0.0f, 0.04f));
     }
 
     private static void registerLeather() {
