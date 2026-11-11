@@ -156,6 +156,7 @@ public class MaterialRegister {
             shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
         }
         if (isTraitEnabled("sniping_throwingknife")) {
+            shulkerShell.addTrait(TraitsRegistry.SNIPING, ConnectorPartType.CONNECTOR);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, GripPartType.GRIP);
             shulkerShell.addTrait(TraitsRegistry.SNIPING, FuelTankPartType.FUEL_TANK);

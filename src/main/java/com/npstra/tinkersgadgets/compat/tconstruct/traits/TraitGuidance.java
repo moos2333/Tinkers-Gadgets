@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.modifiers.ModifierAspect;
 import slimeknights.tconstruct.library.modifiers.ProjectileModifierTrait;
-import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 
 import java.util.List;
 
@@ -27,7 +26,6 @@ public class TraitGuidance extends ProjectileModifierTrait {
     @Override
     public void onProjectileUpdate(EntityProjectileBase projectile, World world, ItemStack toolStack) {
         if (world.isRemote) return;
-        if (!(projectile instanceof EntityThrowingKnife)) return;
         if (projectile.ticksExisted < 2) return;
         if (projectile.isDead || projectile.defused) return;
         if (projectile.motionX == 0.0D && projectile.motionY == 0.0D && projectile.motionZ == 0.0D) return;
@@ -39,7 +37,8 @@ public class TraitGuidance extends ProjectileModifierTrait {
 
         AxisAlignedBB aabb = projectile.getEntityBoundingBox().grow(MAX_RANGE);
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, aabb,
-                e -> e != shooterLiving && e.getEntityId() != projectile.getEntityId() && e.isEntityAlive() && !(e instanceof EntityPlayer && ((EntityPlayer)e).isSpectator()));
+                e -> e != shooterLiving && e.getEntityId() != projectile.getEntityId() && e.isEntityAlive()
+                        && !(e instanceof EntityPlayer && ((EntityPlayer) e).isSpectator()));
 
         if (targets.isEmpty()) return;
 
