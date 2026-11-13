@@ -55,6 +55,7 @@ public class ChainBlade extends ProjectileCore {
     private static final float BASE_DAMAGE_RATIO = 0.4f;
     private static final int THROW_CHARGE_BASE = 20;
     private static final float CHARGE_MULTIPLIER = 2.0f;
+    private static final float MIN_COMBO_MULT = 0.1f;
 
     public static final int MAX_CHARGE = 30;
     public static final String KEY_MAX_CHARGE = "chainMaxCharge";
@@ -250,7 +251,7 @@ public class ChainBlade extends ProjectileCore {
 
         int count = targets.size();
         float comboBonus = getComboBonus(stack);
-        float comboMult = 1.0f + Math.min(count * comboBonus, 1.0f);
+        float comboMult = Math.max(MIN_COMBO_MULT, 1.0f + Math.min(count * comboBonus, 1.0f));
 
         if (!targets.isEmpty()) {
             EntityLivingBase primary = targets.get(0);
