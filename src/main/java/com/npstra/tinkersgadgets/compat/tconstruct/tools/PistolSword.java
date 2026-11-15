@@ -6,12 +6,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
@@ -49,12 +47,13 @@ public class PistolSword extends TinkerToolCore {
     public static final double BURST_RADIUS = 1.0;
 
     public static final double RANGE = 12.0;
-    public static final int POISON_DURATION = 100;
-    public static final int POISON_AMPLIFIER = 2;
     public static final float PIERCE_RATIO = 0.4f;
     public static final float POISON_RANGED_BONUS = 1.5f;
     public static final int SHOT_COOLDOWN = 20;
     public static final double MAX_SPEED_RATIO = 2.0;
+
+    private static final float LIFESTEAL_HEAL_BASE = 2.0f;
+    private static final float LIFESTEAL_HEAL_UNDEAD = 1.0f;
 
     public static final String KEY_MAX_AMMO = "pistolSwordMaxAmmo";
     public static final String KEY_AMMO = "pistolSwordAmmo";
@@ -122,7 +121,9 @@ public class PistolSword extends TinkerToolCore {
         if (pending != AMMO_EMPTY) {
             clearPending(stack);
             if (pending == AMMO_POISON) {
-                primary.addPotionEffect(new PotionEffect(MobEffects.POISON, POISON_DURATION, POISON_AMPLIFIER));
+                float healAmount = primary.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD
+                        ? LIFESTEAL_HEAL_UNDEAD : LIFESTEAL_HEAL_BASE;
+                player.heal(healAmount);
             } else if (pending == AMMO_PIERCE) {
                 primary.hurtResistantTime = 0;
                 primary.attackEntityFrom(buildPierceDamage(player), baseDamage * PIERCE_RATIO);
