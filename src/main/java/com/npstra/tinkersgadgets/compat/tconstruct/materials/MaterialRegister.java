@@ -143,8 +143,8 @@ public class MaterialRegister {
     private static void registerMagmaCream() {
         if (!isMaterialEnabled("magma_cream")) return;
         magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
-        if (isTraitEnabled("superheat")) {
-            magmaCream.addTrait(TinkerTraits.superheat, ChainPartType.CHAIN);
+        if (isTraitEnabled("kinetic_boomerang")) {
+            magmaCream.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);
         }
         magmaCream.addStats(new ChainMaterialStats(3, 3.0f, 0, -0.15f, 0.02f));
     }

@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
-import slimeknights.tconstruct.library.tools.ranged.ProjectileCore;
 import slimeknights.tconstruct.library.traits.AbstractProjectileTrait;
 import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.library.utils.TinkerUtil;
@@ -14,7 +13,7 @@ public class TraitKinetic extends AbstractProjectileTrait {
 
     private static final int MAX_STACKS = 10;
     private static final float PROJECTILE_SPEED_PER_STACK = 0.10F;
-    private static final float SPRINT_DAMAGE_PER_STACK = 0.04F;
+    private static final float DAMAGE_PER_STACK = 0.03F;
     private static final int DECAY_INTERVAL = 60;
 
     private static final String KEY_STACKS = "kinetic_stacks";
@@ -52,12 +51,9 @@ public class TraitKinetic extends AbstractProjectileTrait {
     public float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target,
                         float damage, float newDamage, boolean isCritical) {
         if (player == null) return newDamage;
-        if (tool.getItem() instanceof ProjectileCore) return newDamage;
-        if (!player.isSprinting()) return newDamage;
-
-        int stacks = TagUtil.getToolTag(tool).getInteger(KEY_STACKS);
+        int stacks = getStacks(tool, player.world.getTotalWorldTime());
         if (stacks <= 0) return newDamage;
-        return newDamage + damage * stacks * SPRINT_DAMAGE_PER_STACK;
+        return newDamage + damage * stacks * DAMAGE_PER_STACK;
     }
 
     private int getStacks(ItemStack weapon, long now) {
