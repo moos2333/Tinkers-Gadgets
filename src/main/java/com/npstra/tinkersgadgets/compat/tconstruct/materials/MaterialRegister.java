@@ -5,7 +5,6 @@ import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -22,7 +21,7 @@ import java.util.Set;
 
 public class MaterialRegister {
 
-    public static Material glass, slimeball, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, blueSlimeball, enderpearl, wool, prismarineCrystals;
+    public static Material glass, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, enderpearl, wool, prismarineCrystals;
     public static Material brick, netherbrick;
 
     private static boolean materialsInitialized = false;
@@ -49,14 +48,12 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(GunBarrelMaterialStats.UNKNOWN);
 
         registerGlass();
-        registerSlimeball();
         registerPoppedChorus();
         registerNetherQuartz();
         registerMagmaCream();
         registerShulkerShell();
         registerLeather();
         registerRedstone();
-        registerBlueSlimeball();
         registerEnderpearl();
         registerWool();
         registerPrismarineCrystals();
@@ -81,26 +78,6 @@ public class MaterialRegister {
         TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
         glass.addStats(new GunBarrelMaterialStats(-3, 1.1f, 0));
         glass.setVisible();
-    }
-
-    private static void registerSlimeball() {
-        if (!isMaterialEnabled("slimeball")) return;
-        slimeball = createMaterial("slimeball", 0x71ac63, null, null);
-        if (isTraitEnabled("bouncing_boomerang")) {
-            slimeball.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("rebound_throwingknife")) {
-            slimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-        }
-        if (isTraitEnabled("conduction_heatraygun")) {
-            slimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
-            slimeball.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
-            slimeball.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
-        }
-        TinkerRegistry.addMaterialStats(slimeball, new GripMaterialStats());
-        slimeball.addStats(new FuelTankMaterialStats(4000, 8, 1.2f));
-        slimeball.addStats(new ChainMaterialStats(5, 3.0f, 0, 0.0f, 0.0f));
-        slimeball.addStats(new GunBarrelMaterialStats(2, 0.8f, 0));
     }
 
     private static void registerPoppedChorus() {
@@ -137,7 +114,6 @@ public class MaterialRegister {
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
         netherQuartz.addStats(new GunBarrelMaterialStats(-2, 1.0f, 0));
-
     }
 
     private static void registerMagmaCream() {
@@ -206,26 +182,6 @@ public class MaterialRegister {
         redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
         redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
         redstone.addStats(new GunBarrelMaterialStats(-1, 0.9f, 0));
-    }
-
-    private static void registerBlueSlimeball() {
-        if (!isMaterialEnabled("blue_slimeball")) return;
-        blueSlimeball = createMaterial("blue_slimeball", 0x5BC7FF, null, null);
-        if (isTraitEnabled("deflect_boomerang")) {
-            blueSlimeball.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("rebound_throwingknife")) {
-            blueSlimeball.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-        }
-        if (isTraitEnabled("conduction_heatraygun")) {
-            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
-            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
-            blueSlimeball.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
-        }
-        TinkerRegistry.addMaterialStats(blueSlimeball, new GripMaterialStats());
-        blueSlimeball.addStats(new FuelTankMaterialStats(3000, 9, 1.1f));
-        blueSlimeball.addStats(new ChainMaterialStats(3, 5.0f, 0, 0.0f, 0.0f));
-        blueSlimeball.addStats(new GunBarrelMaterialStats(3, 0.75f, 0));
     }
 
     private static void registerEnderpearl() {
@@ -312,6 +268,66 @@ public class MaterialRegister {
     }
 
     private static void patchExistingMaterials() {
+        Material slime = TinkerRegistry.getMaterial("slime");
+        if (slime != Material.UNKNOWN) {
+            if (isTraitEnabled("bouncing_boomerang")) {
+                slime.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("rebound_throwingknife")) {
+                slime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
+            }
+            if (isTraitEnabled("conduction_heatraygun")) {
+                slime.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+                slime.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
+                slime.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
+            }
+            if (slime.getStats(ConnectorPartType.CONNECTOR) == null) {
+                TinkerRegistry.addMaterialStats(slime, new ConnectorMaterialStats());
+            }
+            if (slime.getStats(GripPartType.GRIP) == null) {
+                TinkerRegistry.addMaterialStats(slime, new GripMaterialStats());
+            }
+            if (slime.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                slime.addStats(new FuelTankMaterialStats(3000, 18, 0.7f));
+            }
+            if (slime.getStats(ChainPartType.CHAIN) == null) {
+                slime.addStats(new ChainMaterialStats(5, 3.0f, 35, 0.0f, 0.0f));
+            }
+            if (slime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                slime.addStats(new GunBarrelMaterialStats(3, 0.8f, 350));
+            }
+        }
+
+        Material blueslime = TinkerRegistry.getMaterial("blueslime");
+        if (blueslime != Material.UNKNOWN) {
+            if (isTraitEnabled("deflect_boomerang")) {
+                blueslime.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("rebound_throwingknife")) {
+                blueslime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
+            }
+            if (isTraitEnabled("conduction_heatraygun")) {
+                blueslime.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
+                blueslime.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
+                blueslime.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
+            }
+            if (blueslime.getStats(ConnectorPartType.CONNECTOR) == null) {
+                TinkerRegistry.addMaterialStats(blueslime, new ConnectorMaterialStats());
+            }
+            if (blueslime.getStats(GripPartType.GRIP) == null) {
+                TinkerRegistry.addMaterialStats(blueslime, new GripMaterialStats());
+            }
+            if (blueslime.getStats(FuelTankPartType.FUEL_TANK) == null) {
+                blueslime.addStats(new FuelTankMaterialStats(2000, 12, 1.3f));
+            }
+            if (blueslime.getStats(ChainPartType.CHAIN) == null) {
+                blueslime.addStats(new ChainMaterialStats(4, 5.0f, 20, 0.0f, 0.0f));
+            }
+            if (blueslime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                blueslime.addStats(new GunBarrelMaterialStats(4, 0.75f, 200));
+            }
+        }
+
         Material iron = TinkerRegistry.getMaterial("iron");
         if (iron != Material.UNKNOWN) {
             if (iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
@@ -411,14 +427,12 @@ public class MaterialRegister {
         materialsInitialized = true;
         setupMaterials();
         integrate(glass);
-        integrate(slimeball);
         integrate(poppedChorus);
         integrate(netherQuartz);
         integrate(magmaCream);
         integrate(shulkerShell);
         integrate(leather);
         integrate(redstone);
-        integrate(blueSlimeball);
         integrate(enderpearl);
         integrate(wool);
         integrate(prismarineCrystals);
@@ -439,7 +453,6 @@ public class MaterialRegister {
 
     private static void setupMaterials() {
         registerMaterial(glass, new ItemStack(Blocks.GLASS), Material.VALUE_Ingot);
-        registerMaterial(slimeball, new ItemStack(Items.SLIME_BALL), 36);
         registerMaterial(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot);
         registerMaterial(netherQuartz, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot);
         registerMaterial(magmaCream, new ItemStack(Items.MAGMA_CREAM), Material.VALUE_Ingot);
@@ -451,27 +464,17 @@ public class MaterialRegister {
         registerMaterial(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS), Material.VALUE_Ingot);
         registerMaterial(brick, new ItemStack(Items.BRICK), Material.VALUE_Ingot);
         registerMaterial(netherbrick, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot);
-
-        if (blueSlimeball != null) {
-            ItemStack blueSlimeStack = new ItemStack(Item.getByNameOrId("tconstruct:edible"), 1, 1);
-            if (!blueSlimeStack.isEmpty()) {
-                blueSlimeball.addItem(blueSlimeStack, 1, 36);
-                blueSlimeball.setRepresentativeItem(blueSlimeStack);
-            }
-        }
     }
 
     @SideOnly(Side.CLIENT)
     public static void registerMaterialRenderInfo() {
         setRenderColor(glass, 0xD1F2EB);
-        setRenderColor(slimeball, 0x71ac63);
         setRenderColor(poppedChorus, 0xb78db7);
         setRenderColor(netherQuartz, 0xe5dfd6);
         setRenderColor(magmaCream, 0xFF8C00);
         setRenderColor(shulkerShell, 0x976997);
         setRenderColor(leather, 0xC76A43);
         setRenderColor(redstone, 0xCC0000);
-        setRenderColor(blueSlimeball, 0x5BC7FF);
         setRenderColor(enderpearl, 0x0A6E6E);
         setRenderColor(wool, 0xF3E9E3);
         setRenderColor(prismarineCrystals, 0xdfe9dc);
