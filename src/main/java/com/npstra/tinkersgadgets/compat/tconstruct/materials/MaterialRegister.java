@@ -335,6 +335,9 @@ public class MaterialRegister {
             if (magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
                 magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
             }
+            if (magmaslime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
+                magmaslime.addStats(new GunBarrelMaterialStats(3, 1.5f, 150));
+            }
         }
 
         Material iron = TinkerRegistry.getMaterial("iron");
