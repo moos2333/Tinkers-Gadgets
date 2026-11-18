@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class ItemConnector extends ToolPart {
     private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
-            "glass", "slime", "popped_chorus", "nether_quartz", "magma_cream",
+            "glass", "slime", "popped_chorus", "nether_quartz", "magmaslime",
             "shulker_shell", "leather", "redstone", "blueslime",
             "enderpearl", "prismarine_crystals", "iron", "cobalt", "wool"
     ));

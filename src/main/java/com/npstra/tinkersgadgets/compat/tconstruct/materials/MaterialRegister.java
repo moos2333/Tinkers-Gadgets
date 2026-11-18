@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class MaterialRegister {
 
-    public static Material glass, poppedChorus, netherQuartz, magmaCream, shulkerShell, leather, redstone, enderpearl, wool, prismarineCrystals;
+    public static Material glass, poppedChorus, netherQuartz, shulkerShell, leather, redstone, enderpearl, wool, prismarineCrystals;
     public static Material brick, netherbrick;
 
     private static boolean materialsInitialized = false;
@@ -50,7 +50,6 @@ public class MaterialRegister {
         registerGlass();
         registerPoppedChorus();
         registerNetherQuartz();
-        registerMagmaCream();
         registerShulkerShell();
         registerLeather();
         registerRedstone();
@@ -114,15 +113,6 @@ public class MaterialRegister {
         netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
         netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
         netherQuartz.addStats(new GunBarrelMaterialStats(-2, 1.0f, 0));
-    }
-
-    private static void registerMagmaCream() {
-        if (!isMaterialEnabled("magma_cream")) return;
-        magmaCream = createMaterial("magma_cream", 0xFF8C00, TraitsRegistry.RETURN_DAMAGE, "return_damage");
-        if (isTraitEnabled("kinetic_boomerang")) {
-            magmaCream.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);
-        }
-        magmaCream.addStats(new ChainMaterialStats(3, 3.0f, 0, -0.15f, 0.02f));
     }
 
     private static void registerShulkerShell() {
@@ -328,6 +318,25 @@ public class MaterialRegister {
             }
         }
 
+        Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
+        if (magmaslime != Material.UNKNOWN) {
+            if (isTraitEnabled("return_damage")) {
+                magmaslime.addTrait(TraitsRegistry.RETURN_DAMAGE, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("kinetic_boomerang")) {
+                magmaslime.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);
+            }
+            if (magmaslime.getStats(ConnectorPartType.CONNECTOR) == null) {
+                TinkerRegistry.addMaterialStats(magmaslime, new ConnectorMaterialStats());
+            }
+            if (magmaslime.getStats(ChainPartType.CHAIN) == null) {
+                magmaslime.addStats(new ChainMaterialStats(3, 3.0f, 15, 0.0f, 0.05f));
+            }
+            if (magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
+                magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
+            }
+        }
+
         Material iron = TinkerRegistry.getMaterial("iron");
         if (iron != Material.UNKNOWN) {
             if (iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
@@ -403,11 +412,6 @@ public class MaterialRegister {
                 cobalt.addTrait(TraitsRegistry.EBB, ChainPartType.CHAIN);
             }
         }
-
-        Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
-        if (magmaslime != Material.UNKNOWN && magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
-        }
     }
 
     private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
@@ -429,7 +433,6 @@ public class MaterialRegister {
         integrate(glass);
         integrate(poppedChorus);
         integrate(netherQuartz);
-        integrate(magmaCream);
         integrate(shulkerShell);
         integrate(leather);
         integrate(redstone);
@@ -455,7 +458,6 @@ public class MaterialRegister {
         registerMaterial(glass, new ItemStack(Blocks.GLASS), Material.VALUE_Ingot);
         registerMaterial(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot);
         registerMaterial(netherQuartz, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot);
-        registerMaterial(magmaCream, new ItemStack(Items.MAGMA_CREAM), Material.VALUE_Ingot);
         registerMaterial(shulkerShell, new ItemStack(Items.SHULKER_SHELL), Material.VALUE_Ingot);
         registerMaterial(leather, new ItemStack(Items.LEATHER), Material.VALUE_Ingot);
         registerMaterial(redstone, new ItemStack(Items.REDSTONE), Material.VALUE_Shard);
@@ -471,7 +473,6 @@ public class MaterialRegister {
         setRenderColor(glass, 0xD1F2EB);
         setRenderColor(poppedChorus, 0xb78db7);
         setRenderColor(netherQuartz, 0xe5dfd6);
-        setRenderColor(magmaCream, 0xFF8C00);
         setRenderColor(shulkerShell, 0x976997);
         setRenderColor(leather, 0xC76A43);
         setRenderColor(redstone, 0xCC0000);
