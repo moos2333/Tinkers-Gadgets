@@ -336,7 +336,7 @@ public class MaterialRegister {
                 magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
             }
             if (magmaslime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                magmaslime.addStats(new GunBarrelMaterialStats(3, 1.5f, 150));
+                magmaslime.addStats(new GunBarrelMaterialStats(1, 1.5f, 150));
             }
         }
 

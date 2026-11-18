@@ -114,10 +114,14 @@ public class PistolSword extends TinkerToolCore {
 
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack;
-
-        ChainBlade.attackWithTraits(stack, player, primary, null, baseDamage);
+        float rangedMult = getRangedMultiplier(stack);
 
         byte pending = getPending(stack);
+        boolean shotBonus = pending != AMMO_EMPTY && rangedMult > 1.0f;
+
+        float meleeDamage = shotBonus ? baseDamage * rangedMult : baseDamage;
+        ChainBlade.attackWithTraits(stack, player, primary, null, meleeDamage);
+
         if (pending != AMMO_EMPTY) {
             clearPending(stack);
             if (pending == AMMO_POISON) {
@@ -125,10 +129,14 @@ public class PistolSword extends TinkerToolCore {
                         ? LIFESTEAL_HEAL_UNDEAD : LIFESTEAL_HEAL_BASE;
                 player.heal(healAmount);
             } else if (pending == AMMO_PIERCE) {
+                float pierceDamage = baseDamage * PIERCE_RATIO;
+                if (shotBonus) {
+                    pierceDamage *= rangedMult;
+                }
                 primary.hurtResistantTime = 0;
-                primary.attackEntityFrom(buildPierceDamage(player), baseDamage * PIERCE_RATIO);
+                primary.attackEntityFrom(buildPierceDamage(player), pierceDamage);
             }
-            performBurst(stack, player, primary, baseDamage);
+            performBurst(stack, player, primary, meleeDamage);
         }
 
         if (readyToCollect) {
