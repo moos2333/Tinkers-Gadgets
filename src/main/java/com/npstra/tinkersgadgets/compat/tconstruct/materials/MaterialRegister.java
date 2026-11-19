@@ -103,7 +103,7 @@ public class MaterialRegister {
             poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
         }
         poppedChorus.addStats(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f));
-        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.2f, 0));
+        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.1f, 0));
     }
 
     private static void registerNetherQuartz() {
