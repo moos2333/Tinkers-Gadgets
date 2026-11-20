@@ -26,6 +26,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.tinkering.Category;
@@ -403,12 +404,9 @@ public class HeatRayGun extends TinkerToolCore {
             itemTag.setInteger("ShotCount", 0);
             player.world.playSound(null, player.posX, player.posY, player.posZ,
                     SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0F, 0.5F);
-            for (int i = 0; i < 8; i++) {
-                player.world.spawnAlwaysVisibleParticle(EnumParticleTypes.SMOKE_LARGE.getParticleID(),
-                        player.posX + (player.world.rand.nextDouble() - 0.5D) * 1.0D,
-                        player.posY + player.world.rand.nextDouble() * 1.5D,
-                        player.posZ + (player.world.rand.nextDouble() - 0.5D) * 1.0D,
-                        0, 0.1D, 0);
+            if (player.world instanceof WorldServer) {
+                ((WorldServer) player.world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, false,
+                        player.posX, player.posY + 0.75D, player.posZ, 8, 0.5D, 0.75D, 0.5D, 0.1D);
             }
         } else {
             itemTag.setInteger("ShotCount", shots);

@@ -295,9 +295,16 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
         );
         List<EntityLivingBase> targets = world.getEntitiesWithinAABB(EntityLivingBase.class, box,
                 e -> e != shooter && !hitEntities.contains(e.getUniqueID()) && e.isEntityAlive());
-        if (targets.isEmpty()) return null;
-        targets.sort((a, b) -> Double.compare(a.getDistance(this), b.getDistance(this)));
-        return targets.get(0);
+        EntityLivingBase nearest = null;
+        double nearestDist = Double.MAX_VALUE;
+        for (EntityLivingBase target : targets) {
+            double dist = target.getDistance(this);
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = target;
+            }
+        }
+        return nearest;
     }
 
     @Override

@@ -95,7 +95,7 @@ public class Boomerang extends ProjectileCore {
             int maxActive = getMaxActive(stack);
             Set<Entity> set = activeBoomerangs.get(toolId);
             if (set != null) {
-                set.removeIf(e -> !e.isEntityAlive());
+                set.removeIf(e -> !e.isEntityAlive() || e.world != worldIn);
                 if (set.size() >= maxActive) {
                     return;
                 }

@@ -434,16 +434,23 @@ public class EntityBoomerang extends EntityProjectileBase {
                         !(e instanceof EntityTameable && ((EntityTameable) e).getOwner() == shootingEntity));
         if (candidates.isEmpty()) return null;
 
-        EntityLivingBase firstFresh = candidates.stream()
-                .filter(e -> !hitEntities.contains(e.getUniqueID()))
-                .min(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)))
-                .orElse(null);
-        if (firstFresh != null) return firstFresh;
-
-        return candidates.stream()
-                .filter(e -> hitEntities.contains(e.getUniqueID()))
-                .min(Comparator.comparingDouble(e -> e.getDistanceSq(currentHit)))
-                .orElse(null);
+        EntityLivingBase fresh = null;
+        EntityLivingBase repeated = null;
+        double freshDist = Double.MAX_VALUE;
+        double repeatedDist = Double.MAX_VALUE;
+        for (EntityLivingBase candidate : candidates) {
+            double dist = candidate.getDistanceSq(currentHit);
+            if (hitEntities.contains(candidate.getUniqueID())) {
+                if (dist < repeatedDist) {
+                    repeatedDist = dist;
+                    repeated = candidate;
+                }
+            } else if (dist < freshDist) {
+                freshDist = dist;
+                fresh = candidate;
+            }
+        }
+        return fresh != null ? fresh : repeated;
     }
 
     public void redirectToTarget(Entity target) {

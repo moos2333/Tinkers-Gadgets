@@ -59,6 +59,7 @@ public class ChainBlade extends ProjectileCore {
 
     public static final int MAX_CHARGE = 30;
     public static final String KEY_MAX_CHARGE = "chainMaxCharge";
+    private static final String TAG_SWEEP_COOLDOWN = "sweep_cooldown";
 
     public ChainBlade() {
         super(PartMaterialType.handle(TinkerTools.toolRod),
@@ -135,12 +136,12 @@ public class ChainBlade extends ProjectileCore {
             return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
         if (player.isSneaking()) {
-            if (isOnCooldown(stack)) {
+            if (isOnCooldown(stack, world)) {
                 return new ActionResult<>(EnumActionResult.FAIL, stack);
             }
             performSweep(world, player, stack);
             if (!world.isRemote) {
-                setCooldown(stack);
+                setCooldown(stack, world);
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
@@ -162,7 +163,7 @@ public class ChainBlade extends ProjectileCore {
             String toolId = getToolId(stack);
             Set<Entity> set = activeChainBlades.get(toolId);
             if (set != null) {
-                set.removeIf(e -> !e.isEntityAlive());
+                set.removeIf(e -> !e.isEntityAlive() || e.world != world);
                 if (!set.isEmpty()) {
                     return;
                 }
@@ -283,20 +284,20 @@ public class ChainBlade extends ProjectileCore {
         return Math.max(1, CHARGE_COST - level * 2);
     }
 
-    private boolean isOnCooldown(ItemStack stack) {
+    private boolean isOnCooldown(ItemStack stack, World world) {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null) return false;
-        return tag.getLong("sweep_cooldown") > System.currentTimeMillis();
+        long remaining = tag.getLong(TAG_SWEEP_COOLDOWN) - world.getTotalWorldTime();
+        return remaining > 0L && remaining <= getSweepCooldown(stack);
     }
 
-    private void setCooldown(ItemStack stack) {
+    private void setCooldown(ItemStack stack, World world) {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null) {
             tag = new NBTTagCompound();
             stack.setTagCompound(tag);
         }
-        int cooldown = getSweepCooldown(stack);
-        tag.setLong("sweep_cooldown", System.currentTimeMillis() + cooldown * 50L);
+        tag.setLong(TAG_SWEEP_COOLDOWN, world.getTotalWorldTime() + getSweepCooldown(stack));
     }
 
     private int getChargeTime(ItemStack stack) {
