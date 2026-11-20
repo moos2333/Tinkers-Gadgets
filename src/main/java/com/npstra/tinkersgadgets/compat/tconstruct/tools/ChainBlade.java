@@ -211,7 +211,7 @@ public class ChainBlade extends ProjectileCore {
         if (world.isRemote) return;
 
         if (getCurrentAmmo(stack) < 1) return;
-        useAmmo(stack, player);
+        if (!player.capabilities.isCreativeMode) useAmmo(stack, player);
 
         ToolNBT data = new ToolNBT(TagUtil.getToolTag(stack));
         float baseDamage = (float) data.attack * BASE_DAMAGE_RATIO;

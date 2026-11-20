@@ -8,10 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.tconstruct.library.TinkerRegistry;
-import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.tools.TinkerTraits;
 
@@ -64,7 +61,7 @@ public class MaterialRegister {
 
     private static void registerGlass() {
         if (!isMaterialEnabled("glass")) return;
-        glass = new Material("glass", 0xFFFFFF, false);
+        glass = new Material("glass", 0xD1F2EB, false);
         glass.setCraftable(true).setCastable(false);
         if (isTraitEnabled("fracture_boomerang")) {
             glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
@@ -479,24 +476,5 @@ public class MaterialRegister {
         registerMaterial(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS), Material.VALUE_Ingot);
         registerMaterial(brick, new ItemStack(Items.BRICK), Material.VALUE_Ingot);
         registerMaterial(netherbrick, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void registerMaterialRenderInfo() {
-        setRenderColor(glass, 0xD1F2EB);
-        setRenderColor(poppedChorus, 0xb78db7);
-        setRenderColor(netherQuartz, 0xe5dfd6);
-        setRenderColor(shulkerShell, 0x976997);
-        setRenderColor(leather, 0xC76A43);
-        setRenderColor(redstone, 0xCC0000);
-        setRenderColor(enderpearl, 0x0A6E6E);
-        setRenderColor(wool, 0xF3E9E3);
-        setRenderColor(prismarineCrystals, 0xdfe9dc);
-        setRenderColor(brick, 0xb75a40);
-        setRenderColor(netherbrick, 0x49282e);
-    }
-
-    private static void setRenderColor(Material mat, int color) {
-        if (mat != null) mat.setRenderInfo(new MaterialRenderInfo.Default(color));
     }
 }

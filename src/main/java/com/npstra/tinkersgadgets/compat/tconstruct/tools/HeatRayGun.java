@@ -257,13 +257,15 @@ public class HeatRayGun extends TinkerToolCore {
             if (invStack.isEmpty()) continue;
             int burnTime = TileEntityFurnace.getItemBurnTime(invStack);
             if (burnTime <= 0) continue;
-            ItemStack copy = invStack.copy();
-            copy.shrink(1);
-            player.inventory.setInventorySlotContents(i, copy.isEmpty() ? ItemStack.EMPTY : copy);
             int newFuel = Math.min(currentFuel + burnTime, maxFuel);
-            setFuel(stack, newFuel);
-            world.playSound(null, player.posX, player.posY, player.posZ,
-                    SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8F, 1.2F);
+            if (!world.isRemote) {
+                ItemStack copy = invStack.copy();
+                copy.shrink(1);
+                player.inventory.setInventorySlotContents(i, copy.isEmpty() ? ItemStack.EMPTY : copy);
+                setFuel(stack, newFuel);
+                world.playSound(null, player.posX, player.posY, player.posZ,
+                        SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8F, 1.2F);
+            }
             for (int p = 0; p < 8; p++) {
                 world.spawnParticle(EnumParticleTypes.FLAME,
                         player.posX + (world.rand.nextDouble() - 0.5D) * 1.0D,
@@ -364,7 +366,7 @@ public class HeatRayGun extends TinkerToolCore {
         RayTraceResult hitBlock = world.rayTraceBlocks(eyePos, rayEnd, false, true, false);
         if (hitBlock != null) rayEnd = hitBlock.hitVec;
         double distance = eyePos.distanceTo(rayEnd);
-        int steps = (int) (distance * 0.8);
+        int steps = Math.max(1, (int) (distance * 0.8));
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / steps;
             Vec3d pathPos = eyePos.add(lookVec.scale(distance * t));

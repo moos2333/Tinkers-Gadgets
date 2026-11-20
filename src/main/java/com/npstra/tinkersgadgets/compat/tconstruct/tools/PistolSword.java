@@ -106,7 +106,7 @@ public class PistolSword extends TinkerToolCore {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (player.world.isRemote) return true;
+        if (ToolHelper.isBroken(stack) || player.world.isRemote) return true;
         if (!(entity instanceof EntityLivingBase)) return false;
         EntityLivingBase primary = (EntityLivingBase) entity;
 
@@ -139,7 +139,7 @@ public class PistolSword extends TinkerToolCore {
             performBurst(stack, player, primary, meleeDamage);
         }
 
-        if (readyToCollect) {
+        if (readyToCollect && !ToolHelper.isBroken(stack)) {
             collectAmmo(stack, determineAmmoType(primary));
         }
 
