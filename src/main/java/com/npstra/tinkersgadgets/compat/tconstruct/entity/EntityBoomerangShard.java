@@ -41,7 +41,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     private static final double RETURN_SPEED_MULTIPLIER = 0.5D;
     private static final double PIERCING_SPEED_REDUCTION = 0.95D;
     private static final double PIERCING_MIN_SPEED = 0.25D;
-    private static final double RETURN_HIT_RADIUS = 0.5D;
 
     private boolean returning;
     private ItemStack renderStack = ItemStack.EMPTY;
@@ -55,7 +54,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
 
     private boolean piercing;
     private int pierceCount;
-    private boolean returnDamageEnabled;
 
     public EntityBoomerangShard(World world) {
         super(world);
@@ -75,7 +73,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     public void setToolId(String id) { this.toolId = id; }
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
-    public void setReturnDamageEnabled(boolean enabled) { this.returnDamageEnabled = enabled; }
 
     private double getCurrentSpeed() {
         return Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
@@ -149,7 +146,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
 
         if (returning) {
             if (shootingEntity != null && shootingEntity.isEntityAlive()) {
-                if (returnDamageEnabled) checkReturnHit();
                 returnToShooter();
                 double dist = getDistance(shootingEntity);
                 if (currentSpeed < STUCK_SPEED_THRESHOLD && dist > STUCK_DIST_THRESHOLD) {
@@ -161,21 +157,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
             } else {
                 setDead();
             }
-        }
-    }
-
-    private void checkReturnHit() {
-        if (this.damage <= 0.0D) return;
-        AxisAlignedBB box = getEntityBoundingBox().grow(RETURN_HIT_RADIUS);
-        List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, box);
-        EntityDamageSource source = null;
-        for (Entity entity : entities) {
-            if (!(entity instanceof EntityLivingBase)) continue;
-            if (entity == shootingEntity) continue;
-            if (hitEntities.contains(entity.getUniqueID())) continue;
-            if (source == null) source = buildDamageSource();
-            ((EntityLivingBase) entity).attackEntityFrom(source, (float) this.damage);
-            hitEntities.add(entity.getUniqueID());
         }
     }
 
@@ -271,7 +252,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         data.writeBoolean(returning);
         data.writeBoolean(piercing);
         data.writeInt(pierceCount);
-        data.writeBoolean(returnDamageEnabled);
         boolean hasIgnore = ignoreEntityId != null;
         data.writeBoolean(hasIgnore);
         if (hasIgnore) {
@@ -289,7 +269,6 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
         returning = data.readBoolean();
         piercing = data.readBoolean();
         pierceCount = data.readInt();
-        returnDamageEnabled = data.readBoolean();
         if (data.readBoolean()) {
             ignoreEntityId = new UUID(data.readLong(), data.readLong());
         }

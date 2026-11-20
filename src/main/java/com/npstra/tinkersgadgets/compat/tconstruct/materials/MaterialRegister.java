@@ -320,8 +320,11 @@ public class MaterialRegister {
 
         Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
         if (magmaslime != Material.UNKNOWN) {
-            if (isTraitEnabled("return_damage")) {
-                magmaslime.addTrait(TraitsRegistry.RETURN_DAMAGE, ConnectorPartType.CONNECTOR);
+            if (isTraitEnabled("bouncing_boomerang")) {
+                magmaslime.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
+            }
+            if (isTraitEnabled("conduction_heatraygun")) {
+                magmaslime.addTrait(TraitsRegistry.CONDUCTION, ConnectorPartType.CONNECTOR);
             }
             if (isTraitEnabled("kinetic_boomerang")) {
                 magmaslime.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);

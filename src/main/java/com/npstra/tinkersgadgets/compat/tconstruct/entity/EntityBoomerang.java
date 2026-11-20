@@ -69,6 +69,8 @@ public class EntityBoomerang extends EntityProjectileBase {
     private final Set<UUID> hitEntities = new HashSet<>();
     private boolean interactUsed;
 
+    private int returnHitsLeft;
+
     private List<IBoomerangTrait> boomerangTraits;
 
     public EntityBoomerang(World world) {
@@ -137,6 +139,7 @@ public class EntityBoomerang extends EntityProjectileBase {
         inGround = false;
         arrowShake = 0;
         ticksInGround = 0;
+        returnHitsLeft = piercing ? Math.max(1, pierceCount) : 1;
     }
 
     private double getCurrentSpeed() {
@@ -369,6 +372,20 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void onHitEntity(RayTraceResult raytraceResult) {
         Entity entityHit = raytraceResult.entityHit;
 
+        if (returning) {
+            if (returnHitsLeft > 0 && entityHit != shootingEntity) {
+                boolean oldBounce = this.bounceOnNoDamage;
+                this.bounceOnNoDamage = true;
+                try {
+                    super.onHitEntity(raytraceResult);
+                } finally {
+                    this.bounceOnNoDamage = oldBounce;
+                }
+                returnHitsLeft--;
+            }
+            return;
+        }
+
         for (IBoomerangTrait trait : getBoomerangTraits()) {
             if (trait.onBoomerangHitEntity(this, entityHit)) return;
         }
@@ -454,7 +471,10 @@ public class EntityBoomerang extends EntityProjectileBase {
     @Nullable
     @Override
     protected Entity findEntityOnPath(Vec3d start, Vec3d end) {
-        if (returning) return null;
+        if (returning) {
+            if (returnHitsLeft <= 0) return null;
+            return super.findEntityOnPath(start, end);
+        }
         if (piercing && pierceCount <= 0) return null;
         return super.findEntityOnPath(start, end);
     }
