@@ -325,12 +325,19 @@ public class MaterialRegister {
             }
             if (isTraitEnabled("conduction_heatraygun")) {
                 magmaslime.addTrait(TraitsRegistry.CONDUCTION, ConnectorPartType.CONNECTOR);
+                magmaslime.addTrait(TraitsRegistry.CONDUCTION, GripPartType.GRIP);
+            }
+            if (isTraitEnabled("rebound_throwingknife")) {
+                magmaslime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
             }
             if (isTraitEnabled("kinetic_boomerang")) {
                 magmaslime.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);
             }
             if (magmaslime.getStats(ConnectorPartType.CONNECTOR) == null) {
                 TinkerRegistry.addMaterialStats(magmaslime, new ConnectorMaterialStats());
+            }
+            if (magmaslime.getStats(GripPartType.GRIP) == null) {
+                TinkerRegistry.addMaterialStats(magmaslime, new GripMaterialStats());
             }
             if (magmaslime.getStats(ChainPartType.CHAIN) == null) {
                 magmaslime.addStats(new ChainMaterialStats(3, 3.0f, 15, 0.0f, 0.05f));

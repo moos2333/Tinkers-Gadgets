@@ -10,7 +10,7 @@ public class ItemGrip extends ToolPart {
     private static final Set<String> ALLOWED_MATERIALS = new HashSet<>(Arrays.asList(
             "leather", "wool", "slime", "shulker_shell", "blueslime",
             "popped_chorus", "redstone", "enderpearl", "nether_quartz", "iron",
-            "cobalt", "prismarine_crystals"
+            "cobalt", "prismarine_crystals", "magmaslime"
     ));
 
     public ItemGrip() {
