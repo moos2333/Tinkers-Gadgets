@@ -43,11 +43,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChainBlade extends ProjectileCore {
-    private static final Map<String, Set<Entity>> activeChainBlades = new WeakHashMap<>();
+    private static final Map<String, Set<Entity>> activeChainBlades = new ConcurrentHashMap<>();
     private static final UUID CUSTOM_DAMAGE_UUID = UUID.fromString("c8f7e6d5-a4b3-2910-8271-6a5b4c3d2e1f");
+    private static final String TAG_TOOL_UUID = "chain_uuid";
     private static final int CHARGE_COST = 10;
     private static final int SWEEP_COOLDOWN_BASE = 40;
     private static final float SWEEP_BASE_RADIUS = 3.5f;
@@ -161,12 +162,8 @@ public class ChainBlade extends ProjectileCore {
         if (useDuration < chargeTime) return;
         if (!world.isRemote) {
             String toolId = getToolId(stack);
-            Set<Entity> set = activeChainBlades.get(toolId);
-            if (set != null) {
-                set.removeIf(e -> !e.isEntityAlive() || e.world != world);
-                if (!set.isEmpty()) {
-                    return;
-                }
+            if (hasActive(toolId, world)) {
+                return;
             }
             boolean ammoDepleted = this.getCurrentAmmo(stack) < 1;
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
@@ -442,12 +439,26 @@ public class ChainBlade extends ProjectileCore {
     }
 
     private static String getToolId(ItemStack stack) {
-        NBTTagCompound root = TagUtil.getTagSafe(stack);
-        NBTTagCompound stats = TagUtil.getToolTag(root);
-        if (stats.hasKey("UUID")) {
-            return stats.getString("UUID");
+        NBTTagCompound tag = TagUtil.getTagSafe(stack);
+        String id = tag.getString(TAG_TOOL_UUID);
+        if (id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+            tag.setString(TAG_TOOL_UUID, id);
         }
-        return stack.getItem().getRegistryName().toString() + "#" + System.identityHashCode(stack);
+        return id;
+    }
+
+    private static boolean hasActive(String toolId, World world) {
+        Set<Entity> set = activeChainBlades.get(toolId);
+        if (set == null) {
+            return false;
+        }
+        set.removeIf(e -> !e.isEntityAlive() || world.getEntityByID(e.getEntityId()) != e);
+        if (set.isEmpty()) {
+            activeChainBlades.remove(toolId);
+            return false;
+        }
+        return true;
     }
 
     public static void addActiveChainBlade(String toolId, Entity entity) {

@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,8 +34,9 @@ import com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType;
 public class Boomerang extends ProjectileCore {
 
     public static final String KEY_MAX_ACTIVE = "maxActiveBoomerangs";
+    private static final String TAG_TOOL_UUID = "tool_uuid";
 
-    private static final Map<String, Set<Entity>> activeBoomerangs = new WeakHashMap<>();
+    private static final Map<String, Set<Entity>> activeBoomerangs = new ConcurrentHashMap<>();
 
     public Boomerang() {
         super(new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD),
@@ -92,13 +94,8 @@ public class Boomerang extends ProjectileCore {
         }
         if (!worldIn.isRemote) {
             String toolId = getToolId(stack);
-            int maxActive = getMaxActive(stack);
-            Set<Entity> set = activeBoomerangs.get(toolId);
-            if (set != null) {
-                set.removeIf(e -> !e.isEntityAlive() || e.world != worldIn);
-                if (set.size() >= maxActive) {
-                    return;
-                }
+            if (countActive(toolId, worldIn) >= getMaxActive(stack)) {
+                return;
             }
             boolean usedAmmo = !player.capabilities.isCreativeMode && !ammoDepleted && useAmmo(stack, player);
             EntityProjectileBase projectile = getProjectile(stack, stack, worldIn, player, 1.8F * progress, 0.5F * (1 - progress), progress, usedAmmo);
@@ -160,11 +157,25 @@ public class Boomerang extends ProjectileCore {
 
     public static String getToolId(ItemStack stack) {
         NBTTagCompound root = TagUtil.getTagSafe(stack);
-        NBTTagCompound stats = TagUtil.getToolTag(root);
-        if (stats.hasKey("UUID")) {
-            return stats.getString("UUID");
+        String id = root.getString(TAG_TOOL_UUID);
+        if (id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+            root.setString(TAG_TOOL_UUID, id);
         }
-        return stack.getItem().getRegistryName().toString() + "#" + System.identityHashCode(stack);
+        return id;
+    }
+
+    private static int countActive(String toolId, World world) {
+        Set<Entity> set = activeBoomerangs.get(toolId);
+        if (set == null) {
+            return 0;
+        }
+        set.removeIf(e -> !e.isEntityAlive() || world.getEntityByID(e.getEntityId()) != e);
+        if (set.isEmpty()) {
+            activeBoomerangs.remove(toolId);
+            return 0;
+        }
+        return set.size();
     }
 
     public static void addActiveBoomerang(String toolId, Entity entity) {

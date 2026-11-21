@@ -73,6 +73,7 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
 
         tessellator.draw();
 
+        GlStateManager.glLineWidth(1.0F);
         GlStateManager.enableTexture2D();
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();

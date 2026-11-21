@@ -6,7 +6,6 @@ import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
-import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.modifiers.ModifierAspect;
 import slimeknights.tconstruct.library.modifiers.ProjectileModifierTrait;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;

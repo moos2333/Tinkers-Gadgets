@@ -1,10 +1,7 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.traits;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
 
 public class TraitPulse extends AbstractTrait {
