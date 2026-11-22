@@ -176,6 +176,11 @@ public class EntityBoomerang extends EntityProjectileBase {
 
     public void split(EntityLivingBase target) {
         if (split || world.isRemote) return;
+        EntityPlayer shooter = getShooterPlayer();
+        if (shooter == null) {
+            setDead();
+            return;
+        }
         split = true;
         ItemStack toolStack = tinkerProjectile.getItemStack();
         if (toolStack.isEmpty() || !(toolStack.getItem() instanceof ToolCore)) {
@@ -204,7 +209,7 @@ public class EntityBoomerang extends EntityProjectileBase {
                 posX - SPLIT_SEARCH_RADIUS, posY - SPLIT_SEARCH_RADIUS, posZ - SPLIT_SEARCH_RADIUS,
                 posX + SPLIT_SEARCH_RADIUS, posY + SPLIT_SEARCH_RADIUS, posZ + SPLIT_SEARCH_RADIUS);
         List<EntityLivingBase> candidates = world.getEntitiesWithinAABB(EntityLivingBase.class, searchBox,
-                e -> e != target && e != shootingEntity && e.isEntityAlive());
+                e -> e != target && e != shooter && e.isEntityAlive());
 
         EntityLivingBase rightTarget = null;
         EntityLivingBase leftTarget = null;
@@ -241,11 +246,11 @@ public class EntityBoomerang extends EntityProjectileBase {
         ).normalize();
 
         Vec3d[] directions = new Vec3d[]{rightFinal, leftFinal};
-        float damage = (float) (ToolHelper.getActualDamage(toolStack, (EntityLivingBase) shootingEntity) * SPLIT_DAMAGE_RATIO);
+        float damage = (float) (ToolHelper.getActualDamage(toolStack, shooter) * SPLIT_DAMAGE_RATIO);
         List<IBoomerangTrait> traits = getBoomerangTraits();
         for (int i = 0; i < 2; i++) {
             Vec3d dir = directions[i];
-            EntityBoomerangShard shard = new EntityBoomerangShard(world, associatedPlayer, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
+            EntityBoomerangShard shard = new EntityBoomerangShard(world, shooter, (float) speed, 0.0f, damage, toolStack, renderStacks[i], target.getUniqueID());
             shard.setToolId(this.toolId);
             shard.setPosition(posX, posY, posZ);
             shard.motionX = dir.x * speed;
