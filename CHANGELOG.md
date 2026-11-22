@@ -3,6 +3,11 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.61] - 2026-11-22
+
+### Fixed
+- A boomerang restored from NBT without a live shooter could crash the server when Fracture triggered its split. The split now aborts safely when no shooter is present.
+
 ## [0.6.60] - 2026-11-21
 
 ### Fixed
