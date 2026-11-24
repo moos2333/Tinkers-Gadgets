@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.materials;
 
 import com.npstra.tinkersgadgets.Config;
-import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
 import com.npstra.tinkersgadgets.compat.tconstruct.traits.TraitsRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -9,17 +8,170 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import slimeknights.tconstruct.library.TinkerRegistry;
+import slimeknights.tconstruct.library.materials.IMaterialStats;
 import slimeknights.tconstruct.library.materials.Material;
+import slimeknights.tconstruct.library.traits.ITrait;
 import slimeknights.tconstruct.tools.TinkerTraits;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.ChainPartType.CHAIN;
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.ConnectorPartType.CONNECTOR;
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.FuelTankPartType.FUEL_TANK;
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.GripPartType.GRIP;
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.GunBarrelPartType.GUN_BARREL;
+import static com.npstra.tinkersgadgets.compat.tconstruct.parts.HeatRayEmitterPartType.HEAT_RAY_EMITTER;
 
 public class MaterialRegister {
 
-    public static Material glass, poppedChorus, netherQuartz, shulkerShell, leather, redstone, enderpearl, wool, prismarineCrystals;
-    public static Material brick, netherbrick;
+    private static final MaterialDef[] MATERIALS = {
+            new MaterialDef("glass", 0xD1F2EB, new ItemStack(Blocks.GLASS), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new FuelTankMaterialStats(4000, 10, 0.8f))
+                    .stat(new GunBarrelMaterialStats(-3, 1.1f, 0))
+                    .trait(TraitsRegistry.FRACTURE, "fracture_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.FOCUS, "focus_heatraygun", FUEL_TANK),
+
+            new MaterialDef("popped_chorus", 0xb78db7, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new HeatRayEmitterMaterialStats(1.5f, 0.95f))
+                    .stat(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f))
+                    .stat(new GunBarrelMaterialStats(0, 1.1f, 0))
+                    .trait(TraitsRegistry.PIERCING, "boomerang_piercing", CONNECTOR)
+                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL)
+                    .trait(TraitsRegistry.ECHO, "echo_throwingknife", GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL),
+
+            new MaterialDef("nether_quartz", 0xe5dfd6, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(20000, 10, 1.0f))
+                    .stat(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f))
+                    .stat(new GunBarrelMaterialStats(-2, 1.0f, 0))
+                    .trait(TraitsRegistry.TRAUMA, "trauma_throwingknife"),
+
+            new MaterialDef("shulker_shell", 0x976997, new ItemStack(Items.SHULKER_SHELL), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(4000, 20, 1.0f))
+                    .stat(new GunBarrelMaterialStats(2, 1.2f, 0))
+                    .stat(new ChainMaterialStats(1, 3.0f, 0, 0.0f, 0.04f))
+                    .trait(TraitsRegistry.COLLECTION, "collection_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.SNIPING, "sniping_throwingknife", CONNECTOR, GUN_BARREL, GRIP, FUEL_TANK, CHAIN)
+                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP, FUEL_TANK, GUN_BARREL, CHAIN),
+
+            new MaterialDef("leather", 0xC76A43, new ItemStack(Items.LEATHER), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new ChainMaterialStats(2, 2.0f, 0, -0.25f, 0.0f)),
+
+            new MaterialDef("redstone", 0xCC0000, new ItemStack(Items.REDSTONE), Material.VALUE_Shard)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(8000, 8, 1.0f))
+                    .stat(new HeatRayEmitterMaterialStats(0.5f, 0.5f))
+                    .stat(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f))
+                    .stat(new GunBarrelMaterialStats(-1, 0.9f, 0))
+                    .trait(TraitsRegistry.INTERACT, "interact_boomerang")
+                    .trait(TraitsRegistry.INTERACT, "interact_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.PULSE, "pulse_throwingknife", GRIP, HEAT_RAY_EMITTER, CHAIN, CONNECTOR, GUN_BARREL)
+                    .trait(TraitsRegistry.BURST, "burst_heatraygun", FUEL_TANK, GUN_BARREL),
+
+            new MaterialDef("enderpearl", 0x0A6E6E, new ItemStack(Items.ENDER_PEARL), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP)
+                    .trait(TraitsRegistry.BURST, "burst_heatraygun", CONNECTOR)
+                    .trait(TraitsRegistry.GUIDANCE, "guidance_throwingknife", GRIP),
+
+            new MaterialDef("wool", 0xBFB5B5, new ItemStack(Blocks.WOOL), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new ChainMaterialStats(3, 2.5f, 0, -0.35f, 0.0f)),
+
+            new MaterialDef("prismarine_crystals", 0x5FCDCD, new ItemStack(Items.PRISMARINE_CRYSTALS), Material.VALUE_Ingot)
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(5000, 8, 0.95f))
+                    .stat(new GunBarrelMaterialStats(0, 1.05f, 0))
+                    .stat(new HeatRayEmitterMaterialStats(1.5f, 0.9f))
+                    .trait(TraitsRegistry.SHATTER, "shatter_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.CONDENSATION, "condensation_heatraygun", FUEL_TANK)
+                    .trait(TraitsRegistry.VORTEX, "vortex_throwingknife", GRIP, GUN_BARREL, CONNECTOR, HEAT_RAY_EMITTER),
+
+            new MaterialDef("brick", 0xb75a40, new ItemStack(Items.BRICK), Material.VALUE_Ingot)
+                    .stat(new FuelTankMaterialStats(5000, 8, 0.9f))
+                    .stat(new GunBarrelMaterialStats(-1, 0.85f, 0))
+                    .trait(TraitsRegistry.TEMPER, "temper_heatraygun", FUEL_TANK),
+
+            new MaterialDef("netherbrick", 0x49282e, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot)
+                    .stat(new FuelTankMaterialStats(10000, 15, 1.0f))
+                    .stat(new GunBarrelMaterialStats(0, 0.8f, 0))
+                    .trait(TraitsRegistry.PRESSURIZED, "pressurized_heatraygun", FUEL_TANK, GUN_BARREL),
+    };
+
+    private static final MaterialDef[] PATCHES = {
+            new MaterialDef("slime")
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(3000, 18, 0.7f))
+                    .stat(new ChainMaterialStats(5, 3.0f, 35, 0.0f, 0.0f))
+                    .stat(new GunBarrelMaterialStats(3, 0.8f, 350))
+                    .trait(TraitsRegistry.BOUNCING, "bouncing_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
+                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", FUEL_TANK, CHAIN, GUN_BARREL),
+
+            new MaterialDef("blueslime")
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(2000, 12, 1.3f))
+                    .stat(new ChainMaterialStats(4, 5.0f, 20, 0.0f, 0.0f))
+                    .stat(new GunBarrelMaterialStats(4, 0.75f, 200))
+                    .trait(TraitsRegistry.DEFLECT, "deflect_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
+                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", FUEL_TANK, CHAIN, GUN_BARREL),
+
+            new MaterialDef("magmaslime")
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new ChainMaterialStats(3, 3.0f, 15, 0.0f, 0.05f))
+                    .stat(new HeatRayEmitterMaterialStats(2.0f, 1.5f))
+                    .stat(new GunBarrelMaterialStats(1, 1.5f, 150))
+                    .trait(TraitsRegistry.BOUNCING, "bouncing_boomerang", CONNECTOR)
+                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", CONNECTOR, GRIP)
+                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
+                    .trait(TraitsRegistry.KINETIC, "kinetic_boomerang", CHAIN),
+
+            new MaterialDef("iron")
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(10000, 10, 1.0f))
+                    .stat(new ChainMaterialStats(3, 4.0f, 10, 0.0f, 0.0f))
+                    .stat(new HeatRayEmitterMaterialStats(1.5f, 1.0f))
+                    .stat(new GunBarrelMaterialStats(0, 1.0f, 100))
+                    .trait(TraitsRegistry.INERTIA, "inertia_throwingknife", GRIP, CONNECTOR)
+                    .trait(TraitsRegistry.SEASONED, "seasoned_chainblade", CHAIN, GUN_BARREL),
+
+            new MaterialDef("stone")
+                    .stat(new FuelTankMaterialStats(1, 1, 0.01f))
+                    .stat(new ChainMaterialStats(1, 1.0f, 0, -0.5f, -0.05f))
+                    .stat(new GunBarrelMaterialStats(-3, 0.5f, 0))
+                    .stat(new HeatRayEmitterMaterialStats(3600.0f, 0.001f)),
+
+            new MaterialDef("cobalt")
+                    .stat(new ConnectorMaterialStats())
+                    .stat(new GripMaterialStats())
+                    .stat(new FuelTankMaterialStats(3000, 12, 1.5f))
+                    .stat(new ChainMaterialStats(4, 3.0f, 30, 0.75f, 0.01f))
+                    .stat(new HeatRayEmitterMaterialStats(0.75f, 0.75f))
+                    .stat(new GunBarrelMaterialStats(1, 1.15f, 300))
+                    .trait(TraitsRegistry.KINETIC, "kinetic_boomerang", CONNECTOR, GRIP, GUN_BARREL)
+                    .trait(TraitsRegistry.EBB, "ebb_chainblade", CHAIN),
+    };
 
     private static boolean materialsInitialized = false;
     private static Set<String> disabledMaterialSet;
@@ -44,437 +196,116 @@ public class MaterialRegister {
         Material.UNKNOWN.addStats(ChainMaterialStats.UNKNOWN);
         Material.UNKNOWN.addStats(GunBarrelMaterialStats.UNKNOWN);
 
-        registerGlass();
-        registerPoppedChorus();
-        registerNetherQuartz();
-        registerShulkerShell();
-        registerLeather();
-        registerRedstone();
-        registerEnderpearl();
-        registerWool();
-        registerPrismarineCrystals();
-        registerBrick();
-        registerNetherbrick();
-
-        patchExistingMaterials();
-    }
-
-    private static void registerGlass() {
-        if (!isMaterialEnabled("glass")) return;
-        glass = new Material("glass", 0xD1F2EB, false);
-        glass.setCraftable(true).setCastable(false);
-        if (isTraitEnabled("fracture_boomerang")) {
-            glass.addTrait(TraitsRegistry.FRACTURE, ConnectorPartType.CONNECTOR);
+        for (MaterialDef def : MATERIALS) {
+            apply(def);
         }
-        if (isTraitEnabled("focus_heatraygun")) {
-            glass.addTrait(TraitsRegistry.FOCUS, FuelTankPartType.FUEL_TANK);
+        for (MaterialDef def : PATCHES) {
+            apply(def);
         }
-        TinkerRegistry.addMaterial(glass);
-        TinkerRegistry.addMaterialStats(glass, new ConnectorMaterialStats());
-        TinkerRegistry.addMaterialStats(glass, new FuelTankMaterialStats(4000, 10, 0.8f));
-        glass.addStats(new GunBarrelMaterialStats(-3, 1.1f, 0));
-        glass.setVisible();
-    }
-
-    private static void registerPoppedChorus() {
-        if (!isMaterialEnabled("popped_chorus")) return;
-        poppedChorus = createMaterial("popped_chorus", 0xb78db7, null, null);
-        if (isTraitEnabled("boomerang_piercing")) {
-            poppedChorus.addTrait(TraitsRegistry.PIERCING, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("enderference")) {
-            poppedChorus.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
-            poppedChorus.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
-            poppedChorus.addTrait(TinkerTraits.enderference, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
-            poppedChorus.addTrait(TinkerTraits.enderference, ChainPartType.CHAIN);
-            poppedChorus.addTrait(TinkerTraits.enderference, GunBarrelPartType.GUN_BARREL);
-        }
-        if (isTraitEnabled("echo_throwingknife")) {
-            poppedChorus.addTrait(TraitsRegistry.ECHO, GripPartType.GRIP);
-            poppedChorus.addTrait(TraitsRegistry.ECHO, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
-            poppedChorus.addTrait(TraitsRegistry.ECHO, ChainPartType.CHAIN);
-            poppedChorus.addTrait(TraitsRegistry.ECHO, GunBarrelPartType.GUN_BARREL);
-        }
-        TinkerRegistry.addMaterialStats(poppedChorus, new GripMaterialStats());
-        if (poppedChorus.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-            poppedChorus.addStats(new HeatRayEmitterMaterialStats(1.5f, 0.95f));
-        }
-        poppedChorus.addStats(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f));
-        poppedChorus.addStats(new GunBarrelMaterialStats(0, 1.1f, 0));
-    }
-
-    private static void registerNetherQuartz() {
-        if (!isMaterialEnabled("nether_quartz")) return;
-        netherQuartz = createMaterial("nether_quartz", 0xe5dfd6, TraitsRegistry.TRAUMA, "trauma_throwingknife");
-        TinkerRegistry.addMaterialStats(netherQuartz, new GripMaterialStats());
-        netherQuartz.addStats(new FuelTankMaterialStats(20000, 10, 1.0f));
-        netherQuartz.addStats(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f));
-        netherQuartz.addStats(new GunBarrelMaterialStats(-2, 1.0f, 0));
-    }
-
-    private static void registerShulkerShell() {
-        if (!isMaterialEnabled("shulker_shell")) return;
-        shulkerShell = createMaterial("shulker_shell", 0x976997, null, null);
-        if (isTraitEnabled("collection_boomerang")) {
-            shulkerShell.addTrait(TraitsRegistry.COLLECTION, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("sniping_throwingknife")) {
-            shulkerShell.addTrait(TraitsRegistry.SNIPING, ConnectorPartType.CONNECTOR);
-            shulkerShell.addTrait(TraitsRegistry.SNIPING, GunBarrelPartType.GUN_BARREL);
-            shulkerShell.addTrait(TraitsRegistry.SNIPING, GripPartType.GRIP);
-            shulkerShell.addTrait(TraitsRegistry.SNIPING, FuelTankPartType.FUEL_TANK);
-            shulkerShell.addTrait(TraitsRegistry.SNIPING, ChainPartType.CHAIN);
-        }
-        if (isTraitEnabled("enderference")) {
-            shulkerShell.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
-            shulkerShell.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
-            shulkerShell.addTrait(TinkerTraits.enderference, FuelTankPartType.FUEL_TANK);
-            shulkerShell.addTrait(TinkerTraits.enderference, GunBarrelPartType.GUN_BARREL);
-            shulkerShell.addTrait(TinkerTraits.enderference, ChainPartType.CHAIN);
-        }
-        TinkerRegistry.addMaterialStats(shulkerShell, new GripMaterialStats());
-        if (shulkerShell.getStats(FuelTankPartType.FUEL_TANK) == null) {
-            shulkerShell.addStats(new FuelTankMaterialStats(4000, 20, 1.0f));
-        }
-        shulkerShell.addStats(new GunBarrelMaterialStats(2, 1.2f, 0));
-        shulkerShell.addStats(new ChainMaterialStats(1, 3.0f, 0, 0.0f, 0.04f));
-    }
-
-    private static void registerLeather() {
-        if (!isMaterialEnabled("leather")) return;
-        leather = createMaterial("leather", 0xC76A43, null, null);
-        TinkerRegistry.addMaterialStats(leather, new GripMaterialStats());
-        leather.addStats(new ChainMaterialStats(2, 2.0f, 0, -0.25f, 0.0f));
-    }
-
-    private static void registerRedstone() {
-        if (!isMaterialEnabled("redstone")) return;
-        redstone = createMaterial("redstone", 0xCC0000, TraitsRegistry.INTERACT, "interact_boomerang");
-        if (isTraitEnabled("pulse_throwingknife")) {
-            redstone.addTrait(TraitsRegistry.PULSE, GripPartType.GRIP);
-            redstone.addTrait(TraitsRegistry.PULSE, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
-            redstone.addTrait(TraitsRegistry.PULSE, ChainPartType.CHAIN);
-            redstone.addTrait(TraitsRegistry.PULSE, ConnectorPartType.CONNECTOR);
-            redstone.addTrait(TraitsRegistry.PULSE, GunBarrelPartType.GUN_BARREL);
-        }
-        if (isTraitEnabled("burst_heatraygun")) {
-            redstone.addTrait(TraitsRegistry.BURST, FuelTankPartType.FUEL_TANK);
-            redstone.addTrait(TraitsRegistry.BURST, GunBarrelPartType.GUN_BARREL);
-        }
-        if (isTraitEnabled("interact_boomerang")) {
-            redstone.addTrait(TraitsRegistry.INTERACT, ConnectorPartType.CONNECTOR);
-        }
-        TinkerRegistry.addMaterialStats(redstone, new GripMaterialStats());
-        redstone.addStats(new FuelTankMaterialStats(8000, 8, 1.0f));
-        redstone.addStats(new HeatRayEmitterMaterialStats(0.5f, 0.5f));
-        redstone.addStats(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f));
-        redstone.addStats(new GunBarrelMaterialStats(-1, 0.9f, 0));
-    }
-
-    private static void registerEnderpearl() {
-        if (!isMaterialEnabled("enderpearl")) return;
-        enderpearl = new Material("enderpearl", 0x0A6E6E, false);
-        enderpearl.setCraftable(true).setCastable(false);
-        if (isTraitEnabled("enderference")) {
-            enderpearl.addTrait(TinkerTraits.enderference, ConnectorPartType.CONNECTOR);
-            enderpearl.addTrait(TinkerTraits.enderference, GripPartType.GRIP);
-        }
-        if (isTraitEnabled("burst_heatraygun")) {
-            enderpearl.addTrait(TraitsRegistry.BURST, ConnectorPartType.CONNECTOR);
-        }
-        if (isTraitEnabled("guidance_throwingknife")) {
-            enderpearl.addTrait(TraitsRegistry.GUIDANCE, GripPartType.GRIP);
-        }
-        TinkerRegistry.addMaterial(enderpearl);
-        TinkerRegistry.addMaterialStats(enderpearl, new ConnectorMaterialStats());
-        TinkerRegistry.addMaterialStats(enderpearl, new GripMaterialStats());
-        enderpearl.setVisible();
-    }
-
-    private static void registerWool() {
-        if (!isMaterialEnabled("wool")) return;
-        wool = new Material("wool", 0xBFB5B5, false);
-        wool.setCraftable(true).setCastable(false);
-        TinkerRegistry.addMaterial(wool);
-        TinkerRegistry.addMaterialStats(wool, new GripMaterialStats());
-        TinkerRegistry.addMaterialStats(wool, new ConnectorMaterialStats());
-        wool.addStats(new ChainMaterialStats(3, 2.5f, 0, -0.35f, 0.0f));
-        wool.setVisible();
-    }
-
-    private static void registerPrismarineCrystals() {
-        if (!isMaterialEnabled("prismarine_crystals")) return;
-        prismarineCrystals = new Material("prismarine_crystals", 0x5FCDCD, false);
-        prismarineCrystals.setCraftable(true).setCastable(false);
-        TinkerRegistry.addMaterial(prismarineCrystals);
-        if (isTraitEnabled("shatter_boomerang")) {
-            prismarineCrystals.addTrait(TraitsRegistry.SHATTER, ConnectorPartType.CONNECTOR);
-        }
-        TinkerRegistry.addMaterialStats(prismarineCrystals, new FuelTankMaterialStats(5000, 8, 0.95f));
-        if (isTraitEnabled("condensation_heatraygun")) {
-            prismarineCrystals.addTrait(TraitsRegistry.CONDENSATION, FuelTankPartType.FUEL_TANK);
-        }
-        if (isTraitEnabled("vortex_throwingknife")) {
-            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GripPartType.GRIP);
-            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, GunBarrelPartType.GUN_BARREL);
-            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, ConnectorPartType.CONNECTOR);
-            prismarineCrystals.addTrait(TraitsRegistry.VORTEX, HeatRayEmitterPartType.HEAT_RAY_EMITTER);
-        }
-        TinkerRegistry.addMaterialStats(prismarineCrystals, new GripMaterialStats());
-        TinkerRegistry.addMaterialStats(prismarineCrystals, new GunBarrelMaterialStats(0, 1.05f, 0));
-        TinkerRegistry.addMaterialStats(prismarineCrystals, new ConnectorMaterialStats());
-        TinkerRegistry.addMaterialStats(prismarineCrystals, new HeatRayEmitterMaterialStats(1.5f, 0.9f));
-        prismarineCrystals.setVisible();
-    }
-
-    private static void registerBrick() {
-        if (!isMaterialEnabled("brick")) return;
-        brick = new Material("brick", 0xb75a40, false);
-        brick.setCraftable(true).setCastable(false);
-        TinkerRegistry.addMaterial(brick);
-        TinkerRegistry.addMaterialStats(brick, new FuelTankMaterialStats(5000, 8, 0.9f));
-        if (isTraitEnabled("temper_heatraygun")) {
-            brick.addTrait(TraitsRegistry.TEMPER, FuelTankPartType.FUEL_TANK);
-        }
-        brick.addStats(new GunBarrelMaterialStats(-1, 0.85f, 0));
-        brick.setVisible();
-    }
-
-    private static void registerNetherbrick() {
-        if (!isMaterialEnabled("netherbrick")) return;
-        netherbrick = new Material("netherbrick", 0x49282e, false);
-        netherbrick.setCraftable(true).setCastable(false);
-        TinkerRegistry.addMaterial(netherbrick);
-        TinkerRegistry.addMaterialStats(netherbrick, new FuelTankMaterialStats(10000, 15, 1.0f));
-        if (isTraitEnabled("pressurized_heatraygun")) {
-            netherbrick.addTrait(TraitsRegistry.PRESSURIZED, FuelTankPartType.FUEL_TANK);
-            netherbrick.addTrait(TraitsRegistry.PRESSURIZED, GunBarrelPartType.GUN_BARREL);
-        }
-        netherbrick.addStats(new GunBarrelMaterialStats(0, 0.8f, 0));
-        netherbrick.setVisible();
-    }
-
-    private static void patchExistingMaterials() {
-        Material slime = TinkerRegistry.getMaterial("slime");
-        if (slime != Material.UNKNOWN) {
-            if (isTraitEnabled("bouncing_boomerang")) {
-                slime.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("rebound_throwingknife")) {
-                slime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("conduction_heatraygun")) {
-                slime.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
-                slime.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
-                slime.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
-            }
-            if (slime.getStats(ConnectorPartType.CONNECTOR) == null) {
-                TinkerRegistry.addMaterialStats(slime, new ConnectorMaterialStats());
-            }
-            if (slime.getStats(GripPartType.GRIP) == null) {
-                TinkerRegistry.addMaterialStats(slime, new GripMaterialStats());
-            }
-            if (slime.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                slime.addStats(new FuelTankMaterialStats(3000, 18, 0.7f));
-            }
-            if (slime.getStats(ChainPartType.CHAIN) == null) {
-                slime.addStats(new ChainMaterialStats(5, 3.0f, 35, 0.0f, 0.0f));
-            }
-            if (slime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                slime.addStats(new GunBarrelMaterialStats(3, 0.8f, 350));
-            }
-        }
-
-        Material blueslime = TinkerRegistry.getMaterial("blueslime");
-        if (blueslime != Material.UNKNOWN) {
-            if (isTraitEnabled("deflect_boomerang")) {
-                blueslime.addTrait(TraitsRegistry.DEFLECT, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("rebound_throwingknife")) {
-                blueslime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("conduction_heatraygun")) {
-                blueslime.addTrait(TraitsRegistry.CONDUCTION, FuelTankPartType.FUEL_TANK);
-                blueslime.addTrait(TraitsRegistry.CONDUCTION, ChainPartType.CHAIN);
-                blueslime.addTrait(TraitsRegistry.CONDUCTION, GunBarrelPartType.GUN_BARREL);
-            }
-            if (blueslime.getStats(ConnectorPartType.CONNECTOR) == null) {
-                TinkerRegistry.addMaterialStats(blueslime, new ConnectorMaterialStats());
-            }
-            if (blueslime.getStats(GripPartType.GRIP) == null) {
-                TinkerRegistry.addMaterialStats(blueslime, new GripMaterialStats());
-            }
-            if (blueslime.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                blueslime.addStats(new FuelTankMaterialStats(2000, 12, 1.3f));
-            }
-            if (blueslime.getStats(ChainPartType.CHAIN) == null) {
-                blueslime.addStats(new ChainMaterialStats(4, 5.0f, 20, 0.0f, 0.0f));
-            }
-            if (blueslime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                blueslime.addStats(new GunBarrelMaterialStats(4, 0.75f, 200));
-            }
-        }
-
-        Material magmaslime = TinkerRegistry.getMaterial("magmaslime");
-        if (magmaslime != Material.UNKNOWN) {
-            if (isTraitEnabled("bouncing_boomerang")) {
-                magmaslime.addTrait(TraitsRegistry.BOUNCING, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("conduction_heatraygun")) {
-                magmaslime.addTrait(TraitsRegistry.CONDUCTION, ConnectorPartType.CONNECTOR);
-                magmaslime.addTrait(TraitsRegistry.CONDUCTION, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("rebound_throwingknife")) {
-                magmaslime.addTrait(TraitsRegistry.REBOUND, GripPartType.GRIP);
-            }
-            if (isTraitEnabled("kinetic_boomerang")) {
-                magmaslime.addTrait(TraitsRegistry.KINETIC, ChainPartType.CHAIN);
-            }
-            if (magmaslime.getStats(ConnectorPartType.CONNECTOR) == null) {
-                TinkerRegistry.addMaterialStats(magmaslime, new ConnectorMaterialStats());
-            }
-            if (magmaslime.getStats(GripPartType.GRIP) == null) {
-                TinkerRegistry.addMaterialStats(magmaslime, new GripMaterialStats());
-            }
-            if (magmaslime.getStats(ChainPartType.CHAIN) == null) {
-                magmaslime.addStats(new ChainMaterialStats(3, 3.0f, 15, 0.0f, 0.05f));
-            }
-            if (magmaslime.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-                magmaslime.addStats(new HeatRayEmitterMaterialStats(2.0f, 1.5f));
-            }
-            if (magmaslime.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                magmaslime.addStats(new GunBarrelMaterialStats(1, 1.5f, 150));
-            }
-        }
-
-        Material iron = TinkerRegistry.getMaterial("iron");
-        if (iron != Material.UNKNOWN) {
-            if (iron.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-                iron.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
-            }
-            if (iron.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                iron.addStats(new FuelTankMaterialStats(10000, 10, 1.0f));
-            }
-            if (iron.getStats(GripPartType.GRIP) == null) {
-                TinkerRegistry.addMaterialStats(iron, new GripMaterialStats());
-            }
-            if (iron.getStats(ChainPartType.CHAIN) == null) {
-                iron.addStats(new ChainMaterialStats(3, 4.0f, 10, 0.0f, 0.0f));
-            }
-            if (iron.getStats(ConnectorPartType.CONNECTOR) == null) {
-                TinkerRegistry.addMaterialStats(iron, new ConnectorMaterialStats());
-            }
-            if (iron.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                iron.addStats(new GunBarrelMaterialStats(0, 1.0f, 100));
-            }
-            if (isTraitEnabled("inertia_throwingknife")) {
-                iron.addTrait(TraitsRegistry.INERTIA, GripPartType.GRIP);
-                iron.addTrait(TraitsRegistry.INERTIA, ConnectorPartType.CONNECTOR);
-            }
-            if (isTraitEnabled("seasoned_chainblade")) {
-                iron.addTrait(TraitsRegistry.SEASONED, ChainPartType.CHAIN);
-                iron.addTrait(TraitsRegistry.SEASONED, GunBarrelPartType.GUN_BARREL);
-            }
-        }
-
-        Material stone = TinkerRegistry.getMaterial("stone");
-        if (stone != Material.UNKNOWN) {
-            if (stone.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-                stone.addStats(new HeatRayEmitterMaterialStats(3600.0f, 0.001f));
-            }
-            if (stone.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                stone.addStats(new FuelTankMaterialStats(1, 1, 0.01f));
-            }
-            if (stone.getStats(ChainPartType.CHAIN) == null) {
-                stone.addStats(new ChainMaterialStats(1, 1.0f, 0, -0.5f, -0.05f));
-            }
-            if (stone.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                stone.addStats(new GunBarrelMaterialStats(-3, 0.5f, 0));
-            }
-        }
-
-        Material cobalt = TinkerRegistry.getMaterial("cobalt");
-        if (cobalt != Material.UNKNOWN) {
-            if (cobalt.getStats(HeatRayEmitterPartType.HEAT_RAY_EMITTER) == null) {
-                cobalt.addStats(new HeatRayEmitterMaterialStats(0.75f, 0.75f));
-            }
-            if (cobalt.getStats(FuelTankPartType.FUEL_TANK) == null) {
-                cobalt.addStats(new FuelTankMaterialStats(3000, 12, 1.5f));
-            }
-            if (cobalt.getStats(ChainPartType.CHAIN) == null) {
-                cobalt.addStats(new ChainMaterialStats(4, 3.0f, 30, 0.75f, 0.01f));
-            }
-            if (cobalt.getStats(ConnectorPartType.CONNECTOR) == null) {
-                cobalt.addStats(new ConnectorMaterialStats());
-            }
-            if (cobalt.getStats(GripPartType.GRIP) == null) {
-                cobalt.addStats(new GripMaterialStats());
-            }
-            if (cobalt.getStats(GunBarrelPartType.GUN_BARREL) == null) {
-                cobalt.addStats(new GunBarrelMaterialStats(1, 1.15f, 300));
-            }
-            if (isTraitEnabled("kinetic_boomerang")) {
-                cobalt.addTrait(TraitsRegistry.KINETIC, ConnectorPartType.CONNECTOR);
-                cobalt.addTrait(TraitsRegistry.KINETIC, GripPartType.GRIP);
-                cobalt.addTrait(TraitsRegistry.KINETIC, GunBarrelPartType.GUN_BARREL);
-            }
-            if (isTraitEnabled("ebb_chainblade")) {
-                cobalt.addTrait(TraitsRegistry.EBB, ChainPartType.CHAIN);
-            }
-        }
-    }
-
-    private static Material createMaterial(String id, int color, slimeknights.tconstruct.library.traits.AbstractTrait trait, String traitId) {
-        Material mat = new Material(id, color, false);
-        mat.setCraftable(true).setCastable(false);
-        if (trait != null && (traitId == null || isTraitEnabled(traitId))) {
-            mat.addTrait(trait);
-        }
-        TinkerRegistry.addMaterial(mat);
-        TinkerRegistry.addMaterialStats(mat, new ConnectorMaterialStats());
-        mat.setVisible();
-        return mat;
     }
 
     public static void init(FMLInitializationEvent event) {
-        if (materialsInitialized) return;
+        if (materialsInitialized) {
+            return;
+        }
         materialsInitialized = true;
-        setupMaterials();
-        integrate(glass);
-        integrate(poppedChorus);
-        integrate(netherQuartz);
-        integrate(shulkerShell);
-        integrate(leather);
-        integrate(redstone);
-        integrate(enderpearl);
-        integrate(wool);
-        integrate(prismarineCrystals);
-        integrate(brick);
-        integrate(netherbrick);
-    }
 
-    private static void integrate(Material mat) {
-        if (mat != null) TinkerRegistry.integrate(mat);
-    }
-
-    private static void registerMaterial(Material mat, ItemStack stack, int value) {
-        if (mat != null) {
-            mat.addItem(stack, 1, value);
-            mat.setRepresentativeItem(stack.getItem());
+        for (MaterialDef def : MATERIALS) {
+            if (def.material == null) {
+                continue;
+            }
+            def.material.addItem(def.item, 1, def.value);
+            def.material.setRepresentativeItem(def.item.getItem());
+            TinkerRegistry.integrate(def.material);
         }
     }
 
-    private static void setupMaterials() {
-        registerMaterial(glass, new ItemStack(Blocks.GLASS), Material.VALUE_Ingot);
-        registerMaterial(poppedChorus, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot);
-        registerMaterial(netherQuartz, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot);
-        registerMaterial(shulkerShell, new ItemStack(Items.SHULKER_SHELL), Material.VALUE_Ingot);
-        registerMaterial(leather, new ItemStack(Items.LEATHER), Material.VALUE_Ingot);
-        registerMaterial(redstone, new ItemStack(Items.REDSTONE), Material.VALUE_Shard);
-        registerMaterial(enderpearl, new ItemStack(Items.ENDER_PEARL), Material.VALUE_Ingot);
-        registerMaterial(wool, new ItemStack(Blocks.WOOL), Material.VALUE_Ingot);
-        registerMaterial(prismarineCrystals, new ItemStack(Items.PRISMARINE_CRYSTALS), Material.VALUE_Ingot);
-        registerMaterial(brick, new ItemStack(Items.BRICK), Material.VALUE_Ingot);
-        registerMaterial(netherbrick, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot);
+    private static void apply(MaterialDef def) {
+        Material mat;
+        if (def.isPatch()) {
+            mat = TinkerRegistry.getMaterial(def.id);
+            if (mat == Material.UNKNOWN) {
+                return;
+            }
+        } else {
+            if (!isMaterialEnabled(def.id)) {
+                return;
+            }
+            mat = new Material(def.id, def.color, false);
+            mat.setCraftable(true).setCastable(false);
+            TinkerRegistry.addMaterial(mat);
+        }
+
+        for (TraitDef trait : def.traits) {
+            if (!isTraitEnabled(trait.configKey)) {
+                continue;
+            }
+            if (trait.partTypes.length == 0) {
+                mat.addTrait(trait.trait);
+            } else {
+                for (String partType : trait.partTypes) {
+                    mat.addTrait(trait.trait, partType);
+                }
+            }
+        }
+
+        for (IMaterialStats stats : def.stats) {
+            if (def.isPatch() && mat.getStats(stats.getIdentifier()) != null) {
+                continue;
+            }
+            TinkerRegistry.addMaterialStats(mat, stats);
+        }
+
+        if (!def.isPatch()) {
+            mat.setVisible();
+            def.material = mat;
+        }
+    }
+
+    private static final class MaterialDef {
+        final String id;
+        final int color;
+        final ItemStack item;
+        final int value;
+        final List<IMaterialStats> stats = new ArrayList<>();
+        final List<TraitDef> traits = new ArrayList<>();
+        Material material;
+
+        MaterialDef(String id, int color, ItemStack item, int value) {
+            this.id = id;
+            this.color = color;
+            this.item = item;
+            this.value = value;
+        }
+
+        MaterialDef(String id) {
+            this(id, 0, null, 0);
+        }
+
+        boolean isPatch() {
+            return item == null;
+        }
+
+        MaterialDef stat(IMaterialStats stats) {
+            this.stats.add(stats);
+            return this;
+        }
+
+        MaterialDef trait(ITrait trait, String configKey, String... partTypes) {
+            this.traits.add(new TraitDef(trait, configKey, partTypes));
+            return this;
+        }
+    }
+
+    private static final class TraitDef {
+        final ITrait trait;
+        final String configKey;
+        final String[] partTypes;
+
+        TraitDef(ITrait trait, String configKey, String... partTypes) {
+            this.trait = trait;
+            this.configKey = configKey;
+            this.partTypes = partTypes;
+        }
     }
 }
