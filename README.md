@@ -36,6 +36,14 @@ Six exclusive traits for thrown weapons:
 | Magma Cream | Return Damage |
 | Shulker Shell | Collection |
 
+### 📖 Gadgets & Gizmos / 奇械图鉴
+An in-game guide for this addon alone. Materials and You is left untouched.
+
+- Crafted from a **book** and a **clasp of any material**.
+- Covers the tools, the modifiers, and the material tables for every part.
+- Hover a trait name on a material page to read what it does.
+- Bilingual: English and 简体中文.
+
 ---
 
 ## Installation

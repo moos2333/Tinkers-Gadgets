@@ -1,0 +1,16 @@
+{
+  "title": "Before you start",
+  "text": [
+    {
+      "text": "Welcome to Gadgets & Gizmos, the handbook for Tinkers' Gadgets. Inside you will find the five tools this addon adds, the parts they are built from, the four modifiers that fit them, and the material tables to consult when you pick a material for a part."
+    },
+    {
+      "text": "This is a standalone book. Materials and You is never edited, extended or appended to. If a page is missing here, it simply does not belong to this addon.",
+      "paragraph": true
+    },
+    {
+      "text": "Everything is read from the game the moment you open the book, so a tool your pack has turned off will not show up at all.",
+      "paragraph": true
+    }
+  ]
+}

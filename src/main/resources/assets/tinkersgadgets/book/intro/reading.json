@@ -1,0 +1,12 @@
+{
+  "title": "Reading the material pages",
+  "text": [
+    {
+      "text": "Every part gets an overview page listing the materials that fit it, followed by detail pages that cover three materials each."
+    },
+    {
+      "text": "On a detail page the left column holds the stats the material gives that part, and the right column the traits it grants there. Hover a trait name to read what it does.",
+      "paragraph": true
+    }
+  ]
+}

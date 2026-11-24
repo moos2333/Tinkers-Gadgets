@@ -2,16 +2,24 @@ package com.npstra.tinkersgadgets.compat.tconstruct.tools;
 
 import com.npstra.tinkersgadgets.TinkersGadgets;
 import com.npstra.tinkersgadgets.Config;
+import com.npstra.tinkersgadgets.compat.tconstruct.common.ItemGadgetsBook;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.parts.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,6 +27,7 @@ import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import slimeknights.tconstruct.common.ModelRegisterUtil;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.tools.Pattern;
@@ -39,10 +48,14 @@ public class GadgetsRegister {
     public static ChainBlade chainBlade;
     public static ItemGunBarrel gunBarrel;
     public static PistolSword pistolSword;
+    public static Item gadgetBook;
 
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
+        gadgetBook = new ItemGadgetsBook();
+        event.getRegistry().register(gadgetBook);
+
         if (Config.enableBoomerang) {
             connector = new ItemConnector();
             event.getRegistry().register(connector);
@@ -118,6 +131,31 @@ public class GadgetsRegister {
         }
     }
 
+    /**
+     * Shapeless: a book plus a Connector of any material becomes the guide book.
+     *
+     * <p>Registered in code rather than as a JSON recipe on purpose: the Connector only exists while
+     * the Boomerang is enabled, and a JSON recipe pointing at a missing item would fail to load. NBT
+     * takes no part in ingredient matching, so every material's Connector fits the same single
+     * recipe.</p>
+     */
+    @SubscribeEvent
+    public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        if (gadgetBook == null || connector == null) {
+            return;
+        }
+
+        NonNullList<Ingredient> ingredients = NonNullList.create();
+        ingredients.add(Ingredient.fromStacks(new ItemStack(Items.BOOK)));
+        ingredients.add(Ingredient.fromStacks(
+                new ItemStack(connector, 1, OreDictionary.WILDCARD_VALUE)));
+
+        IRecipe recipe = new ShapelessRecipes(TinkersGadgets.MOD_ID,
+                new ItemStack(gadgetBook), ingredients);
+        recipe.setRegistryName(new ResourceLocation(TinkersGadgets.MOD_ID, "gadget_book"));
+        event.getRegistry().register(recipe);
+    }
+
     private static void registerEntity(RegistryEvent.Register<EntityEntry> event, Class<? extends Entity> entityClass, String name, int id) {
         EntityEntry entry = EntityEntryBuilder.create()
                 .entity(entityClass)
@@ -131,6 +169,11 @@ public class GadgetsRegister {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
+        if (gadgetBook != null) {
+            ModelLoader.setCustomModelResourceLocation(gadgetBook, 0,
+                    new ModelResourceLocation(new ResourceLocation(TinkersGadgets.MOD_ID, "gadget_book"), "inventory"));
+        }
+
         if (Config.enableBoomerang) {
             if (boomerang != null) {
                 ModelRegisterUtil.registerToolModel(boomerang);

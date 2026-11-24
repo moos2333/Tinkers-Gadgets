@@ -1,5 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.client;
 
+import com.npstra.tinkersgadgets.compat.tconstruct.book.GadgetsBook;
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderBoomerang;
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.client.renderer.RenderChainBlade;
@@ -10,6 +11,7 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerangShard;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityChainBlade;
 import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.GadgetsRegister;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import slimeknights.tconstruct.library.TinkerRegistryClient;
 import slimeknights.tconstruct.library.client.ToolBuildGuiInfo;
@@ -29,6 +31,11 @@ public class ClientProxy extends CommonProxy {
                 33, 60, 33, 24, 33, 42);
         registerGui(GadgetsRegister.pistolSword,
                 18, 57, 48, 27, 48, 57);
+    }
+
+    @Override
+    public void openGuideBook(ItemStack stack) {
+        GadgetsBook.open(stack);
     }
 
     private static void registerGui(ToolCore tool, int... slotCoords) {

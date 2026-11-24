@@ -1,0 +1,34 @@
+// 章节
+intro=引言
+tools=工具
+modifiers=强化
+materials=材料
+
+// 通用页签
+modifier.effect=特殊效果：
+tool.properties=所需部件：
+
+// 材料章节的部件名
+materials.connector=扣环
+materials.grip=裹柄
+materials.fuel_tank=燃料仓
+materials.heat_ray_emitter=热射线发射器
+materials.chain=链节
+materials.gun_barrel=枪管
+
+// 工具页
+tools.boomerang.text=会自己回来的投掷武器，右键蓄力掷出。\n去程做什么由扣环决定：玻璃碎裂、紫颂贯穿、潜影收拢、红石交互、蓝色史莱姆弹开箭矢。
+tools.throwing_knife.text=轻巧的投掷刃。短蓄力掷出一柄，长蓄力（潜行+右键）掷出三柄。\n裹柄决定命中后的花样：史莱姆弹回落地、海晶碎片拉拢、下界石英叠加。
+tools.heat_ray_gun.text=烧固体燃料，射出一束聚焦的热。潜行+右键补充燃料。\n燃料仓决定储量与热量，发射器决定蓄能与伤害。
+tools.chain_blade.text=在敌人之间弹射，把他们拖向你；蓄力掷出可横扫。\n链节决定弹射次数、附带弹药与连击增长。
+tools.pistol_sword.text=两把武器合在一起：近战挥砍集弹，右键远程射出。\n枪管决定载弹量与远程伤害，扣环把特性借给两半。
+
+// 强化页
+modifiers.capacity_heatraygun.text=凡是工具，总会用完点什么：燃料、弹药、充能。这一级让那份储备再大一点。
+modifiers.capacity_heatraygun.effects=热射线枪：每级+2000燃料、+1热容\n枪刃：每级+1载弹量\n链刃：每级+10充能上限\n回力镖：每级+1活动弹射物
+modifiers.efficiency_heatraygun.text=少浪费一点。同样的燃料走得更远，同样的充能办更多事，掷出去的刃也更容易回到手上。
+modifiers.efficiency_heatraygun.effects=热射线枪：每级+45%燃料效率\n链刃：每级-2强化横扫所需充能\n回力镖：每级+25%弹药返还概率
+modifiers.power_heatraygun.text=把热量用在伤害上，而不是速度上。工具做的每件事都更重一些。
+modifiers.power_heatraygun.effects=热射线枪：每级+15%伤害\n枪刃：每级+15%远程伤害\n链刃：每级+2%连击增幅
+modifiers.rapid_heatraygun.text=快一点总没坏处。射线转得更勤，链子抽得更急，掷出去的刃也少让你等一会儿。
+modifiers.rapid_heatraygun.effects=热射线枪：每级+15%速率\n链刃：最多+60%速率\n投掷武器：每级缩短20%蓄力

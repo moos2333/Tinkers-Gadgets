@@ -1,0 +1,29 @@
+{
+  "title": "Crafting this book",
+  "grid_size": "small",
+  "grid": [
+    [
+      {
+        "id": "minecraft:book"
+      },
+      {
+        "id": "tinkersgadgets:connector",
+        "nbt": {
+          "material": "iron"
+        }
+      }
+    ]
+  ],
+  "result": {
+    "id": "tinkersgadgets:gadget_book"
+  },
+  "description": [
+    {
+      "text": "Combine a vanilla book with any Clasp. The Clasp only holds the pages together, so the material it is made of makes no difference."
+    },
+    {
+      "text": "Clasps are cast or built like any other part. What each material offers is listed under Clasp in the Materials chapter.",
+      "paragraph": true
+    }
+  ]
+}

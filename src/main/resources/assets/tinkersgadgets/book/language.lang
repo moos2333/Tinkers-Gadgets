@@ -1,0 +1,34 @@
+// Sections
+intro=Introduction
+tools=Tools
+modifiers=Modifiers
+materials=Materials
+
+// Shared page labels
+modifier.effect=Effects:
+tool.properties=Parts:
+
+// Part labels used by the material chapter
+materials.connector=Clasp
+materials.grip=Grip
+materials.fuel_tank=Fuel Tank
+materials.heat_ray_emitter=Heat Ray Emitter
+materials.chain=Chain Link
+materials.gun_barrel=Gun Barrel
+
+// Tool pages
+tools.boomerang.text=A thrown weapon that comes back. Charge and release to throw.\nThe Clasp's material decides what it does in flight.
+tools.throwing_knife.text=A light blade made to be thrown; a long charge throws three.\nThe Grip's material decides what the blades do on impact.
+tools.heat_ray_gun.text=Burns solid fuel for a focused ray of heat.\nThe Fuel Tank sets capacity, the Emitter charge speed and damage.
+tools.chain_blade.text=A chain that ricochets between enemies and drags them towards you.\nThe Chain Link sets bounces, spare ammo and combo speed.
+tools.pistol_sword.text=Two weapons in one: slash to gather bullets, fire at range.\nThe Gun Barrel sets capacity and damage; the Clasp shares its traits.
+
+// Modifier pages
+modifiers.capacity_heatraygun.text=Every tool runs out of something: fuel, ammo, charge. Each level gives that something a little more room.
+modifiers.capacity_heatraygun.effects=Heat Ray Gun: +2000 fuel, +1 heat\nPistol Sword: +1 ammo\nChain Blade: +10 charge\nBoomerang: +1 active boomerang
+modifiers.efficiency_heatraygun.text=Less waste each level. The same fuel goes further, the same charge does more, and thrown blades come back more often.
+modifiers.efficiency_heatraygun.effects=Heat Ray Gun: +45% fuel efficiency\nChain Blade: -2 charge for a sweep\nBoomerang: +25% chance to refund ammo
+modifiers.power_heatraygun.text=Heat aimed at damage instead of speed. Each level hits a little harder.
+modifiers.power_heatraygun.effects=Heat Ray Gun: +15% damage\nPistol Sword: +15% ranged damage\nChain Blade: +2% combo bonus
+modifiers.rapid_heatraygun.text=Faster is usually better. Each level the ray cycles quicker, the chain whips quicker and a thrown blade leaves your hand sooner.
+modifiers.rapid_heatraygun.effects=Heat Ray Gun: +15% rate\nChain Blade: up to +60% rate\nThrown weapons: 20% shorter charge

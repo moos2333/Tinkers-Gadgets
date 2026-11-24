@@ -1,0 +1,29 @@
+{
+  "title": "这本书怎么做",
+  "grid_size": "small",
+  "grid": [
+    [
+      {
+        "id": "minecraft:book"
+      },
+      {
+        "id": "tinkersgadgets:connector",
+        "nbt": {
+          "material": "iron"
+        }
+      }
+    ]
+  ],
+  "result": {
+    "id": "tinkersgadgets:gadget_book"
+  },
+  "description": [
+    {
+      "text": "把一本原版书和任意一个扣环合成即可。扣环在这里只负责把书页夹住，用什么材料做都不影响配方。"
+    },
+    {
+      "text": "扣环与其他部件一样可以浇铸或制作。每种材料能提供什么，见「材料」一章的扣环页。",
+      "paragraph": true
+    }
+  ]
+}

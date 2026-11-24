@@ -1,0 +1,14 @@
+[
+  {
+    "type": "text",
+    "data": "intro/welcome.json"
+  },
+  {
+    "type": "crafting",
+    "data": "intro/crafting.json"
+  },
+  {
+    "type": "text",
+    "data": "intro/reading.json"
+  }
+]

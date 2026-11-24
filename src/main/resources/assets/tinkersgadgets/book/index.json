@@ -1,0 +1,38 @@
+[
+  {
+    "name": "intro",
+    "data": "sections/intro.json",
+    "icon": {
+      "item": {
+        "id": "tinkersgadgets:gadget_book"
+      }
+    }
+  },
+  {
+    "name": "tools",
+    "data": "no-load",
+    "icon": {
+      "item": {
+        "id": "tinkersgadgets:boomerang"
+      }
+    }
+  },
+  {
+    "name": "modifiers",
+    "data": "no-load",
+    "icon": {
+      "item": {
+        "id": "minecraft:redstone"
+      }
+    }
+  },
+  {
+    "name": "materials",
+    "data": "no-load",
+    "icon": {
+      "item": {
+        "id": "minecraft:iron_ingot"
+      }
+    }
+  }
+]

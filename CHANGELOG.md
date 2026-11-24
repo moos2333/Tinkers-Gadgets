@@ -3,6 +3,23 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-11-24
+
+### Added
+- `Gadgets & Gizmos` / `奇械图鉴`, the addon's own guide book. Crafted shapelessly from a book and a Connector of any material (NBT-insensitive, so every material works with a single recipe), it covers the mod's tools, modifiers and per-part material tables, with bilingual `en_us` and `zh_cn` text.
+- Four chapters in the book, all generated from the live Tinkers' registries at open time rather than duplicated as JSON: an introduction, tools (part lists derived from each tool's build components), modifiers, and material tables laid out like the vanilla arrow shaft pages - one icon overview (split across pages when needed) plus three materials per page, with each material's traits hoverable for their description.
+
+### Changed
+- The whole book now follows the voice of Materials and You: two-sentence tool blurbs that state what the tool is and which part decides what, modifier pages that pair a one-line summary with a bare-numbers Effects list, and an introduction written as a preface instead of a feature list.
+- Copy is sized to the boxes Mantle actually draws - tool blurb 172x50, modifier prose 162x50, effect bullets 96px wide - so nothing is cut off mid-sentence. Chinese pages keep Latin names and ASCII spaces out of running text: the book's line wrapper restarts at every space, which is why "Tinkers' Gadgets" used to break over three lines in the middle of a sentence.
+- Introduction paragraphs are separated with the `paragraph` flag instead of empty lines, so they read as paragraphs rather than one block.
+- Book-only copy lives in the book's own language files and falls back to the modifier tooltip for locales that have not been written yet.
+- The book is a completely separate `BookData` with its own resource repository, so Materials and You is never touched, extended or re-transformed.
+- Nothing is parsed until the book is first opened: registering it only adds a reload-aware registry entry, keeping constant overhead at zero.
+
+### Fixed
+- Every part had its material overview page twice. `ContentPageIconList.getPagesNeededForItemCount` already creates and appends the pages it returns, so adding them again duplicated each one; the transformer now links the pages the helper made.
+
 ## [0.6.61] - 2026-11-22
 
 ### Fixed
