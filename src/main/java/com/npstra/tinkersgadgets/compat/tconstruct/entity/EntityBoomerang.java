@@ -46,6 +46,7 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final double RETURN_DIST_THRESHOLD = 1.2D;
     private static final double STUCK_SPEED_THRESHOLD = 0.1D;
     private static final double STUCK_DIST_THRESHOLD = 2.0D;
+    private static final double STALL_SPEED_THRESHOLD = 0.05D;
     private static final float SPLIT_DAMAGE_RATIO = 0.5f;
     private static final double SPLIT_SEARCH_RADIUS = 3.0D;
 
@@ -297,6 +298,8 @@ public class EntityBoomerang extends EntityProjectileBase {
 
         if (!returning) {
             if (totalDistanceTraveled >= maxDistance) {
+                beginReturn();
+            } else if (getCurrentSpeed() < STALL_SPEED_THRESHOLD) {
                 beginReturn();
             } else if (totalDistanceTraveled > slowStartDistance) {
                 double progress = (totalDistanceTraveled - slowStartDistance) / (maxDistance - slowStartDistance);
