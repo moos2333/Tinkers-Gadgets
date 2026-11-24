@@ -9,9 +9,9 @@ import java.util.List;
 
 public class GunBarrelMaterialStats extends AbstractMaterialStats {
 
-    public static final String LOC_AMMO = "stat.gun_barrel.ammo.name";
-    public static final String LOC_DAMAGE = "stat.gun_barrel.damage.name";
-    public static final String LOC_DURABILITY = "stat.gun_barrel.durability.name";
+    private static final String LOC_AMMO = "stat.gun_barrel.ammo";
+    private static final String LOC_DAMAGE = "stat.gun_barrel.damage";
+    private static final String LOC_DURABILITY = "stat.gun_barrel.durability";
 
     public static final GunBarrelMaterialStats UNKNOWN = new GunBarrelMaterialStats(0, 1.0f, 0);
 
@@ -29,9 +29,9 @@ public class GunBarrelMaterialStats extends AbstractMaterialStats {
     @Override
     public List<String> getLocalizedInfo() {
         List<String> info = new ArrayList<>();
-        info.add(formatAmmo(LOC_AMMO, ammoBonus));
-        info.add(formatDamage(LOC_DAMAGE, rangedDamage));
-        info.add(formatDurability(LOC_DURABILITY, durabilityBonus));
+        info.add(formatAmmo(LOC_AMMO + ".name", ammoBonus));
+        info.add(formatDamage(LOC_DAMAGE + ".name", rangedDamage));
+        info.add(formatDurability(LOC_DURABILITY + ".name", durabilityBonus));
         return info;
     }
 

@@ -17,11 +17,11 @@ materials.chain=Chain Link
 materials.gun_barrel=Gun Barrel
 
 // Tool pages
-tools.boomerang.text=A thrown weapon that comes back. Charge and release to throw.\nThe Clasp's material decides what it does in flight.
-tools.throwing_knife.text=A light blade made to be thrown; a long charge throws three.\nThe Grip's material decides what the blades do on impact.
-tools.heat_ray_gun.text=Burns solid fuel for a focused ray of heat.\nThe Fuel Tank sets capacity, the Emitter charge speed and damage.
-tools.chain_blade.text=A chain that ricochets between enemies and drags them towards you.\nThe Chain Link sets bounces, spare ammo and combo speed.
-tools.pistol_sword.text=Two weapons in one: slash to gather bullets, fire at range.\nThe Gun Barrel sets capacity and damage; the Clasp shares its traits.
+tools.boomerang.text=A thrown weapon that comes back on its own.\nCharge and release to throw. The Clasp decides its flight plan: glass seeks enemies, chorus pierces, shulker shells gather drops, redstone works blocks, blue slime deflects arrows.
+tools.throwing_knife.text=A light blade made to be thrown.\nA short charge throws one; sneaking throws three. The Grip decides what they do: slime bounces blades for pickup, prismarine groups enemies, quartz stacks damage.
+tools.heat_ray_gun.text=Burns solid fuel into a focused ray of heat.\nRight-click to fire; sneak + right-click refuels it. The Fuel Tank sets capacity, the Emitter charge speed and damage. Run it too hot and it needs a break.
+tools.chain_blade.text=A chain on a handle that ricochets between enemies and drags them in.\nA charged throw sweeps the area; sneak + right-click empowers it. The Chain Link sets bounces, spare ammo and combo speed.
+tools.pistol_sword.text=Two weapons in one. Slash in melee to gather bullets; right-click fires the loaded one.\nThe Gun Barrel sets ammo and ranged damage. For melee, trust the Sword Blade.
 
 // Modifier pages
 modifiers.capacity_heatraygun.text=Every tool runs out of something: fuel, ammo, charge. Each level gives that something a little more room.

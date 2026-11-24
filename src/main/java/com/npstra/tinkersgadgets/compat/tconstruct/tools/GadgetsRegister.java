@@ -214,8 +214,12 @@ public class GadgetsRegister {
         }
 
         if (Config.enablePistolSword) {
-            if (gunBarrel != null) ModelRegisterUtil.registerPartModel(gunBarrel);
-            if (pistolSword != null) ModelRegisterUtil.registerToolModel(pistolSword);
+            if (gunBarrel != null) {
+                ModelRegisterUtil.registerPartModel(gunBarrel);
+            }
+            if (pistolSword != null) {
+                ModelRegisterUtil.registerToolModel(pistolSword);
+            }
         }
     }
 }
