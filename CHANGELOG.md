@@ -3,6 +3,14 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.1] - 2026-11-25
+
+### Changed
+- Material registration was consolidated into a single declarative table. All part stats now go through `TinkerRegistry.addMaterialStats` (fires `StatRegisterEvent`, refuses to silently overwrite registrations from other mods, and patches to existing Tinkers' materials only fill in missing stats). Part items no longer carry their own material whitelists - acceptance now derives from the registered stats alone. Gameplay data is unchanged.
+
+### Fixed
+- A boomerang thrown into water without the Fins modifier stalled a few blocks in and hung motionless, then despawned after half a minute and was lost together with the ammo it consumed. The boomerang now turns back the moment it loses way, crawling back to its owner. With Fins it still cruises through water at full speed.
+
 ## [0.7.0] - 2026-11-24
 
 ### Added
