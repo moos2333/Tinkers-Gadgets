@@ -214,14 +214,22 @@ public class MaterialRegister {
             if (def.material == null) {
                 continue;
             }
-            def.material.addItem(def.item, 1, def.value);
-            def.material.setRepresentativeItem(def.item.getItem());
-            TinkerRegistry.integrate(def.material);
+            if (def.grafted) {
+                if (!def.material.hasItems()) {
+                    def.material.addItem(def.item, 1, def.value);
+                    def.material.setRepresentativeItem(def.item.getItem());
+                }
+            } else {
+                def.material.addItem(def.item, 1, def.value);
+                def.material.setRepresentativeItem(def.item.getItem());
+                TinkerRegistry.integrate(def.material);
+            }
         }
     }
 
     private static void apply(MaterialDef def) {
         Material mat;
+        boolean grafted = false;
         if (def.isPatch()) {
             mat = TinkerRegistry.getMaterial(def.id);
             if (mat == Material.UNKNOWN) {
@@ -234,6 +242,15 @@ public class MaterialRegister {
             mat = new Material(def.id, def.color, false);
             mat.setCraftable(true).setCastable(false);
             TinkerRegistry.addMaterial(mat);
+
+            Material existing = TinkerRegistry.getMaterial(def.id);
+            if (existing != mat) {
+                if (existing == Material.UNKNOWN) {
+                    return;
+                }
+                mat = existing;
+                grafted = true;
+            }
         }
 
         for (TraitDef trait : def.traits) {
@@ -250,15 +267,18 @@ public class MaterialRegister {
         }
 
         for (IMaterialStats stats : def.stats) {
-            if (def.isPatch() && mat.getStats(stats.getIdentifier()) != null) {
+            if (mat.getStats(stats.getIdentifier()) != null) {
                 continue;
             }
             TinkerRegistry.addMaterialStats(mat, stats);
         }
 
         if (!def.isPatch()) {
-            mat.setVisible();
+            if (!grafted) {
+                mat.setVisible();
+            }
             def.material = mat;
+            def.grafted = grafted;
         }
     }
 
@@ -270,6 +290,7 @@ public class MaterialRegister {
         final List<IMaterialStats> stats = new ArrayList<>();
         final List<TraitDef> traits = new ArrayList<>();
         Material material;
+        boolean grafted;
 
         MaterialDef(String id, int color, ItemStack item, int value) {
             this.id = id;

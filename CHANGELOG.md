@@ -3,6 +3,11 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.2] - Unreleased
+
+### Changed
+- When another Tinkers' addon already registers a material with the same ID, its material is now adopted instead of being dropped: the mod's part stats and traits are grafted onto the existing material, so this mod's parts stay available alongside it.
+
 ## [0.7.1] - 2026-11-25
 
 ### Changed
