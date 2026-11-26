@@ -13,8 +13,10 @@ public class TraitTrauma extends AbstractTrait {
     private static final float BONUS_PER_LEVEL = 0.05F;
     private static final int DURATION_TICKS = 100;
 
+    public static final String ID = "trauma_throwingknife";
+
     public TraitTrauma() {
-        super("trauma_throwingknife", TextFormatting.GRAY);
+        super(ID, TextFormatting.GRAY);
     }
 
     @Override

@@ -10,8 +10,10 @@ import slimeknights.tconstruct.library.utils.TagUtil;
 public class TraitFocus extends AbstractTrait {
     private static final float BONUS_PER_HEAT = 0.03f;
 
+    public static final String ID = "focus_heatraygun";
+
     public TraitFocus() {
-        super("focus_heatraygun", TextFormatting.WHITE);
+        super(ID, TextFormatting.WHITE);
     }
 
     @Override

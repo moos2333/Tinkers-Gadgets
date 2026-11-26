@@ -33,8 +33,8 @@ public class MaterialRegister {
                     .stat(new ConnectorMaterialStats())
                     .stat(new FuelTankMaterialStats(4000, 10, 0.8f))
                     .stat(new GunBarrelMaterialStats(-3, 1.1f, 0))
-                    .trait(TraitsRegistry.FRACTURE, "fracture_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.FOCUS, "focus_heatraygun", FUEL_TANK),
+                    .trait(TraitsRegistry.FRACTURE, CONNECTOR)
+                    .trait(TraitsRegistry.FOCUS, FUEL_TANK),
 
             new MaterialDef("popped_chorus", 0xb78db7, new ItemStack(Items.CHORUS_FRUIT_POPPED), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
@@ -42,9 +42,9 @@ public class MaterialRegister {
                     .stat(new HeatRayEmitterMaterialStats(1.5f, 0.95f))
                     .stat(new ChainMaterialStats(2, 2.0f, 0, 0.0f, 0.04f))
                     .stat(new GunBarrelMaterialStats(0, 1.1f, 0))
-                    .trait(TraitsRegistry.PIERCING, "boomerang_piercing", CONNECTOR)
-                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL)
-                    .trait(TraitsRegistry.ECHO, "echo_throwingknife", GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL),
+                    .trait(TraitsRegistry.PIERCING, CONNECTOR)
+                    .trait(TinkerTraits.enderference, CONNECTOR, GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL)
+                    .trait(TraitsRegistry.ECHO, GRIP, HEAT_RAY_EMITTER, CHAIN, GUN_BARREL),
 
             new MaterialDef("nether_quartz", 0xe5dfd6, new ItemStack(Items.QUARTZ), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
@@ -52,7 +52,7 @@ public class MaterialRegister {
                     .stat(new FuelTankMaterialStats(20000, 10, 1.0f))
                     .stat(new ChainMaterialStats(1, 1.0f, 0, 0.0f, 0.03f))
                     .stat(new GunBarrelMaterialStats(-2, 1.0f, 0))
-                    .trait(TraitsRegistry.TRAUMA, "trauma_throwingknife"),
+                    .trait(TraitsRegistry.TRAUMA),
 
             new MaterialDef("shulker_shell", 0x976997, new ItemStack(Items.SHULKER_SHELL), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
@@ -60,9 +60,9 @@ public class MaterialRegister {
                     .stat(new FuelTankMaterialStats(4000, 20, 1.0f))
                     .stat(new GunBarrelMaterialStats(2, 1.2f, 0))
                     .stat(new ChainMaterialStats(1, 3.0f, 0, 0.0f, 0.04f))
-                    .trait(TraitsRegistry.COLLECTION, "collection_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.SNIPING, "sniping_throwingknife", CONNECTOR, GUN_BARREL, GRIP, FUEL_TANK, CHAIN)
-                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP, FUEL_TANK, GUN_BARREL, CHAIN),
+                    .trait(TraitsRegistry.COLLECTION, CONNECTOR)
+                    .trait(TraitsRegistry.SNIPING, CONNECTOR, GUN_BARREL, GRIP, FUEL_TANK, CHAIN)
+                    .trait(TinkerTraits.enderference, CONNECTOR, GRIP, FUEL_TANK, GUN_BARREL, CHAIN),
 
             new MaterialDef("leather", 0xC76A43, new ItemStack(Items.LEATHER), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
@@ -76,17 +76,17 @@ public class MaterialRegister {
                     .stat(new HeatRayEmitterMaterialStats(0.5f, 0.5f))
                     .stat(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f))
                     .stat(new GunBarrelMaterialStats(-1, 0.9f, 0))
-                    .trait(TraitsRegistry.INTERACT, "interact_boomerang")
-                    .trait(TraitsRegistry.INTERACT, "interact_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.PULSE, "pulse_throwingknife", GRIP, HEAT_RAY_EMITTER, CHAIN, CONNECTOR, GUN_BARREL)
-                    .trait(TraitsRegistry.BURST, "burst_heatraygun", FUEL_TANK, GUN_BARREL),
+                    .trait(TraitsRegistry.INTERACT)
+                    .trait(TraitsRegistry.INTERACT, CONNECTOR)
+                    .trait(TraitsRegistry.PULSE, GRIP, HEAT_RAY_EMITTER, CHAIN, CONNECTOR, GUN_BARREL)
+                    .trait(TraitsRegistry.BURST, FUEL_TANK, GUN_BARREL),
 
             new MaterialDef("enderpearl", 0x0A6E6E, new ItemStack(Items.ENDER_PEARL), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
                     .stat(new GripMaterialStats())
-                    .trait(TinkerTraits.enderference, "enderference", CONNECTOR, GRIP)
-                    .trait(TraitsRegistry.BURST, "burst_heatraygun", CONNECTOR)
-                    .trait(TraitsRegistry.GUIDANCE, "guidance_throwingknife", GRIP),
+                    .trait(TinkerTraits.enderference, CONNECTOR, GRIP)
+                    .trait(TraitsRegistry.BURST, CONNECTOR)
+                    .trait(TraitsRegistry.GUIDANCE, GRIP),
 
             new MaterialDef("wool", 0xBFB5B5, new ItemStack(Blocks.WOOL), Material.VALUE_Ingot)
                     .stat(new ConnectorMaterialStats())
@@ -99,19 +99,19 @@ public class MaterialRegister {
                     .stat(new FuelTankMaterialStats(5000, 8, 0.95f))
                     .stat(new GunBarrelMaterialStats(0, 1.05f, 0))
                     .stat(new HeatRayEmitterMaterialStats(1.5f, 0.9f))
-                    .trait(TraitsRegistry.SHATTER, "shatter_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.CONDENSATION, "condensation_heatraygun", FUEL_TANK)
-                    .trait(TraitsRegistry.VORTEX, "vortex_throwingknife", GRIP, GUN_BARREL, CONNECTOR, HEAT_RAY_EMITTER),
+                    .trait(TraitsRegistry.SHATTER, CONNECTOR)
+                    .trait(TraitsRegistry.CONDENSATION, FUEL_TANK)
+                    .trait(TraitsRegistry.VORTEX, GRIP, GUN_BARREL, CONNECTOR, HEAT_RAY_EMITTER),
 
             new MaterialDef("brick", 0xb75a40, new ItemStack(Items.BRICK), Material.VALUE_Ingot)
                     .stat(new FuelTankMaterialStats(5000, 8, 0.9f))
                     .stat(new GunBarrelMaterialStats(-1, 0.85f, 0))
-                    .trait(TraitsRegistry.TEMPER, "temper_heatraygun", FUEL_TANK),
+                    .trait(TraitsRegistry.TEMPER, FUEL_TANK),
 
             new MaterialDef("netherbrick", 0x49282e, new ItemStack(Items.NETHERBRICK), Material.VALUE_Ingot)
                     .stat(new FuelTankMaterialStats(10000, 15, 1.0f))
                     .stat(new GunBarrelMaterialStats(0, 0.8f, 0))
-                    .trait(TraitsRegistry.PRESSURIZED, "pressurized_heatraygun", FUEL_TANK, GUN_BARREL),
+                    .trait(TraitsRegistry.PRESSURIZED, FUEL_TANK, GUN_BARREL),
     };
 
     private static final MaterialDef[] PATCHES = {
@@ -121,9 +121,9 @@ public class MaterialRegister {
                     .stat(new FuelTankMaterialStats(3000, 18, 0.7f))
                     .stat(new ChainMaterialStats(5, 3.0f, 35, 0.0f, 0.0f))
                     .stat(new GunBarrelMaterialStats(3, 0.8f, 350))
-                    .trait(TraitsRegistry.BOUNCING, "bouncing_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
-                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", FUEL_TANK, CHAIN, GUN_BARREL),
+                    .trait(TraitsRegistry.BOUNCING, CONNECTOR)
+                    .trait(TraitsRegistry.REBOUND, GRIP)
+                    .trait(TraitsRegistry.CONDUCTION, FUEL_TANK, CHAIN, GUN_BARREL),
 
             new MaterialDef("blueslime")
                     .stat(new ConnectorMaterialStats())
@@ -131,9 +131,9 @@ public class MaterialRegister {
                     .stat(new FuelTankMaterialStats(2000, 12, 1.3f))
                     .stat(new ChainMaterialStats(4, 5.0f, 20, 0.0f, 0.0f))
                     .stat(new GunBarrelMaterialStats(4, 0.75f, 200))
-                    .trait(TraitsRegistry.DEFLECT, "deflect_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
-                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", FUEL_TANK, CHAIN, GUN_BARREL),
+                    .trait(TraitsRegistry.DEFLECT, CONNECTOR)
+                    .trait(TraitsRegistry.REBOUND, GRIP)
+                    .trait(TraitsRegistry.CONDUCTION, FUEL_TANK, CHAIN, GUN_BARREL),
 
             new MaterialDef("magmaslime")
                     .stat(new ConnectorMaterialStats())
@@ -141,10 +141,10 @@ public class MaterialRegister {
                     .stat(new ChainMaterialStats(3, 3.0f, 15, 0.0f, 0.05f))
                     .stat(new HeatRayEmitterMaterialStats(2.0f, 1.5f))
                     .stat(new GunBarrelMaterialStats(1, 1.5f, 150))
-                    .trait(TraitsRegistry.BOUNCING, "bouncing_boomerang", CONNECTOR)
-                    .trait(TraitsRegistry.CONDUCTION, "conduction_heatraygun", CONNECTOR, GRIP)
-                    .trait(TraitsRegistry.REBOUND, "rebound_throwingknife", GRIP)
-                    .trait(TraitsRegistry.KINETIC, "kinetic_boomerang", CHAIN),
+                    .trait(TraitsRegistry.BOUNCING, CONNECTOR)
+                    .trait(TraitsRegistry.CONDUCTION, CONNECTOR, GRIP)
+                    .trait(TraitsRegistry.REBOUND, GRIP)
+                    .trait(TraitsRegistry.KINETIC, CHAIN),
 
             new MaterialDef("iron")
                     .stat(new ConnectorMaterialStats())
@@ -153,8 +153,8 @@ public class MaterialRegister {
                     .stat(new ChainMaterialStats(3, 4.0f, 10, 0.0f, 0.0f))
                     .stat(new HeatRayEmitterMaterialStats(1.5f, 1.0f))
                     .stat(new GunBarrelMaterialStats(0, 1.0f, 100))
-                    .trait(TraitsRegistry.INERTIA, "inertia_throwingknife", GRIP, CONNECTOR)
-                    .trait(TraitsRegistry.SEASONED, "seasoned_chainblade", CHAIN, GUN_BARREL),
+                    .trait(TraitsRegistry.INERTIA, GRIP, CONNECTOR)
+                    .trait(TraitsRegistry.SEASONED, CHAIN, GUN_BARREL),
 
             new MaterialDef("stone")
                     .stat(new FuelTankMaterialStats(1, 1, 0.01f))
@@ -169,8 +169,8 @@ public class MaterialRegister {
                     .stat(new ChainMaterialStats(4, 3.0f, 30, 0.75f, 0.01f))
                     .stat(new HeatRayEmitterMaterialStats(0.75f, 0.75f))
                     .stat(new GunBarrelMaterialStats(1, 1.15f, 300))
-                    .trait(TraitsRegistry.KINETIC, "kinetic_boomerang", CONNECTOR, GRIP, GUN_BARREL)
-                    .trait(TraitsRegistry.EBB, "ebb_chainblade", CHAIN),
+                    .trait(TraitsRegistry.KINETIC, CONNECTOR, GRIP, GUN_BARREL)
+                    .trait(TraitsRegistry.EBB, CHAIN),
     };
 
     private static boolean materialsInitialized = false;
@@ -254,7 +254,7 @@ public class MaterialRegister {
         }
 
         for (TraitDef trait : def.traits) {
-            if (!isTraitEnabled(trait.configKey)) {
+            if (trait.trait == null || !isTraitEnabled(trait.trait.getIdentifier())) {
                 continue;
             }
             if (trait.partTypes.length == 0) {
@@ -312,20 +312,18 @@ public class MaterialRegister {
             return this;
         }
 
-        MaterialDef trait(ITrait trait, String configKey, String... partTypes) {
-            this.traits.add(new TraitDef(trait, configKey, partTypes));
+        MaterialDef trait(ITrait trait, String... partTypes) {
+            this.traits.add(new TraitDef(trait, partTypes));
             return this;
         }
     }
 
     private static final class TraitDef {
         final ITrait trait;
-        final String configKey;
         final String[] partTypes;
 
-        TraitDef(ITrait trait, String configKey, String... partTypes) {
+        TraitDef(ITrait trait, String... partTypes) {
             this.trait = trait;
-            this.configKey = configKey;
             this.partTypes = partTypes;
         }
     }

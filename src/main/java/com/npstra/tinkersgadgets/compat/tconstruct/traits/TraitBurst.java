@@ -15,8 +15,10 @@ public class TraitBurst extends AbstractTrait {
     private static final float SPLASH_RADIUS = 1.5f;
     private static final float SPLASH_DAMAGE_RATIO = 0.25f;
 
+    public static final String ID = "burst_heatraygun";
+
     public TraitBurst() {
-        super("burst_heatraygun", TextFormatting.GRAY);
+        super(ID, TextFormatting.GRAY);
     }
 
     @Override

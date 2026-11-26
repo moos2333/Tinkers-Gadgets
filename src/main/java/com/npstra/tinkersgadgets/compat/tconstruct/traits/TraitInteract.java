@@ -11,8 +11,10 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 
 public class TraitInteract extends ProjectileModifierTrait implements IBoomerangTrait {
 
+    public static final String ID = "interact_boomerang";
+
     public TraitInteract() {
-        super("interact_boomerang", 0xCC0000);
+        super(ID, 0xCC0000);
         addAspects(ModifierAspect.projectileOnly);
     }
 

@@ -17,8 +17,10 @@ public class TraitBouncing extends ProjectileModifierTrait implements IBoomerang
     private static final int BOUNCE_COUNT = 3;
     private static final float DECAY_PER_BOUNCE = 0.25F;
 
+    public static final String ID = "bouncing_boomerang";
+
     public TraitBouncing() {
-        super("bouncing_boomerang", 0x32CD32);
+        super(ID, 0x32CD32);
         addAspects(ModifierAspect.projectileOnly);
     }
 

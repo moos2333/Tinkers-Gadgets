@@ -15,8 +15,10 @@ public class TraitSeasoned extends AbstractTrait {
     private static final float CHANCE_PER_STACK = 0.01f;
     private static final int DECAY_INTERVAL = 100;
 
+    public static final String ID = "seasoned_chainblade";
+
     public TraitSeasoned() {
-        super("seasoned_chainblade", 0xCCCCCC);
+        super(ID, 0xCCCCCC);
     }
 
     @Override

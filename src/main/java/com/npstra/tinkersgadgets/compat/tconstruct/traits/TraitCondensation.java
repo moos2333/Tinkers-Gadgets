@@ -13,8 +13,10 @@ public class TraitCondensation extends AbstractTrait {
     private static final String TAG_LAST_COOLDOWN = "condensation_last_cooldown";
     private static final int COOLDOWN_INTERVAL = 100;
 
+    public static final String ID = "condensation_heatraygun";
+
     public TraitCondensation() {
-        super("condensation_heatraygun", TextFormatting.AQUA);
+        super(ID, TextFormatting.AQUA);
     }
 
     @Override

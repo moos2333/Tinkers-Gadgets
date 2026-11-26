@@ -16,8 +16,10 @@ public class TraitPressurized extends AbstractTrait {
     private static final String TAG_MAX_FUEL = "maxFuel";
     private static final String TAG_FUEL = "Fuel";
 
+    public static final String ID = "pressurized_heatraygun";
+
     public TraitPressurized() {
-        super("pressurized_heatraygun", TextFormatting.AQUA);
+        super(ID, TextFormatting.AQUA);
     }
 
     @Override

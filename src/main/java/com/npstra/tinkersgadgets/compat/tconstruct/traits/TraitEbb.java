@@ -12,8 +12,10 @@ public class TraitEbb extends AbstractTrait {
     private static final String TAG_CHARGE = "chain_charge";
     private static final float BONUS_PER_MISSING = 0.01f;
 
+    public static final String ID = "ebb_chainblade";
+
     public TraitEbb() {
-        super("ebb_chainblade", 0x2B4C8C);
+        super(ID, 0x2B4C8C);
     }
 
     @Override

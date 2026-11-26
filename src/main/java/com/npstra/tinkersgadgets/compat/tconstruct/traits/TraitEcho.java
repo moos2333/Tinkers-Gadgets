@@ -18,8 +18,10 @@ public class TraitEcho extends AbstractTrait {
     private static final int MAX_STACKS = 5;
     private static final float ECHO_DAMAGE_RATIO = 0.2f;
 
+    public static final String ID = "echo_throwingknife";
+
     public TraitEcho() {
-        super("echo_throwingknife", TextFormatting.LIGHT_PURPLE);
+        super(ID, TextFormatting.LIGHT_PURPLE);
     }
 
     @Override

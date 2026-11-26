@@ -19,8 +19,10 @@ public class TraitKinetic extends AbstractProjectileTrait {
     private static final String KEY_STACKS = "kinetic_stacks";
     private static final String KEY_LAST_HIT = "kinetic_last_hit";
 
+    public static final String ID = "kinetic_boomerang";
+
     public TraitKinetic() {
-        super("kinetic_boomerang", 0xF5E66C);
+        super(ID, 0xF5E66C);
     }
 
     @Override

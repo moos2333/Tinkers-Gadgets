@@ -6,8 +6,10 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 
 public class TraitPulse extends AbstractTrait {
 
+    public static final String ID = "pulse_throwingknife";
+
     public TraitPulse() {
-        super("pulse_throwingknife", 0xCC0000);
+        super(ID, 0xCC0000);
     }
 
     @Override

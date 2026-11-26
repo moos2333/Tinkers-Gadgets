@@ -11,8 +11,10 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityBoomerang;
 
 public class TraitFracture extends ProjectileModifierTrait implements IBoomerangTrait {
 
+    public static final String ID = "fracture_boomerang";
+
     public TraitFracture() {
-        super("fracture_boomerang", 0xAAAAAA);
+        super(ID, 0xAAAAAA);
         addAspects(ModifierAspect.projectileOnly);
     }
 

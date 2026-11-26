@@ -27,8 +27,10 @@ public class TraitConduction extends AbstractTrait {
     private static final String TAG_SHOT_COUNT = "ShotCount";
     private static final String TAG_OVERHEAT_END = "OverheatEndTick";
 
+    public static final String ID = "conduction_heatraygun";
+
     public TraitConduction() {
-        super("conduction_heatraygun", TextFormatting.GOLD);
+        super(ID, TextFormatting.GOLD);
     }
 
     @Override

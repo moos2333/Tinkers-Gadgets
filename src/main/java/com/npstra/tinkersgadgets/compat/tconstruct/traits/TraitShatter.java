@@ -27,8 +27,10 @@ public class TraitShatter extends ProjectileModifierTrait implements IBoomerangT
     private ModLuck cachedLuckModifier;
     private boolean luckResolved;
 
+    public static final String ID = "shatter_boomerang";
+
     public TraitShatter() {
-        super("shatter_boomerang", 0xAAAAAA);
+        super(ID, 0xAAAAAA);
         addAspects(ModifierAspect.projectileOnly);
     }
 

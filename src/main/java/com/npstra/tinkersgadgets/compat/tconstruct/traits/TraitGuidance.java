@@ -18,8 +18,10 @@ public class TraitGuidance extends ProjectileModifierTrait {
     private static final double MAX_RANGE = 12.0;
     private static final double HOMING_STRENGTH = 0.05;
 
+    public static final String ID = "guidance_throwingknife";
+
     public TraitGuidance() {
-        super("guidance_throwingknife", 0x0A6E6E);
+        super(ID, 0x0A6E6E);
         addAspects(ModifierAspect.projectileOnly);
     }
 

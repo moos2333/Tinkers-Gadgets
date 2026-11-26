@@ -14,8 +14,10 @@ public class TraitPiercing extends ProjectileModifierTrait implements IBoomerang
 
     private static final int PIERCE_COUNT = 10;
 
+    public static final String ID = "boomerang_piercing";
+
     public TraitPiercing() {
-        super("boomerang_piercing", 0x8B0000);
+        super(ID, 0x8B0000);
         addAspects(ModifierAspect.projectileOnly);
     }
 

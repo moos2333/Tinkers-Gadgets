@@ -13,8 +13,10 @@ import com.npstra.tinkersgadgets.compat.tconstruct.entity.EntityThrowingKnife;
 
 public class TraitRebound extends ProjectileModifierTrait {
 
+    public static final String ID = "rebound_throwingknife";
+
     public TraitRebound() {
-        super("rebound_throwingknife", 0xBFB5B5);
+        super(ID, 0xBFB5B5);
         addAspects(ModifierAspect.projectileOnly);
     }
 

@@ -9,8 +9,10 @@ public class TraitSniping extends AbstractTrait {
     private static final float BONUS_PER_BLOCK = 0.025f;
     private static final float MAX_BONUS = 0.50f;
 
+    public static final String ID = "sniping_throwingknife";
+
     public TraitSniping() {
-        super("sniping_throwingknife", TextFormatting.AQUA);
+        super(ID, TextFormatting.AQUA);
     }
 
     @Override

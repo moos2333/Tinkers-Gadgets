@@ -18,8 +18,10 @@ public class TraitDeflect extends ProjectileModifierTrait implements IBoomerangT
     private static final double DEFLECT_MULTIPLIER_Y = -0.5D;
     private static final double SEARCH_RADIUS = 1.5D;
 
+    public static final String ID = "deflect_boomerang";
+
     public TraitDeflect() {
-        super("deflect_boomerang", 0x5BC7FF);
+        super(ID, 0x5BC7FF);
         addAspects(ModifierAspect.projectileOnly);
     }
 

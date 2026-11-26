@@ -14,8 +14,10 @@ public class TraitVortex extends AbstractTrait {
     private static final double PULL_STRENGTH = 0.4D;
     private static final double MIN_DISTANCE = 0.1D;
 
+    public static final String ID = "vortex_throwingknife";
+
     public TraitVortex() {
-        super("vortex_throwingknife", 0x5FCDCD);
+        super(ID, 0x5FCDCD);
     }
 
     @Override

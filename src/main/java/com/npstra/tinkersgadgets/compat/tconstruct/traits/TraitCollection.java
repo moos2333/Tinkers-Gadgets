@@ -13,8 +13,10 @@ import slimeknights.tconstruct.library.modifiers.ProjectileModifierTrait;
 public class TraitCollection extends ProjectileModifierTrait {
     private static final int MAX_PASSENGERS = 20;
 
+    public static final String ID = "collection_boomerang";
+
     public TraitCollection() {
-        super("collection_boomerang", 0x8B6B4D);
+        super(ID, 0x8B6B4D);
         addAspects(ModifierAspect.projectileOnly);
     }
 

@@ -7,6 +7,7 @@ This project adheres to the [KeepAChangelog Convention](https://keepachangelog.c
 
 ### Changed
 - When another Tinkers' addon already registers a material with the same ID, its material is now adopted instead of being dropped: the mod's part stats and traits are grafted onto the existing material, so this mod's parts stay available alongside it.
+- The `disabledTraits` config option now prevents the listed traits from being registered at all instead of merely withholding them from materials. Behavior for worlds and existing tools is unchanged.
 
 ## [0.7.1] - 2026-11-25
 

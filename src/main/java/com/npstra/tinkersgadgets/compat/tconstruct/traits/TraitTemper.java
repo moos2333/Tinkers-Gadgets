@@ -13,8 +13,10 @@ import slimeknights.tconstruct.library.utils.TinkerUtil;
 public class TraitTemper extends AbstractTrait {
     private static final String TAG_TEMPER_READY = "temper_ready";
 
+    public static final String ID = "temper_heatraygun";
+
     public TraitTemper() {
-        super("temper_heatraygun", TextFormatting.GOLD);
+        super(ID, TextFormatting.GOLD);
     }
 
     @Override
