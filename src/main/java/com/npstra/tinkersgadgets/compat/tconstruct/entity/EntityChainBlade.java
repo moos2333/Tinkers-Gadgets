@@ -12,7 +12,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.utils.TagUtil;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.ChainBlade;
@@ -23,8 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class EntityChainBlade extends EntityProjectileBase implements IEntityAdditionalSpawnData {
+public class EntityChainBlade extends EntityProjectileBase {
     private static final int MAX_ALIVE = 120;
+    private static final int RETURN_TIMEOUT = 200;
     private static final double GRAVITY = 0.065D;
     private static final double MAX_RETURN_SPEED = 3.5D;
     private static final float PULL_STRENGTH_HIT = 0.5f;
@@ -152,6 +152,10 @@ public class EntityChainBlade extends EntityProjectileBase implements IEntityAdd
             returning = true;
         }
         if (returning) {
+            if (ticksExisted > MAX_ALIVE + RETURN_TIMEOUT) {
+                setDead();
+                return;
+            }
             if (shooter != null && shooter.isEntityAlive()) {
                 returnToShooter();
                 if (isDead) return;

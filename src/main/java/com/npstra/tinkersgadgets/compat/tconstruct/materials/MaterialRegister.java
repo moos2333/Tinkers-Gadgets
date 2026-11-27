@@ -77,7 +77,6 @@ public class MaterialRegister {
                     .stat(new ChainMaterialStats(1, 1.5f, 0, 1.0f, -0.01f))
                     .stat(new GunBarrelMaterialStats(-1, 0.9f, 0))
                     .trait(TraitsRegistry.INTERACT)
-                    .trait(TraitsRegistry.INTERACT, CONNECTOR)
                     .trait(TraitsRegistry.PULSE, GRIP, HEAT_RAY_EMITTER, CHAIN, CONNECTOR, GUN_BARREL)
                     .trait(TraitsRegistry.BURST, FUEL_TANK, GUN_BARREL),
 
@@ -191,8 +190,8 @@ public class MaterialRegister {
 
         Material.UNKNOWN.addStats(new ConnectorMaterialStats());
         Material.UNKNOWN.addStats(new GripMaterialStats());
-        Material.UNKNOWN.addStats(new FuelTankMaterialStats(0, 0, 1.0f));
-        Material.UNKNOWN.addStats(new HeatRayEmitterMaterialStats(1.5f, 1.0f));
+        Material.UNKNOWN.addStats(FuelTankMaterialStats.UNKNOWN);
+        Material.UNKNOWN.addStats(HeatRayEmitterMaterialStats.UNKNOWN);
         Material.UNKNOWN.addStats(ChainMaterialStats.UNKNOWN);
         Material.UNKNOWN.addStats(GunBarrelMaterialStats.UNKNOWN);
 
@@ -239,17 +238,16 @@ public class MaterialRegister {
             if (!isMaterialEnabled(def.id)) {
                 return;
             }
-            mat = new Material(def.id, def.color, false);
-            mat.setCraftable(true).setCastable(false);
-            TinkerRegistry.addMaterial(mat);
-
-            Material existing = TinkerRegistry.getMaterial(def.id);
-            if (existing != mat) {
-                if (existing == Material.UNKNOWN) {
+            mat = TinkerRegistry.getMaterial(def.id);
+            if (mat != Material.UNKNOWN) {
+                grafted = true;
+            } else {
+                mat = new Material(def.id, def.color, false);
+                mat.setCraftable(true).setCastable(false);
+                TinkerRegistry.addMaterial(mat);
+                if (TinkerRegistry.getMaterial(def.id) != mat) {
                     return;
                 }
-                mat = existing;
-                grafted = true;
             }
         }
 
@@ -274,9 +272,6 @@ public class MaterialRegister {
         }
 
         if (!def.isPatch()) {
-            if (!grafted) {
-                mat.setVisible();
-            }
             def.material = mat;
             def.grafted = grafted;
         }

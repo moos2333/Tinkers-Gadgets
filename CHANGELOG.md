@@ -3,7 +3,12 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
-## [0.7.2] - Unreleased
+## [0.7.3] - Unreleased
+
+### Fixed
+- A boomerang shard or chain blade whose way back was permanently blocked (wall, piston, sealed room) could linger forever, silently blocking that tool's next throw. Returning projectiles now give up after a generous grace period; chain blades refund their accumulated combo charge on despawn and the weapon itself never leaves the player's inventory.
+
+## [0.7.2] - 2026-11-27
 
 ### Changed
 - When another Tinkers' addon already registers a material with the same ID, its material is now adopted instead of being dropped: the mod's part stats and traits are grafted onto the existing material, so this mod's parts stay available alongside it.

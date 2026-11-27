@@ -41,6 +41,7 @@ public class TraitShatter extends ProjectileModifierTrait implements IBoomerangT
         if (luck == null) return;
         int targetLevel = luck.getLuckLevel(tool);
         if (targetLevel <= 0) return;
+        targetLevel = Math.min(targetLevel, Enchantments.FORTUNE.getMaxLevel());
         NBTTagCompound root = TagUtil.getTagSafe(tool);
         if (ToolBuilder.getEnchantmentLevel(root, Enchantments.FORTUNE) >= targetLevel) return;
         while (targetLevel > ToolBuilder.getEnchantmentLevel(root, Enchantments.FORTUNE)) {

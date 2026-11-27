@@ -66,64 +66,37 @@ public class ModCapacity extends ModifierTrait {
     private void applyHeatRayGun(NBTTagCompound toolTag, int points) {
         int levels = points / POINTS_PER_LEVEL;
 
-        int fuelBase;
-        if (toolTag.hasKey(KEY_BASE_FUEL)) {
-            fuelBase = toolTag.getInteger(KEY_BASE_FUEL);
-        } else {
-            fuelBase = toolTag.getInteger(TAG_FUEL);
-            toolTag.setInteger(KEY_BASE_FUEL, fuelBase);
-        }
+        int fuelBase = getOrStoreBase(toolTag, KEY_BASE_FUEL, TAG_FUEL, 0);
         toolTag.setInteger(TAG_FUEL, fuelBase + levels * FUEL_PER_LEVEL);
 
-        int heatBase;
-        if (toolTag.hasKey(KEY_BASE_HEAT)) {
-            heatBase = toolTag.getInteger(KEY_BASE_HEAT);
-        } else {
-            heatBase = toolTag.getInteger(TAG_HEAT);
-            toolTag.setInteger(KEY_BASE_HEAT, heatBase);
-        }
+        int heatBase = getOrStoreBase(toolTag, KEY_BASE_HEAT, TAG_HEAT, 0);
         toolTag.setInteger(TAG_HEAT, heatBase + levels * HEAT_PER_LEVEL);
     }
 
     private void applyPistolSword(NBTTagCompound toolTag, int points) {
-        int base;
-        if (toolTag.hasKey(KEY_BASE_AMMO)) {
-            base = toolTag.getInteger(KEY_BASE_AMMO);
-        } else {
-            base = toolTag.hasKey(PistolSword.KEY_MAX_AMMO)
-                    ? toolTag.getInteger(PistolSword.KEY_MAX_AMMO)
-                    : PistolSword.BASE_CAPACITY;
-            toolTag.setInteger(KEY_BASE_AMMO, base);
-        }
+        int base = getOrStoreBase(toolTag, KEY_BASE_AMMO, PistolSword.KEY_MAX_AMMO, PistolSword.BASE_CAPACITY);
         int levels = points / POINTS_PER_LEVEL;
         toolTag.setInteger(PistolSword.KEY_MAX_AMMO, base + levels * AMMO_PER_LEVEL);
     }
 
     private void applyChainBlade(NBTTagCompound toolTag, int points) {
-        int base;
-        if (toolTag.hasKey(KEY_BASE_CHARGE)) {
-            base = toolTag.getInteger(KEY_BASE_CHARGE);
-        } else {
-            base = toolTag.hasKey(ChainBlade.KEY_MAX_CHARGE)
-                    ? toolTag.getInteger(ChainBlade.KEY_MAX_CHARGE)
-                    : ChainBlade.MAX_CHARGE;
-            toolTag.setInteger(KEY_BASE_CHARGE, base);
-        }
+        int base = getOrStoreBase(toolTag, KEY_BASE_CHARGE, ChainBlade.KEY_MAX_CHARGE, ChainBlade.MAX_CHARGE);
         int levels = points / POINTS_PER_LEVEL;
         toolTag.setInteger(ChainBlade.KEY_MAX_CHARGE, base + levels * CHARGE_PER_LEVEL);
     }
 
     private void applyBoomerang(NBTTagCompound toolTag, int points) {
-        int base;
-        if (toolTag.hasKey(KEY_BASE_BOOMERANG)) {
-            base = toolTag.getInteger(KEY_BASE_BOOMERANG);
-        } else {
-            base = toolTag.hasKey(Boomerang.KEY_MAX_ACTIVE)
-                    ? toolTag.getInteger(Boomerang.KEY_MAX_ACTIVE)
-                    : 1;
-            toolTag.setInteger(KEY_BASE_BOOMERANG, base);
-        }
+        int base = getOrStoreBase(toolTag, KEY_BASE_BOOMERANG, Boomerang.KEY_MAX_ACTIVE, 1);
         int levels = points / POINTS_PER_LEVEL;
         toolTag.setInteger(Boomerang.KEY_MAX_ACTIVE, base + levels * BOOMERANG_PER_LEVEL);
+    }
+
+    private static int getOrStoreBase(NBTTagCompound toolTag, String baseKey, String targetKey, int fallback) {
+        if (toolTag.hasKey(baseKey)) {
+            return toolTag.getInteger(baseKey);
+        }
+        int base = toolTag.hasKey(targetKey) ? toolTag.getInteger(targetKey) : fallback;
+        toolTag.setInteger(baseKey, base);
+        return base;
     }
 }

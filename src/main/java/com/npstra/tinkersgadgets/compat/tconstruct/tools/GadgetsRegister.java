@@ -131,14 +131,6 @@ public class GadgetsRegister {
         }
     }
 
-    /**
-     * Shapeless: a book plus a Connector of any material becomes the guide book.
-     *
-     * <p>Registered in code rather than as a JSON recipe on purpose: the Connector only exists while
-     * the Boomerang is enabled, and a JSON recipe pointing at a missing item would fail to load. NBT
-     * takes no part in ingredient matching, so every material's Connector fits the same single
-     * recipe.</p>
-     */
     @SubscribeEvent
     public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         if (gadgetBook == null || connector == null) {

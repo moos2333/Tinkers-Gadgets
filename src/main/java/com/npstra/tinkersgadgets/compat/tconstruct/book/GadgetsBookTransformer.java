@@ -39,26 +39,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Fills the addon book's sections from the live Tinkers' registries, so pages always match the
- * current config (disabled tools/parts/modifiers simply do not show up) without duplicating any JSON.
- *
- * <p>Every page type used here is public API of Tinkers' Construct / Mantle, which is what keeps this
- * non-invasive: nothing in Tinkers' Construct is modified, only read.</p>
- */
 @SideOnly(Side.CLIENT)
 public class GadgetsBookTransformer extends BookTransformer {
 
     private static final String PKG = "com.npstra.tinkersgadgets.compat.tconstruct";
 
-    /**
-     * Book language files keep their line breaks as the two characters "\n" (the same convention the
-     * mod's normal lang files use); depending on how the file was read they may also arrive as real
-     * newlines, so both are accepted.
-     */
     private static final String LINE_BREAK = "\\\\n|\\r?\\n";
 
-    /** Stat / part identifiers in reading order, grouped by the tool that uses them. */
     private static final List<String> PART_STAT_ORDER = Arrays.asList(
             "connector", "grip", "fuel_tank", "heat_ray_emitter", "chain", "gun_barrel");
 
@@ -68,8 +55,6 @@ public class GadgetsBookTransformer extends BookTransformer {
         buildModifiers(book);
         buildMaterials(book);
     }
-
-    /* ------------------------------------------------------------------ tools */
 
     private void buildTools(BookData book) {
         SectionData section = findSection(book, "tools");
@@ -99,7 +84,7 @@ public class GadgetsBookTransformer extends BookTransformer {
         }
     }
 
-    /** "Clasp x1", "Knife Blade x2" - derived from the tool's own build components. */
+    
     private String[] partProperties(ToolCore tool) {
         Map<String, Integer> counts = new LinkedHashMap<>();
         for (PartMaterialType component : tool.getToolBuildComponents()) {
@@ -128,8 +113,6 @@ public class GadgetsBookTransformer extends BookTransformer {
         return stack.isEmpty() ? "" : stack.getDisplayName();
     }
 
-    /* -------------------------------------------------------------- modifiers */
-
     private void buildModifiers(BookData book) {
         SectionData section = findSection(book, "modifiers");
         if (section == null) {
@@ -156,8 +139,6 @@ public class GadgetsBookTransformer extends BookTransformer {
         for (IModifier modifier : modifiers) {
             ContentModifier content = new ContentModifier(modifier);
 
-            // Book prose/effects live in the book's language.lang so they can follow the book's voice;
-            // the tooltip description is only the fallback for languages that have not been written yet.
             List<String> lines = descLines(modifier);
             content.text = prose(book, "modifiers." + modifier.getIdentifier() + ".text",
                     lines.isEmpty() ? null : lines.get(0));
@@ -171,8 +152,6 @@ public class GadgetsBookTransformer extends BookTransformer {
             listing.addEntry(modifier.getLocalizedName(), page);
         }
     }
-
-    /* -------------------------------------------------------------- materials */
 
     private void buildMaterials(BookData book) {
         SectionData section = findSection(book, "materials");
@@ -209,8 +188,6 @@ public class GadgetsBookTransformer extends BookTransformer {
                     ? book.translate("materials." + stat)
                     : template.getLocalizedName();
 
-            // Overview pages with the material icons, exactly like the arrow shaft / bow pages. The
-            // helper already creates and appends the pages it needs, so they must not be added again.
             int pagesBefore = section.pages.size();
             List<ContentPageIconList> overviews =
                     ContentPageIconList.getPagesNeededForItemCount(materials.size(), section, stat);
@@ -225,7 +202,6 @@ public class GadgetsBookTransformer extends BookTransformer {
                 }
             }
 
-            // Three materials per page, stat lines on the left and traits on the right.
             Map<Material, PageData> pages = new LinkedHashMap<>();
             int index = 0;
             for (List<Material> group : Lists.partition(materials, 3)) {
@@ -254,14 +230,12 @@ public class GadgetsBookTransformer extends BookTransformer {
         }
     }
 
-    /* ----------------------------------------------------------------- helpers */
-
     private static boolean isOurs(ToolCore tool) {
         return tool.getRegistryName() != null
                 && TinkersGadgets.MOD_ID.equals(tool.getRegistryName().getNamespace());
     }
 
-    /** True if a registered part with that stat actually accepts the material. */
+    
     private static boolean isUsable(String stat, Material material) {
         for (IToolPart part : TinkerRegistry.getToolParts()) {
             if (part.hasUseForStat(stat) && part.canUseMaterial(material)) {
@@ -282,10 +256,6 @@ public class GadgetsBookTransformer extends BookTransformer {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Reads book-only prose from the book's language.lang. Newlines are written as the two characters
-     * "\n" (the same convention as the mod's normal lang files), so they are split back here.
-     */
     private static TextData[] text(BookData book, String key) {
         String raw = book.strings.get(key);
         if (raw == null || raw.isEmpty()) {
@@ -294,10 +264,6 @@ public class GadgetsBookTransformer extends BookTransformer {
         return lines(raw.split(LINE_BREAK));
     }
 
-    /**
-     * Page prose. Prefers the hand-written book text and only falls back to the modifier's own
-     * tooltip description for languages whose book text has not been written yet.
-     */
     private static TextData[] prose(BookData book, String key, String fallback) {
         TextData[] written = text(book, key);
         if (written.length > 0) {
@@ -309,10 +275,6 @@ public class GadgetsBookTransformer extends BookTransformer {
         return lines(fallback.split("\n"));
     }
 
-    /**
-     * The "Effects" bullet list. Prefers the book's own bullet lines; otherwise borrows the second and
-     * following lines of the tooltip, which is where the descriptions keep their per-effect lines.
-     */
     private static String[] bullets(BookData book, String key, List<String> fallback) {
         String raw = book.strings.get(key);
         if (raw != null && !raw.isEmpty()) {

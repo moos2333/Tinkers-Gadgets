@@ -18,11 +18,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * The guide book of this addon. It is deliberately a plain item: everything book related lives in
- * client-only code, handed off through the proxy, so the dedicated server never touches Mantle's
- * book GUI classes.
- */
 public class ItemGadgetsBook extends Item {
 
     public ItemGadgetsBook() {

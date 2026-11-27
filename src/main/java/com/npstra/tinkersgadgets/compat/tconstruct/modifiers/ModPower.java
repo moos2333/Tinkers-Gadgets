@@ -43,16 +43,16 @@ public class ModPower extends ModifierTrait {
         ModifierNBT.IntegerNBT modData = ModifierNBT.readInteger(modifierTag);
         NBTTagCompound toolTag = TagUtil.getToolTag(rootCompound);
         if (toolTag.hasKey(TAG_POWER)) {
-            applyMultiplicative(toolTag, modData.current, KEY_BASE, TAG_POWER, PER_LEVEL);
+            apply(toolTag, modData.current, KEY_BASE, TAG_POWER, PER_LEVEL, true);
         } else if (toolTag.hasKey(TAG_COMBO)) {
-            applyAdditive(toolTag, modData.current, KEY_BASE_COMBO, TAG_COMBO, CHAIN_PER_LEVEL);
+            apply(toolTag, modData.current, KEY_BASE_COMBO, TAG_COMBO, CHAIN_PER_LEVEL, false);
         } else if (toolTag.hasKey(TAG_PISTOL)) {
-            applyMultiplicative(toolTag, modData.current, KEY_BASE_PISTOL, TAG_PISTOL, PER_LEVEL);
+            apply(toolTag, modData.current, KEY_BASE_PISTOL, TAG_PISTOL, PER_LEVEL, true);
         }
         TagUtil.setToolTag(rootCompound, toolTag);
     }
 
-    private void applyMultiplicative(NBTTagCompound toolTag, int points, String baseKey, String targetKey, float perLevel) {
+    private void apply(NBTTagCompound toolTag, int points, String baseKey, String targetKey, float perLevel, boolean multiplicative) {
         float base;
         if (toolTag.hasKey(baseKey)) {
             base = toolTag.getFloat(baseKey);
@@ -61,18 +61,9 @@ public class ModPower extends ModifierTrait {
             toolTag.setFloat(baseKey, base);
         }
         float perPoint = perLevel / POINTS_PER_LEVEL;
-        toolTag.setFloat(targetKey, base * (1.0f + points * perPoint));
-    }
-
-    private void applyAdditive(NBTTagCompound toolTag, int points, String baseKey, String targetKey, float perLevel) {
-        float base;
-        if (toolTag.hasKey(baseKey)) {
-            base = toolTag.getFloat(baseKey);
-        } else {
-            base = toolTag.getFloat(targetKey);
-            toolTag.setFloat(baseKey, base);
-        }
-        float perPoint = perLevel / POINTS_PER_LEVEL;
-        toolTag.setFloat(targetKey, base + points * perPoint);
+        float value = multiplicative
+                ? base * (1.0f + points * perPoint)
+                : base + points * perPoint;
+        toolTag.setFloat(targetKey, value);
     }
 }

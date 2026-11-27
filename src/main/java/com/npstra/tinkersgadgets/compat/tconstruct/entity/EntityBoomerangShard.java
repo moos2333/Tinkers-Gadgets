@@ -12,7 +12,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import com.npstra.tinkersgadgets.compat.tconstruct.tools.Boomerang;
 
@@ -21,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class EntityBoomerangShard extends EntityProjectileBase implements IEntityAdditionalSpawnData {
+public class EntityBoomerangShard extends EntityProjectileBase {
 
     private static final int MAX_ALIVE = 300;
     private static final double BASE_RETURN_SPEED = 0.4D;
@@ -34,6 +33,7 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
     private static final double STUCK_SPEED_THRESHOLD = 0.1D;
     private static final double STUCK_DIST_THRESHOLD = 2.0D;
     private static final int STUCK_TIMEOUT = 60;
+    private static final int RETURN_TIMEOUT = 100;
     private static final double RETURN_DIST_THRESHOLD = 1.2D;
     private static final double RETURN_SPEED_MULTIPLIER = 0.5D;
     private static final double PIERCING_SPEED_REDUCTION = 0.95D;
@@ -128,6 +128,11 @@ public class EntityBoomerangShard extends EntityProjectileBase implements IEntit
 
         if (ticksExisted > MAX_ALIVE) {
             returning = true;
+        }
+
+        if (returning && ticksExisted > MAX_ALIVE + RETURN_TIMEOUT) {
+            setDead();
+            return;
         }
 
         double currentSpeed = getCurrentSpeed();

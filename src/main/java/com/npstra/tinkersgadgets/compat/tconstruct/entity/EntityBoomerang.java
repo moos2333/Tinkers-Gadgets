@@ -55,7 +55,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     private static final float REFUND_CHANCE_PER_LEVEL = 0.25f;
 
     private boolean returning;
-    private EntityPlayer associatedPlayer;
     private boolean split;
     private double totalDistanceTraveled;
     private double initialSpeed;
@@ -85,7 +84,6 @@ public class EntityBoomerang extends EntityProjectileBase {
         this.initialSpeed = speed;
     }
 
-    public void setAssociatedPlayer(EntityPlayer player) { associatedPlayer = player; }
     public void setPiercing(boolean piercing) { this.piercing = piercing; }
     public void setPierceCount(int count) { this.pierceCount = count; }
     public void setBounceCount(int count) {
@@ -108,15 +106,6 @@ public class EntityBoomerang extends EntityProjectileBase {
     public void markInteracted() { this.interactUsed = true; }
     public EntityPlayer getShooterPlayer() {
         return shootingEntity instanceof EntityPlayer ? (EntityPlayer) shootingEntity : null;
-    }
-    public EntityLivingBase getShooterLiving() {
-        return shootingEntity instanceof EntityLivingBase ? (EntityLivingBase) shootingEntity : null;
-    }
-    public boolean hasHitEntity(Entity entity) {
-        return hitEntities.contains(entity.getUniqueID());
-    }
-    public void markHitEntity(Entity entity) {
-        hitEntities.add(entity.getUniqueID());
     }
 
     private List<IBoomerangTrait> getBoomerangTraits() {

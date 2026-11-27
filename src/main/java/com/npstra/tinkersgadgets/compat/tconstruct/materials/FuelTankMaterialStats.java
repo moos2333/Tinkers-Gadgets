@@ -24,24 +24,28 @@ public class FuelTankMaterialStats extends AbstractMaterialStats {
     @Override
     public List<String> getLocalizedInfo() {
         int effPercent = (int)((efficiency - 1.0f) * 100);
-        String effColor;
-        String effSign;
-        if (effPercent > 0) {
-            effColor = TextFormatting.GREEN.toString();
-            effSign = "+";
-        } else if (effPercent < 0) {
-            effColor = TextFormatting.RED.toString();
-            effSign = "";
-        } else {
-            effColor = TextFormatting.GRAY.toString();
-            effSign = "+";
-        }
 
         return ImmutableList.of(
                 TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.max_fuel.name", TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET),
                 TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.heat_capacity.name", TextFormatting.GOLD + String.valueOf(heatCapacity) + TextFormatting.RESET),
-                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.efficiency.name", effColor + effSign + effPercent + "%" + TextFormatting.RESET)
+                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.efficiency.name", percentPart(effPercent) + TextFormatting.RESET)
         );
+    }
+
+    private static String percentPart(int percent) {
+        String color;
+        String sign;
+        if (percent > 0) {
+            color = TextFormatting.GREEN.toString();
+            sign = "+";
+        } else if (percent < 0) {
+            color = TextFormatting.RED.toString();
+            sign = "";
+        } else {
+            color = TextFormatting.GRAY.toString();
+            sign = "+";
+        }
+        return color + sign + percent + "%";
     }
 
     @Override

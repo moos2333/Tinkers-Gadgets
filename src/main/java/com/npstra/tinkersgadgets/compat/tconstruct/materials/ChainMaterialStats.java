@@ -25,22 +25,11 @@ public class ChainMaterialStats extends AbstractMaterialStats {
         this.comboBonus = Math.max(-0.09f, Math.min(0.1f, comboBonus));
     }
 
-    private String formatPercent(float value) {
-        String sign = value >= 0 ? "+" : "-";
-        String percent = String.format("%.0f", Math.abs(value * 100));
-        TextFormatting color;
-        if (value > 0) color = TextFormatting.GREEN;
-        else if (value < 0) color = TextFormatting.RED;
-        else color = TextFormatting.GRAY;
-        return TextFormatting.GRAY + Util.translate("stat.chain.speed_rate.name") + " " +
-                color + sign + percent + "%" + TextFormatting.RESET;
-    }
-
-    private String formatComboBonus(float value) {
+    private String formatPercent(String locKey, float value) {
         String sign = value >= 0 ? "+" : "-";
         String percent = String.format("%.0f", Math.abs(value * 100));
         TextFormatting color = value > 0 ? TextFormatting.GREEN : (value < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        return TextFormatting.GRAY + Util.translate("stat.chain.combo_bonus.name") + " " +
+        return TextFormatting.GRAY + Util.translate(locKey) + " " +
                 color + sign + percent + "%" + TextFormatting.RESET;
     }
 
@@ -49,8 +38,8 @@ public class ChainMaterialStats extends AbstractMaterialStats {
         return ImmutableList.of(
                 TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces,
                 TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m",
-                formatPercent(speedRate),
-                formatComboBonus(comboBonus),
+                formatPercent("stat.chain.speed_rate.name", speedRate),
+                formatPercent("stat.chain.combo_bonus.name", comboBonus),
                 TextFormatting.GRAY + Util.translate("stat.chain.ammo_bonus.name") + " " + TextFormatting.GOLD + "+" + ammoBonus
         );
     }

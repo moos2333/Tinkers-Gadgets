@@ -16,6 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.materials.HeadMaterialStats;
@@ -104,10 +105,9 @@ public class Boomerang extends ProjectileCore {
                 boomerang.setToolId(toolId);
                 boomerang.setConsumedAmmo(usedAmmo);
                 addActiveBoomerang(toolId, boomerang);
-                boomerang.setAssociatedPlayer(player);
             }
             worldIn.spawnEntity(projectile);
-            worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, net.minecraft.util.SoundCategory.PLAYERS, 1.0F, 0.8F + worldIn.rand.nextFloat() * 0.4F);
+            worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0F, 0.8F + worldIn.rand.nextFloat() * 0.4F);
             player.getCooldownTracker().setCooldown(stack.getItem(), getCooldown(stack));
             if (ammoDepleted) {
                 ToolHelper.breakTool(stack, player);
