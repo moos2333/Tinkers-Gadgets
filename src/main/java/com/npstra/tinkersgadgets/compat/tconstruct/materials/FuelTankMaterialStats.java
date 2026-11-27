@@ -26,9 +26,9 @@ public class FuelTankMaterialStats extends AbstractMaterialStats {
         int effPercent = (int)((efficiency - 1.0f) * 100);
 
         return ImmutableList.of(
-                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.max_fuel.name", TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET),
-                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.heat_capacity.name", TextFormatting.GOLD + String.valueOf(heatCapacity) + TextFormatting.RESET),
-                TextFormatting.GRAY + Util.translateFormatted("stat.fuel_tank.efficiency.name", percentPart(effPercent) + TextFormatting.RESET)
+                Util.translateFormatted("stat.fuel_tank.max_fuel.name", TextFormatting.GOLD + String.valueOf(maxFuel) + TextFormatting.RESET),
+                Util.translateFormatted("stat.fuel_tank.heat_capacity.name", TextFormatting.GOLD + String.valueOf(heatCapacity) + TextFormatting.RESET),
+                Util.translateFormatted("stat.fuel_tank.efficiency.name", percentPart(effPercent) + TextFormatting.RESET)
         );
     }
 

@@ -25,8 +25,8 @@ public class HeatRayEmitterMaterialStats extends AbstractMaterialStats {
         int powerPercent = (int)((power - 1.0f) * 100);
 
         return ImmutableList.of(
-                TextFormatting.GRAY + Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", percentPart(chargePercent) + TextFormatting.RESET),
-                TextFormatting.GRAY + Util.translateFormatted("stat.heat_ray_emitter.power.name", percentPart(powerPercent) + TextFormatting.RESET)
+                Util.translateFormatted("stat.heat_ray_emitter.charge_time.name", percentPart(chargePercent) + TextFormatting.RESET),
+                Util.translateFormatted("stat.heat_ray_emitter.power.name", percentPart(powerPercent) + TextFormatting.RESET)
         );
     }
 

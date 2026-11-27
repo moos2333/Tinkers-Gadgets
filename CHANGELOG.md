@@ -5,6 +5,9 @@ This project adheres to the [KeepAChangelog Convention](https://keepachangelog.c
 
 ## [0.7.3] - Unreleased
 
+### Changed
+- Stat tooltips no longer tint their label text gray; labels use the standard text color while value colors are unchanged.
+
 ### Fixed
 - A boomerang shard or chain blade whose way back was permanently blocked (wall, piston, sealed room) could linger forever, silently blocking that tool's next throw. Returning projectiles now give up after a generous grace period; chain blades refund their accumulated combo charge on despawn and the weapon itself never leaves the player's inventory.
 

@@ -29,18 +29,17 @@ public class ChainMaterialStats extends AbstractMaterialStats {
         String sign = value >= 0 ? "+" : "-";
         String percent = String.format("%.0f", Math.abs(value * 100));
         TextFormatting color = value > 0 ? TextFormatting.GREEN : (value < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        return TextFormatting.GRAY + Util.translate(locKey) + " " +
-                color + sign + percent + "%" + TextFormatting.RESET;
+        return Util.translate(locKey) + " " + color + sign + percent + "%" + TextFormatting.RESET;
     }
 
     @Override
     public List<String> getLocalizedInfo() {
         return ImmutableList.of(
-                TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces,
-                TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m",
+                Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces,
+                Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m",
                 formatPercent("stat.chain.speed_rate.name", speedRate),
                 formatPercent("stat.chain.combo_bonus.name", comboBonus),
-                TextFormatting.GRAY + Util.translate("stat.chain.ammo_bonus.name") + " " + TextFormatting.GOLD + "+" + ammoBonus
+                Util.translate("stat.chain.ammo_bonus.name") + " " + TextFormatting.GOLD + "+" + ammoBonus
         );
     }
 

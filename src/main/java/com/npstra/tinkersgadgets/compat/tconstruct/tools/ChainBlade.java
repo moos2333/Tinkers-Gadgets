@@ -362,18 +362,18 @@ public class ChainBlade extends ProjectileCore {
         float speedRate = toolTag.hasKey("speedRate") ? toolTag.getFloat("speedRate") : 0.0f;
         float comboBonus = toolTag.hasKey("comboBonus") ? toolTag.getFloat("comboBonus") : 0.0f;
 
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m");
+        info.add(Util.translate("stat.chain.max_bounces.name") + " " + TextFormatting.GOLD + maxBounces);
+        info.add(Util.translate("stat.chain.bounce_range.name") + " " + TextFormatting.GOLD + String.format("%.1f", bounceRange) + "m");
 
         String speedSign = speedRate >= 0 ? "+" : "-";
         String speedPercent = String.format("%.0f", Math.abs(speedRate * 100));
         TextFormatting speedColor = speedRate > 0 ? TextFormatting.GREEN : (speedRate < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.speed_rate.name") + " " + speedColor + speedSign + speedPercent + "%" + TextFormatting.RESET);
+        info.add(Util.translate("stat.chain.speed_rate.name") + " " + speedColor + speedSign + speedPercent + "%" + TextFormatting.RESET);
 
         String comboSig = comboBonus >= 0 ? "+" : "-";
         String comboPercent = String.format("%.0f", Math.abs(comboBonus * 100));
         TextFormatting comboColor = comboBonus > 0 ? TextFormatting.GREEN : (comboBonus < 0 ? TextFormatting.RED : TextFormatting.GRAY);
-        info.add(TextFormatting.GRAY + Util.translate("stat.chain.combo_bonus.name") + " " + comboColor + comboSig + comboPercent + "%" + TextFormatting.RESET);
+        info.add(Util.translate("stat.chain.combo_bonus.name") + " " + comboColor + comboSig + comboPercent + "%" + TextFormatting.RESET);
 
         if (detailed) {
             int charge = getCharge(stack);

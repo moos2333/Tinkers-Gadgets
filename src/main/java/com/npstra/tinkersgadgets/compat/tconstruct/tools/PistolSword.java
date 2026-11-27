@@ -384,7 +384,7 @@ public class PistolSword extends TinkerToolCore {
         byte[] ammo = getAmmo(stack);
         int capacity = getCapacity(stack);
         StringBuilder sb = new StringBuilder();
-        sb.append(TextFormatting.GRAY).append(Util.translate("stat.pistol_sword.ammo.name"));
+        sb.append(Util.translate("stat.pistol_sword.ammo.name"));
         for (int i = 0; i < capacity; i++) {
             sb.append(i < ammo.length ? colorFor(ammo[i]) : TextFormatting.DARK_GRAY);
             sb.append("▮");
