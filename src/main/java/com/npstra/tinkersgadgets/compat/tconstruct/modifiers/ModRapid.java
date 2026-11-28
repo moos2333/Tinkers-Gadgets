@@ -65,6 +65,6 @@ public class ModRapid extends ModifierTrait {
             bonus += (levelBonus[i] - start) * seg / (float) POINTS_PER_LEVEL;
             remaining -= seg;
         }
-        return Math.min(bonus, 0.99f);
+        return bonus;
     }
 }

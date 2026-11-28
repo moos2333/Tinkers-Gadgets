@@ -16,6 +16,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderBoomerangShard extends Render<EntityBoomerangShard> {
+
+    private static final ItemStack STICK = new ItemStack(Items.STICK);
+
     private final RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
 
     public RenderBoomerangShard(RenderManager renderManager) {
@@ -26,7 +29,7 @@ public class RenderBoomerangShard extends Render<EntityBoomerangShard> {
     public void doRender(EntityBoomerangShard entity, double x, double y, double z, float entityYaw, float partialTicks) {
         ItemStack stack = entity.getArrowStack();
         if (stack.isEmpty()) {
-            stack = new ItemStack(Items.STICK);
+            stack = STICK;
         }
 
         GlStateManager.pushMatrix();

@@ -17,6 +17,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
 
+    private static final ItemStack STICK = new ItemStack(Items.STICK);
+
     private final RenderItem itemRenderer;
 
     public RenderThrowingKnife(RenderManager renderManager) {
@@ -28,7 +30,7 @@ public class RenderThrowingKnife extends Render<EntityThrowingKnife> {
     public void doRender(EntityThrowingKnife entity, double x, double y, double z, float entityYaw, float partialTicks) {
         ItemStack stack = entity.tinkerProjectile.getItemStack();
         if (stack.isEmpty()) {
-            stack = new ItemStack(Items.STICK);
+            stack = STICK;
         }
 
         GlStateManager.pushMatrix();

@@ -23,6 +23,9 @@ import java.nio.FloatBuffer;
 
 @SideOnly(Side.CLIENT)
 public class RenderChainBlade extends Render<EntityChainBlade> {
+
+    private static final ItemStack STICK = new ItemStack(net.minecraft.init.Items.STICK);
+
     private final RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -83,7 +86,7 @@ public class RenderChainBlade extends Render<EntityChainBlade> {
     private void renderTool(EntityChainBlade entity, double x, double y, double z, float partialTicks) {
         ItemStack stack = entity.getArrowStack();
         if (stack.isEmpty()) {
-            stack = new ItemStack(net.minecraft.init.Items.STICK);
+            stack = STICK;
         }
 
         GlStateManager.pushMatrix();

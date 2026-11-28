@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
-import slimeknights.tconstruct.library.materials.MaterialTypes;
-
-public interface ConnectorPartType extends MaterialTypes {
-    String CONNECTOR = "connector";
+public final class ConnectorPartType {
+    public static final String CONNECTOR = "connector";
+    private ConnectorPartType() {}
 }

@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
-import slimeknights.tconstruct.library.materials.MaterialTypes;
-
-public interface HeatRayEmitterPartType extends MaterialTypes {
-    String HEAT_RAY_EMITTER = "heat_ray_emitter";
+public final class HeatRayEmitterPartType {
+    public static final String HEAT_RAY_EMITTER = "heat_ray_emitter";
+    private HeatRayEmitterPartType() {}
 }

@@ -59,7 +59,6 @@ public class GadgetsRegister {
         if (Config.enableBoomerang) {
             connector = new ItemConnector();
             event.getRegistry().register(connector);
-            TinkerRegistry.registerToolPart(connector);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), connector));
 
             boomerang = new Boomerang();
@@ -70,7 +69,6 @@ public class GadgetsRegister {
         if (Config.enableThrowingKnife) {
             grip = new ItemGrip();
             event.getRegistry().register(grip);
-            TinkerRegistry.registerToolPart(grip);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), grip));
 
             throwingKnife = new ThrowingKnife();
@@ -81,12 +79,10 @@ public class GadgetsRegister {
         if (Config.enableHeatRayGun) {
             fuelTank = new ItemFuelTank();
             event.getRegistry().register(fuelTank);
-            TinkerRegistry.registerToolPart(fuelTank);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), fuelTank));
 
             heatRayEmitter = new ItemHeatRayEmitter();
             event.getRegistry().register(heatRayEmitter);
-            TinkerRegistry.registerToolPart(heatRayEmitter);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), heatRayEmitter));
 
             heatRayGun = new HeatRayGun();
@@ -97,7 +93,6 @@ public class GadgetsRegister {
         if (Config.enableChainBlade) {
             chain = new ItemChain();
             event.getRegistry().register(chain);
-            TinkerRegistry.registerToolPart(chain);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), chain));
 
             chainBlade = new ChainBlade();
@@ -108,7 +103,6 @@ public class GadgetsRegister {
         if (Config.enablePistolSword) {
             gunBarrel = new ItemGunBarrel();
             event.getRegistry().register(gunBarrel);
-            TinkerRegistry.registerToolPart(gunBarrel);
             TinkerRegistry.registerStencilTableCrafting(Pattern.setTagForPart(new ItemStack(TinkerTools.pattern), gunBarrel));
 
             pistolSword = new PistolSword();
@@ -167,50 +161,33 @@ public class GadgetsRegister {
         }
 
         if (Config.enableBoomerang) {
-            if (boomerang != null) {
-                ModelRegisterUtil.registerToolModel(boomerang);
-            }
-            if (connector != null) {
-                ModelRegisterUtil.registerPartModel(connector);
-            }
+            registerToolWithPart(boomerang, connector);
         }
 
         if (Config.enableThrowingKnife) {
-            if (grip != null) {
-                ModelRegisterUtil.registerPartModel(grip);
-            }
-            if (throwingKnife != null) {
-                ModelRegisterUtil.registerToolModel(throwingKnife);
-            }
+            registerToolWithPart(throwingKnife, grip);
         }
 
         if (Config.enableHeatRayGun) {
-            if (fuelTank != null) {
-                ModelRegisterUtil.registerPartModel(fuelTank);
-            }
-            if (heatRayEmitter != null) {
-                ModelRegisterUtil.registerPartModel(heatRayEmitter);
-            }
-            if (heatRayGun != null) {
-                ModelRegisterUtil.registerToolModel(heatRayGun);
-            }
+            registerToolWithPart(heatRayGun, fuelTank, heatRayEmitter);
         }
 
         if (Config.enableChainBlade) {
-            if (chain != null) {
-                ModelRegisterUtil.registerPartModel(chain);
-            }
-            if (chainBlade != null) {
-                ModelRegisterUtil.registerToolModel(chainBlade);
-            }
+            registerToolWithPart(chainBlade, chain);
         }
 
         if (Config.enablePistolSword) {
-            if (gunBarrel != null) {
-                ModelRegisterUtil.registerPartModel(gunBarrel);
-            }
-            if (pistolSword != null) {
-                ModelRegisterUtil.registerToolModel(pistolSword);
+            registerToolWithPart(pistolSword, gunBarrel);
+        }
+    }
+
+    private static void registerToolWithPart(ToolCore tool, ToolPart... parts) {
+        if (tool != null) {
+            ModelRegisterUtil.registerToolModel(tool);
+        }
+        for (ToolPart part : parts) {
+            if (part != null) {
+                ModelRegisterUtil.registerPartModel(part);
             }
         }
     }

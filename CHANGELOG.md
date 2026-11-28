@@ -3,7 +3,12 @@
 All notable changes to this mod are documented here.
 This project adheres to the [KeepAChangelog Convention](https://keepachangelog.com/en/1.1.0/).
 
-## [0.7.3] - Unreleased
+## [0.7.4] - Unreleased
+
+### Changed
+- Internal cleanup. No gameplay changes.
+
+## [0.7.3] - 2026-11-27
 
 ### Changed
 - Stat tooltips no longer tint their label text gray; labels use the standard text color while value colors are unchanged.

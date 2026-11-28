@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
-import slimeknights.tconstruct.library.materials.MaterialTypes;
-
-public interface GripPartType extends MaterialTypes {
-    String GRIP = "grip";
+public final class GripPartType {
+    public static final String GRIP = "grip";
+    private GripPartType() {}
 }

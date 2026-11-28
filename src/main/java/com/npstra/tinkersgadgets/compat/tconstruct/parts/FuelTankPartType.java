@@ -1,7 +1,6 @@
 package com.npstra.tinkersgadgets.compat.tconstruct.parts;
 
-import slimeknights.tconstruct.library.materials.MaterialTypes;
-
-public interface FuelTankPartType extends MaterialTypes {
-    String FUEL_TANK = "fuel_tank";
+public final class FuelTankPartType {
+    public static final String FUEL_TANK = "fuel_tank";
+    private FuelTankPartType() {}
 }
